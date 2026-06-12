@@ -16,8 +16,8 @@ export function SetItem({
 }: {
   set: SetLog
   fields: MetricField[]
-  onUpdate: (id: number, fields: MetricField[], v: Values) => Promise<void>
-  onDelete: (id: number) => Promise<void>
+  onUpdate: (values: Values) => Promise<void>
+  onDelete: () => Promise<void>
 }) {
   const [editing, setEditing] = useState(false)
 
@@ -47,7 +47,7 @@ export function SetItem({
           fields={fields}
           initial={initial}
           onSubmit={async (v) => {
-            await onUpdate(set.id, fields, v)
+            await onUpdate(v)
             setEditing(false)
           }}
           onCancel={() => setEditing(false)}
@@ -65,7 +65,7 @@ export function SetItem({
         <Button variant="icon" onClick={() => setEditing(true)} aria-label="Edytuj">
           ✎
         </Button>
-        <Button variant="danger" onClick={() => onDelete(set.id)} aria-label="Usuń">
+        <Button variant="danger" onClick={onDelete} aria-label="Usuń">
           ✕
         </Button>
       </span>

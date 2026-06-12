@@ -51,7 +51,13 @@ export function ExerciseRow({
       {sets.length > 0 && (
         <ul className="mt-2 mb-1 list-none p-0">
           {sets.map((s) => (
-            <SetItem key={s.id} set={s} fields={fields} onUpdate={onUpdate} onDelete={onDelete} />
+            <SetItem
+              key={s.id}
+              set={s}
+              fields={fields}
+              onUpdate={(values) => onUpdate(s.id, fields, values)}
+              onDelete={() => onDelete(s.id)}
+            />
           ))}
         </ul>
       )}
