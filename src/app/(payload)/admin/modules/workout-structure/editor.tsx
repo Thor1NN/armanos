@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useAuth } from '@payloadcms/ui'
 import type { ExerciseCatalogItem, ExerciseRow, Group, Section } from './types'
 import { PROTOCOL_LABEL } from './constants'
 import { exerciseLabel, exerciseMeta, groupLabel } from './utils'
@@ -9,7 +10,6 @@ import { GroupForm } from './components/group-form'
 import { ExerciseForm } from './components/exercise-form'
 
 type Props = {
-  workoutId: number
   sections: Section[]
   initialGroups: Group[]
   initialExerciseRows: ExerciseRow[]
@@ -18,13 +18,13 @@ type Props = {
 }
 
 export function WorkoutStructureEditor({
-  workoutId,
   sections,
   initialGroups,
   initialExerciseRows,
   exerciseCatalog,
   hasLogs = false,
 }: Props) {
+  const { token } = useAuth()
   const [groups, setGroups] = useState<Group[]>(initialGroups)
   const [exerciseRows, setExerciseRows] = useState<ExerciseRow[]>(initialExerciseRows)
   const [addingGroupFor, setAddingGroupFor] = useState<string | null>(null)
@@ -48,7 +48,7 @@ export function WorkoutStructureEditor({
     try {
       const res = await fetch(`/api/workout-groups/${groupId}`, {
         method: 'DELETE',
-        credentials: 'same-origin',
+        headers: { Authorization: `JWT ${token}` },
       })
       if (!res.ok) {
         const data = await res.json()
@@ -67,7 +67,7 @@ export function WorkoutStructureEditor({
     try {
       const res = await fetch(`/api/workout-exercise-rows/${rowId}`, {
         method: 'DELETE',
-        credentials: 'same-origin',
+        headers: { Authorization: `JWT ${token}` },
       })
       if (!res.ok) {
         const data = await res.json()
@@ -106,7 +106,6 @@ export function WorkoutStructureEditor({
                   {editingGroup === group.id ? (
                     <GroupForm
                       sectionRowId={group.sectionRowId ?? undefined}
-                      workoutId={workoutId}
                       nextOrder={group.order ?? 0}
                       initial={group}
                       onSaved={(updated) => {
@@ -230,7 +229,6 @@ export function WorkoutStructureEditor({
               {addingGroupFor === sectionKey ? (
                 <GroupForm
                   sectionRowId={section.id}
-                  workoutId={workoutId}
                   nextOrder={sectionGroups.length}
                   onSaved={(group) => {
                     setGroups((prev) => [...prev, group])

@@ -1,20 +1,22 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useAuth, useDocumentInfo } from '@payloadcms/ui'
 import type { Group } from '../types'
 import { PROTOCOLS } from '../constants'
 import { s } from '../styles'
 
 type Props = {
   sectionRowId: string | undefined
-  workoutId: number
   nextOrder: number
   initial?: Group
   onSaved: (group: Group) => void
   onCancel: () => void
 }
 
-export function GroupForm({ sectionRowId, workoutId, nextOrder, initial, onSaved, onCancel }: Props) {
+export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel }: Props) {
+  const { token } = useAuth()
+  const { id: docId } = useDocumentInfo()
   const isEdit = !!initial
   const [label, setLabel] = useState(initial?.label ?? '')
   const [protocol, setProtocol] = useState(initial?.protocol ?? 'standard')
@@ -40,14 +42,13 @@ export function GroupForm({ sectionRowId, workoutId, nextOrder, initial, onSaved
         workSeconds: workSeconds ? Number(workSeconds) : null,
         restSeconds: restSeconds ? Number(restSeconds) : null,
         restBetweenRounds: restBetweenRounds || null,
-        ...(!isEdit && { workout: workoutId, sectionRowId: sectionRowId ?? '', order: nextOrder }),
+        ...(!isEdit && { workout: docId, sectionRowId: sectionRowId ?? '', order: nextOrder }),
       }
 
       const url = isEdit ? `/api/workout-groups/${initial!.id}` : '/api/workout-groups'
       const res = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
         body: JSON.stringify(body),
       })
       const data = await res.json()

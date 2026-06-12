@@ -95,7 +95,6 @@ export async function WorkoutStructureView({
 
   return (
     <WorkoutStructureEditor
-      workoutId={Number(docId)}
       sections={sections}
       initialGroups={groups}
       initialExerciseRows={exerciseRows}

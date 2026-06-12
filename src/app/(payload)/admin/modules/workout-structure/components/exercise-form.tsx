@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useAuth } from '@payloadcms/ui'
 import type { ExerciseCatalogItem, ExerciseRow } from '../types'
 import { s } from '../styles'
 
@@ -14,6 +15,7 @@ type Props = {
 }
 
 export function ExerciseForm({ groupId, nextOrder, exerciseCatalog, initial, onSaved, onCancel }: Props) {
+  const { token } = useAuth()
   const isEdit = !!initial
   const [exerciseId, setExerciseId] = useState(initial?.exercise ? String(initial.exercise.id) : '')
   const [rounds, setRounds] = useState(initial?.rounds ?? '')
@@ -46,8 +48,7 @@ export function ExerciseForm({ groupId, nextOrder, exerciseCatalog, initial, onS
       const url = isEdit ? `/api/workout-exercise-rows/${initial!.id}` : '/api/workout-exercise-rows'
       const res = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
         body: JSON.stringify(body),
       })
       const data = await res.json()
