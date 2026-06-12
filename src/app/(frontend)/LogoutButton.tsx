@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+import { secondaryButtonClass } from './ui'
 
 export default function LogoutButton() {
   const router = useRouter()
@@ -15,7 +16,11 @@ export default function LogoutButton() {
   }
 
   return (
-    <button className="btn-ghost" onClick={onClick} disabled={loading}>
+    <button
+      className={secondaryButtonClass}
+      onClick={onClick}
+      disabled={loading}
+    >
       {loading ? '…' : 'Wyloguj'}
     </button>
   )

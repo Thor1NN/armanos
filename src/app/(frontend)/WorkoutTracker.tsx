@@ -2,6 +2,21 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { METRIC_FIELDS, trackingFields, type MetricField } from '../../trackingTypes'
+import {
+  compactInputClass,
+  compactUnitInputClass,
+  dangerIconButtonClass,
+  dashedButtonClass,
+  iconButtonClass,
+  inputClass,
+  joinClasses,
+  mutedTextClass,
+  panelClass,
+  primaryButtonClass,
+  secondaryButtonClass,
+  sectionLabelClass,
+  selectClass,
+} from './ui'
 
 export type TExercise = {
   rowId: string
@@ -100,7 +115,6 @@ const fmtDuration = (start?: string | null, end?: string | null): string | null 
   return h ? `${h} h ${m} min` : `${m} min`
 }
 
-// ISO (UTC) → osobno data i godzina (czas lokalny) dla inputów date/time
 const pad2 = (n: number) => String(n).padStart(2, '0')
 const isoToDateInput = (iso?: string | null): string => {
   if (!iso) return ''
@@ -112,7 +126,6 @@ const isoToTimeInput = (iso?: string | null): string => {
   const d = new Date(iso)
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`
 }
-// Złożenie daty + godziny w ISO; brak daty → dzisiaj, brak godziny → 00:00
 const combineDateTime = (date: string, time: string): string | null => {
   if (!date && !time) return null
   const d = date || isoToDateInput(new Date().toISOString())
@@ -120,7 +133,6 @@ const combineDateTime = (date: string, time: string): string | null => {
   return new Date(`${d}T${t}`).toISOString()
 }
 
-// Wartości metryk z formularza → ciało zapytania (konwersja jednostek do bazowej)
 const metricBody = (fields: MetricField[], v: Values): Record<string, unknown> => {
   const body: Record<string, unknown> = {}
   for (const f of fields) {
@@ -146,7 +158,6 @@ const metricBody = (fields: MetricField[], v: Values): Record<string, unknown> =
   return body
 }
 
-// Wartość bazowa (np. sekundy) → string w domyślnej jednostce, dla edycji
 const toDefaultUnit = (f: MetricField, base: number): { value: string; unit: string } => {
   const meta = METRIC_FIELDS[f]
   if (!meta.units) return { value: String(base), unit: '' }
@@ -155,7 +166,6 @@ const toDefaultUnit = (f: MetricField, base: number): { value: string; unit: str
   return { value: String(base / factor), unit }
 }
 
-// Sekundy → czytelny czas
 const fmtSec = (s: number): string => {
   if (s < 60) return `${s} s`
   const m = Math.floor(s / 60)
@@ -163,7 +173,6 @@ const fmtSec = (s: number): string => {
   return rest ? `${m} min ${rest} s` : `${m} min`
 }
 
-// Podsumowanie serii — pokazuje tylko wypełnione metryki
 const setSummary = (s: SetLog): string => {
   const parts: string[] = []
   if (s.weight != null) parts.push(`${s.weight} kg`)
@@ -191,7 +200,6 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
     }
   }, [workout.id])
 
-  // Dedupe tworzenia sesji — wiele równoległych zapisów nie utworzy kilku sesji
   const creating = useRef<Promise<Session> | null>(null)
   const ensureSession = async (): Promise<Session> => {
     if (session) return session
@@ -244,26 +252,28 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   }
 
   return (
-    <div className="workout">
-      <div className="workout-head">
+    <div className={`mb-3 px-4 py-3 ${panelClass}`}>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-sm font-semibold text-app-text">
         <span>
-          {workout.title}
-          {workout.rpe != null && <span className="muted"> · RPE {workout.rpe}</span>}
+          <span className="break-words">{workout.title}</span>
+          {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
         </span>
         <SessionTimes session={session} onSet={setTime} onSave={saveTimes} />
       </div>
 
       {workout.sections.map((section, si) => (
-        <div className="section" key={si}>
+        <div className="mt-3" key={si}>
           {(section.title || section.subtitle) && (
-            <div className="section-head">
+            <div className="mb-2 text-sm font-semibold text-app-accent">
               {section.title}
               {section.subtitle ? ` · ${section.subtitle}` : ''}
             </div>
           )}
           {section.groups.map((group, gi) => (
-            <div className="group" key={gi}>
-              {group.setType && <div className="set-type">{group.setType}</div>}
+            <div className="my-2 mb-3" key={gi}>
+              {group.setType && (
+                <div className={`mb-1 ${sectionLabelClass}`}>{group.setType}</div>
+              )}
               {group.exercises.map((ex) => (
                 <ExerciseRow
                   key={ex.rowId}
@@ -301,8 +311,6 @@ function SessionTimes({
   const [ed, setEd] = useState(() => isoToDateInput(finishIso))
   const [et, setEt] = useState(() => isoToTimeInput(finishIso))
 
-  // Korekta stanu podczas renderu, gdy wartość zmieni się z zewnątrz (wczytanie/"teraz") —
-  // bez useEffect i bez gubienia focusu podczas pisania.
   const [prevStart, setPrevStart] = useState(startIso)
   if (startIso !== prevStart) {
     setPrevStart(startIso)
@@ -325,51 +333,89 @@ function SessionTimes({
     }
   }
 
-  // Zwinięty: kompaktowa plakietka
   if (!open) {
     const duration = fmtDuration(startIso, finishIso)
     const compact = (iso: string | null) =>
       iso ? `${isoToDateInput(iso).slice(5).replace('-', '.')} ${isoToTimeInput(iso)}` : null
     const s = compact(startIso)
     const e = compact(finishIso)
+
     return (
-      <button type="button" className="time-chip" onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className={joinClasses(
+          secondaryButtonClass,
+          'rounded-full bg-app-panel px-3 py-1.5 text-xs font-normal text-app-text',
+        )}
+        onClick={() => setOpen(true)}
+      >
         {s || e ? (
           <>
             <span>🕒 {s ?? '—'}{e ? ` – ${e}` : ''}</span>
-            {duration && <span className="time-dur">{duration}</span>}
+            {duration && <span className="font-semibold text-app-accent">{duration}</span>}
           </>
         ) : (
-          <span className="muted">＋ Czas treningu</span>
+          <span className={mutedTextClass}>＋ Czas treningu</span>
         )}
       </button>
     )
   }
 
-  // Rozwinięty: edytor
   return (
-    <div className="workout-time">
-      <div className="time-field">
-        <span className="muted">Rozpoczęto</span>
-        <input type="date" value={sd} onChange={(e) => setSd(e.target.value)} onBlur={() => onSet('startedAt', combineDateTime(sd, st))} />
-        <input type="time" value={st} onChange={(e) => setSt(e.target.value)} onBlur={() => onSet('startedAt', combineDateTime(sd, st))} />
-        <button type="button" className="btn-mini ghost" onClick={() => onSet('startedAt', new Date().toISOString())}>
+    <div className={`mt-1 basis-full p-3 font-normal ${panelClass}`}>
+      <div className="flex flex-wrap items-center gap-1.5 text-sm">
+        <span className={`w-[86px] shrink-0 text-xs ${mutedTextClass}`}>Rozpoczęto</span>
+        <input
+          className={inputClass}
+          type="date"
+          value={sd}
+          onChange={(e) => setSd(e.target.value)}
+          onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
+        />
+        <input
+          className={inputClass}
+          type="time"
+          value={st}
+          onChange={(e) => setSt(e.target.value)}
+          onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
+        />
+        <button
+          type="button"
+          className={secondaryButtonClass}
+          onClick={() => onSet('startedAt', new Date().toISOString())}
+        >
           teraz
         </button>
       </div>
-      <div className="time-field">
-        <span className="muted">Zakończono</span>
-        <input type="date" value={ed} onChange={(e) => setEd(e.target.value)} onBlur={() => onSet('finishedAt', combineDateTime(ed, et))} />
-        <input type="time" value={et} onChange={(e) => setEt(e.target.value)} onBlur={() => onSet('finishedAt', combineDateTime(ed, et))} />
-        <button type="button" className="btn-mini ghost" onClick={() => onSet('finishedAt', new Date().toISOString())}>
+      <div className="mt-2 flex flex-wrap items-center gap-1.5 text-sm">
+        <span className={`w-[86px] shrink-0 text-xs ${mutedTextClass}`}>Zakończono</span>
+        <input
+          className={inputClass}
+          type="date"
+          value={ed}
+          onChange={(e) => setEd(e.target.value)}
+          onBlur={() => onSet('finishedAt', combineDateTime(ed, et))}
+        />
+        <input
+          className={inputClass}
+          type="time"
+          value={et}
+          onChange={(e) => setEt(e.target.value)}
+          onBlur={() => onSet('finishedAt', combineDateTime(ed, et))}
+        />
+        <button
+          type="button"
+          className={secondaryButtonClass}
+          onClick={() => onSet('finishedAt', new Date().toISOString())}
+        >
           teraz
         </button>
       </div>
-      <div className="time-actions">
-        <button type="button" className="btn-mini" onClick={save} disabled={saving}>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button type="button" className={primaryButtonClass} onClick={save} disabled={saving}>
           {saving ? '…' : 'Zapisz'}
         </button>
-        <button type="button" className="btn-mini ghost" onClick={() => setOpen(false)}>
+        <button type="button" className={secondaryButtonClass} onClick={() => setOpen(false)}>
           Zwiń
         </button>
       </div>
@@ -403,13 +449,14 @@ function SetForm({
   }
 
   return (
-    <form className="set-form" onSubmit={submit}>
+    <form className="mt-1.5 flex flex-wrap gap-1.5" onSubmit={submit}>
       {fields.map((f, i) => {
         const meta = METRIC_FIELDS[f]
         if (meta.composite === 'duration') {
           return (
-            <span className="field-unit" key={f}>
+            <span className="inline-flex items-stretch gap-1" key={f}>
               <input
+                className={compactUnitInputClass}
                 type="number"
                 min="0"
                 placeholder="min"
@@ -417,8 +464,9 @@ function SetForm({
                 onChange={(e) => set(`${f}__min`, e.target.value)}
                 autoFocus={i === 0}
               />
-              <span className="unit-sep">min</span>
+              <span className="flex items-center text-xs text-app-muted">min</span>
               <input
+                className={compactUnitInputClass}
                 type="number"
                 min="0"
                 max="59"
@@ -426,15 +474,16 @@ function SetForm({
                 value={values[`${f}__sec`] ?? ''}
                 onChange={(e) => set(`${f}__sec`, e.target.value)}
               />
-              <span className="unit-sep">sek</span>
+              <span className="flex items-center text-xs text-app-muted">sek</span>
             </span>
           )
         }
         if (meta.units) {
           const unit = values[`${f}__unit`] ?? meta.units.default
           return (
-            <span className="field-unit" key={f}>
+            <span className="inline-flex items-stretch gap-1" key={f}>
               <input
+                className={compactUnitInputClass}
                 type="number"
                 step="any"
                 placeholder={meta.placeholder}
@@ -442,7 +491,11 @@ function SetForm({
                 onChange={(e) => set(f, e.target.value)}
                 autoFocus={i === 0}
               />
-              <select value={unit} onChange={(e) => set(`${f}__unit`, e.target.value)}>
+              <select
+                className={selectClass}
+                value={unit}
+                onChange={(e) => set(`${f}__unit`, e.target.value)}
+              >
                 {meta.units.options.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
@@ -455,6 +508,7 @@ function SetForm({
         return (
           <input
             key={f}
+            className={compactInputClass}
             type={meta.numeric ? 'number' : 'text'}
             step={meta.numeric ? '0.5' : undefined}
             placeholder={meta.placeholder}
@@ -465,16 +519,17 @@ function SetForm({
         )
       })}
       <input
+        className={`min-w-[90px] flex-1 ${inputClass}`}
         type="text"
         placeholder="notatka"
         value={values.note ?? ''}
         onChange={(e) => set('note', e.target.value)}
       />
-      <button className="btn-mini" type="submit" disabled={saving}>
+      <button className={primaryButtonClass} type="submit" disabled={saving}>
         {saving ? '…' : 'Zapisz'}
       </button>
       {onCancel && (
-        <button className="btn-mini ghost" type="button" onClick={onCancel}>
+        <button className={secondaryButtonClass} type="button" onClick={onCancel}>
           Anuluj
         </button>
       )}
@@ -514,7 +569,7 @@ function SetItem({
       }
     }
     return (
-      <li>
+      <li className={`px-2.5 py-2 ${joinClasses(panelClass, 'rounded-lg bg-app-bg')}`}>
         <SetForm
           fields={fields}
           initial={initial}
@@ -529,15 +584,15 @@ function SetItem({
   }
 
   return (
-    <li>
+    <li className="mb-1 flex items-center justify-between gap-2 rounded-lg border border-app-border bg-app-bg px-2.5 py-1.5 text-sm">
       <span>
         Seria {set.setNumber}: {setSummary(set)}
       </span>
-      <span className="set-actions">
-        <button className="set-edit" onClick={() => setEditing(true)} aria-label="Edytuj">
+      <span className="flex shrink-0 gap-0.5">
+        <button className={iconButtonClass} onClick={() => setEditing(true)} aria-label="Edytuj">
           ✎
         </button>
-        <button className="set-del" onClick={() => onDelete(set.id)} aria-label="Usuń">
+        <button className={dangerIconButtonClass} onClick={() => onDelete(set.id)} aria-label="Usuń">
           ✕
         </button>
       </span>
@@ -562,21 +617,28 @@ function ExerciseRow({
   const fields = trackingFields(ex.trackingType)
 
   return (
-    <div className="ex">
-      <div className="ex-name">
-        {ex.numer ? <span className="ex-num">{ex.numer}</span> : null}
+    <div className="border-t border-app-border py-2 first:border-t-0">
+      <div className="break-words text-sm text-app-text">
+        {ex.numer ? (
+          <span className={`inline-block min-w-[26px] font-semibold ${mutedTextClass}`}>{ex.numer}</span>
+        ) : null}
         {ex.name}
         {ex.videoUrl && (
-          <a className="ex-video" href={ex.videoUrl} target="_blank" rel="noopener noreferrer">
+          <a
+            className="ml-2 whitespace-nowrap text-xs text-app-accent"
+            href={ex.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             ▶ wideo
           </a>
         )}
       </div>
-      {ex.meta.length > 0 && <div className="ex-meta">{ex.meta.join(' · ')}</div>}
-      {ex.note && <div className="ex-meta">{ex.note}</div>}
+      {ex.meta.length > 0 && <div className={`mt-0.5 pl-[26px] text-xs ${mutedTextClass}`}>{ex.meta.join(' · ')}</div>}
+      {ex.note && <div className={`mt-0.5 pl-[26px] text-xs ${mutedTextClass}`}>{ex.note}</div>}
 
       {sets.length > 0 && (
-        <ul className="set-list">
+        <ul className="mt-2 mb-1 list-none p-0">
           {sets.map((s) => (
             <SetItem key={s.id} set={s} fields={fields} onUpdate={onUpdate} onDelete={onDelete} />
           ))}
@@ -594,7 +656,10 @@ function ExerciseRow({
           onCancel={() => setOpen(false)}
         />
       ) : (
-        <button className="btn-add" onClick={() => setOpen(true)}>
+        <button
+          className={`mt-1.5 ${dashedButtonClass}`}
+          onClick={() => setOpen(true)}
+        >
           + dodaj serię
         </button>
       )}

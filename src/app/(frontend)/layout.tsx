@@ -11,7 +11,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
   return (
     <html lang="pl">
-      <body>
+      <body className="bg-app-bg text-app-text">
         <main>{children}</main>
       </body>
     </html>

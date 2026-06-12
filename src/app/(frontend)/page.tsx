@@ -6,7 +6,7 @@ import React from 'react'
 import config from '@/payload.config'
 import LogoutButton from './LogoutButton'
 import WorkoutTracker, { type TWorkout } from './WorkoutTracker'
-import './styles.css'
+import { sectionLabelClass, statusBadgeClass, surfaceClass } from './ui'
 
 const STATUS_LABEL: Record<string, string> = {
   active: 'Aktywny',
@@ -132,39 +132,42 @@ export default async function HomePage() {
   })
 
   return (
-    <div className="container">
-      <div className="topbar">
+    <div className="mx-auto max-w-3xl px-5 py-6 sm:px-6 sm:py-8">
+      <div className="mb-7 flex items-center justify-between gap-4">
         <div>
-          <h1>Cześć, {user.name || user.email} 👋</h1>
-          <span className="muted">Twoje plany treningowe</span>
+          <h1 className="text-xl font-semibold text-app-text">Cześć, {user.name || user.email} 👋</h1>
+          <span className="mt-1 block text-xs text-app-muted">Twoje plany treningowe</span>
         </div>
         <LogoutButton />
       </div>
 
       {plans.docs.length === 0 && (
-        <div className="empty">Nie masz jeszcze przypisanego planu. Skontaktuj się z trenerem.</div>
+        <div className="py-10 text-center text-sm text-app-muted">
+          Nie masz jeszcze przypisanego planu. Skontaktuj się z trenerem.
+        </div>
       )}
 
       {plans.docs.map((plan) => {
         const status = (plan.status as string) || 'active'
+
         return (
-          <div className="card" key={plan.id}>
-            <h2>
+          <div className={`mb-4 px-5 py-4 ${surfaceClass}`} key={plan.id}>
+            <h2 className="mb-1 text-base font-semibold text-app-text">
               {plan.title}{' '}
-              <span className={`badge ${status}`}>{STATUS_LABEL[status] || status}</span>
+              <span className={statusBadgeClass(status)}>{STATUS_LABEL[status] || status}</span>
             </h2>
             {(plan.startDate || plan.endDate) && (
-              <div className="meta">
+              <div className="text-sm text-app-muted">
                 {[plan.startDate, plan.endDate]
                   .map((d) => (d ? new Date(d).toLocaleDateString('pl-PL') : '…'))
                   .join(' – ')}
               </div>
             )}
-            {plan.description && <div className="meta">{plan.description}</div>}
+            {plan.description && <div className="mt-1 text-sm text-app-muted">{plan.description}</div>}
 
             {mcByPlan(plan.id).map((mc) => (
               <div key={mc.id}>
-                <div className="mc-title">
+                <div className={`mt-5 mb-2.5 ${sectionLabelClass}`}>
                   {mc.title}
                   {mc.rpe != null ? ` · RPE ${mc.rpe}` : ''}
                 </div>
