@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useAuth, useDocumentInfo } from '@payloadcms/ui'
+import { toast, useAuth, useDocumentInfo } from '@payloadcms/ui'
 import type { Group } from '../types'
 import { PROTOCOLS } from '../constants'
 import { s } from '../styles'
@@ -27,11 +27,9 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
   const [restSeconds, setRestSeconds] = useState(String(initial?.restSeconds ?? '10'))
   const [restBetweenRounds, setRestBetweenRounds] = useState(initial?.restBetweenRounds ?? '')
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
 
   const handleSave = async () => {
     setSaving(true)
-    setError('')
     try {
       const body: Record<string, unknown> = {
         label: label || null,
@@ -53,9 +51,10 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.errors?.[0]?.message ?? 'Błąd zapisu')
+      toast.success(isEdit ? 'Grupa zaktualizowana' : 'Grupa dodana')
       onSaved(data.doc)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Błąd zapisu')
+      toast.error(e instanceof Error ? e.message : 'Błąd zapisu')
     } finally {
       setSaving(false)
     }
@@ -66,7 +65,6 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
       <div style={{ ...s.label, fontSize: 12, fontWeight: 700, color: '#E8E8E8', marginBottom: 10 }}>
         {isEdit ? 'Edytuj grupę' : 'Nowa grupa'}
       </div>
-      {error && <div style={s.errorMsg}>{error}</div>}
 
       <div style={s.formRow}>
         <div style={{ flex: '1 1 200px' }}>

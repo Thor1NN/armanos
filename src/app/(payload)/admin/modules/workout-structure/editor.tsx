@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useAuth } from '@payloadcms/ui'
-import type { ExerciseCatalogItem, ExerciseRow, Group, Section } from './types'
+import { toast, useAuth } from '@payloadcms/ui'
+import type { ExerciseRow, Group, Section } from './types'
 import { PROTOCOL_LABEL } from './constants'
 import { exerciseLabel, exerciseMeta, groupLabel } from './utils'
 import { s } from './styles'
@@ -13,7 +13,6 @@ type Props = {
   sections: Section[]
   initialGroups: Group[]
   initialExerciseRows: ExerciseRow[]
-  exerciseCatalog: ExerciseCatalogItem[]
   hasLogs?: boolean
 }
 
@@ -21,7 +20,6 @@ export function WorkoutStructureEditor({
   sections,
   initialGroups,
   initialExerciseRows,
-  exerciseCatalog,
   hasLogs = false,
 }: Props) {
   const { token } = useAuth()
@@ -52,11 +50,12 @@ export function WorkoutStructureEditor({
       })
       if (!res.ok) {
         const data = await res.json()
-        alert(data?.errors?.[0]?.message ?? 'Nie można usunąć grupy')
+        toast.error(data?.errors?.[0]?.message ?? 'Nie można usunąć grupy')
         return
       }
       setGroups((prev) => prev.filter((g) => g.id !== groupId))
       setExerciseRows((prev) => prev.filter((r) => r.group !== groupId))
+      toast.success('Grupa usunięta')
     } finally {
       setDeletingGroup(null)
     }
@@ -71,10 +70,11 @@ export function WorkoutStructureEditor({
       })
       if (!res.ok) {
         const data = await res.json()
-        alert(data?.errors?.[0]?.message ?? 'Nie można usunąć ćwiczenia')
+        toast.error(data?.errors?.[0]?.message ?? 'Nie można usunąć ćwiczenia')
         return
       }
       setExerciseRows((prev) => prev.filter((r) => r.id !== rowId))
+      toast.success('Ćwiczenie usunięte')
     } finally {
       setDeletingExercise(null)
     }
@@ -158,7 +158,6 @@ export function WorkoutStructureEditor({
                           <ExerciseForm
                             groupId={group.id}
                             nextOrder={row.order ?? 0}
-                            exerciseCatalog={exerciseCatalog}
                             initial={row}
                             onSaved={(updated) => {
                               setExerciseRows((prev) => prev.map((r) => r.id === updated.id ? { ...r, ...updated } : r))
@@ -205,7 +204,6 @@ export function WorkoutStructureEditor({
                       <ExerciseForm
                         groupId={group.id}
                         nextOrder={rows.length}
-                        exerciseCatalog={exerciseCatalog}
                         onSaved={(row) => {
                           setExerciseRows((prev) => [...prev, row])
                           setAddingExerciseFor(null)

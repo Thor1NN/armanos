@@ -1,6 +1,6 @@
 import React from 'react'
 import { WorkoutStructureEditor } from './editor'
-import type { ExerciseCatalogItem, ExerciseRow, Group, RawExerciseRow, Section } from './types'
+import type { ExerciseRow, Group, RawExerciseRow, Section } from './types'
 
 export async function WorkoutStructureView({
   initPageResult,
@@ -46,13 +46,6 @@ export async function WorkoutStructureView({
       })
     : { docs: [] }
 
-  const exercisesResult = await payload.find({
-    collection: 'exercises',
-    sort: 'name',
-    limit: 1000,
-    depth: 0,
-  })
-
   const sections: Section[] = (workout.sections ?? []) as Section[]
 
   const groups: Group[] = groupsResult.docs.map((g: Group) => ({
@@ -89,16 +82,11 @@ export async function WorkoutStructureView({
     durationSec: r.durationSec ?? null,
   }))
 
-  const exerciseCatalog: ExerciseCatalogItem[] = exercisesResult.docs.map(
-    (e: ExerciseCatalogItem) => ({ id: e.id, name: e.name ?? null }),
-  )
-
   return (
     <WorkoutStructureEditor
       sections={sections}
       initialGroups={groups}
       initialExerciseRows={exerciseRows}
-      exerciseCatalog={exerciseCatalog}
       hasLogs={hasLogs}
     />
   )
