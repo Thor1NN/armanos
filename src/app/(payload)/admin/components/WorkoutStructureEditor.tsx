@@ -45,6 +45,7 @@ type Props = {
   initialGroups: Group[]
   initialExerciseRows: ExerciseRow[]
   exerciseCatalog: ExerciseCatalogItem[]
+  hasLogs?: boolean
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -490,6 +491,7 @@ export function WorkoutStructureEditor({
   initialGroups,
   initialExerciseRows,
   exerciseCatalog,
+  hasLogs = false,
 }: Props) {
   const [groups, setGroups] = useState<Group[]>(initialGroups)
   const [exerciseRows, setExerciseRows] = useState<ExerciseRow[]>(initialExerciseRows)
@@ -599,17 +601,19 @@ export function WorkoutStructureEditor({
                         >
                           Edytuj grupę
                         </button>
-                        <button
-                          style={s.btnDanger}
-                          disabled={deletingGroup === group.id}
-                          onClick={() => {
-                            if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
-                              handleDeleteGroup(group.id)
-                            }
-                          }}
-                        >
-                          {deletingGroup === group.id ? '…' : 'Usuń grupę'}
-                        </button>
+                        {!hasLogs && (
+                          <button
+                            style={s.btnDanger}
+                            disabled={deletingGroup === group.id}
+                            onClick={() => {
+                              if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
+                                handleDeleteGroup(group.id)
+                              }
+                            }}
+                          >
+                            {deletingGroup === group.id ? '…' : 'Usuń grupę'}
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
@@ -647,17 +651,19 @@ export function WorkoutStructureEditor({
                           >
                             Edytuj
                           </button>
-                          <button
-                            style={s.btnDanger}
-                            disabled={deletingExercise === row.id}
-                            onClick={() => {
-                              if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
-                                handleDeleteExercise(row.id)
-                              }
-                            }}
-                          >
-                            {deletingExercise === row.id ? '…' : 'Usuń'}
-                          </button>
+                          {!hasLogs && (
+                            <button
+                              style={s.btnDanger}
+                              disabled={deletingExercise === row.id}
+                              onClick={() => {
+                                if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
+                                  handleDeleteExercise(row.id)
+                                }
+                              }}
+                            >
+                              {deletingExercise === row.id ? '…' : 'Usuń'}
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>

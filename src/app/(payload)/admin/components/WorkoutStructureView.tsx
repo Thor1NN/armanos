@@ -71,11 +71,11 @@ export async function WorkoutStructureView({
     )
   }
 
-  const workout = await payload.findByID({
-    collection: 'workouts',
-    id: docId,
-    depth: 0,
-  })
+  const [workout, logsCount] = await Promise.all([
+    payload.findByID({ collection: 'workouts', id: docId, depth: 0 }),
+    payload.count({ collection: 'workout-logs', where: { workout: { equals: docId } } }),
+  ])
+  const hasLogs = logsCount.totalDocs > 0
 
   const groupsResult = await payload.find({
     collection: 'workout-groups',
@@ -151,6 +151,7 @@ export async function WorkoutStructureView({
       initialGroups={groups}
       initialExerciseRows={exerciseRows}
       exerciseCatalog={exerciseCatalog}
+      hasLogs={hasLogs}
     />
   )
 }
