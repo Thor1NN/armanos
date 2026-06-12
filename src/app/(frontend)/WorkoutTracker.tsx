@@ -13,8 +13,8 @@ export type { TWorkout } from './components/workout/types'
 const api = {
   async findSession(workoutId: number): Promise<Session | null> {
     const res = await fetch(
-      `/api/workout-logs?where[workout][equals]=${workoutId}&limit=1&depth=0`,
-      { credentials: 'same-origin' },
+      `/api/workout-logs?where[workout][equals]=${workoutId}&limit=1&depth=0&sort=-updatedAt`,
+      { credentials: 'same-origin', cache: 'no-store' },
     )
     const data = await res.json()
     return data.docs?.[0] ?? null
@@ -40,7 +40,7 @@ const api = {
   async loadSets(sessionId: number): Promise<SetLog[]> {
     const res = await fetch(
       `/api/set-logs?where[session][equals]=${sessionId}&limit=500&depth=0&sort=setNumber`,
-      { credentials: 'same-origin' },
+      { credentials: 'same-origin', cache: 'no-store' },
     )
     return (await res.json()).docs ?? []
   },
@@ -71,14 +71,34 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   const [session, setSession] = useState<Session | null>(null)
   const [sets, setSets] = useState<SetLog[]>([])
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
+  const [loadedWorkoutId, setLoadedWorkoutId] = useState<number | null>(null)
+
+  const hasLoadedWorkout = loadedWorkoutId === workout.id
+  const displayedSession = hasLoadedWorkout ? session : null
+  const displayedSets = hasLoadedWorkout ? sets : []
 
   useEffect(() => {
     let active = true
+
     api.findSession(workout.id).then(async (s) => {
-      if (!active || !s) return
+      if (!active) return
+
+      if (!s) {
+        setSession(null)
+        setSets([])
+        setLoadedWorkoutId(workout.id)
+        return
+      }
+
       setSession(s)
-      setSets(await api.loadSets(s.id))
+
+      const loadedSets = await api.loadSets(s.id)
+      if (!active) return
+
+      setSets(loadedSets)
+      setLoadedWorkoutId(workout.id)
     })
+
     return () => {
       active = false
     }
@@ -86,10 +106,11 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
 
   const creating = useRef<Promise<Session> | null>(null)
   const ensureSession = async (): Promise<Session> => {
-    if (session) return session
+    if (displayedSession) return displayedSession
     if (!creating.current) {
       creating.current = api.createSession(workout.id).then((s) => {
         setSession(s)
+        setLoadedWorkoutId(workout.id)
         return s
       })
     }
@@ -107,7 +128,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   }
 
   const setsForRow = (rowId: string) =>
-    sets
+    displayedSets
       .filter((s) => s.workoutExerciseRowId === rowId)
       .sort((a, b) => (a.setNumber ?? 0) - (b.setNumber ?? 0))
 
@@ -143,7 +164,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
           {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
         </span>
         <SessionTimesBadge
-          session={session}
+          session={displayedSession}
           open={timeEditorOpen}
           onOpen={() => setTimeEditorOpen(true)}
         />
@@ -151,7 +172,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
 
       {timeEditorOpen && (
         <SessionTimesForm
-          session={session}
+          session={displayedSession}
           onSet={setTime}
           onSave={saveTimes}
           onClose={() => setTimeEditorOpen(false)}
@@ -183,6 +204,12 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
           ))}
         </div>
       ))}
+
+      {hasLoadedWorkout && !displayedSession && (
+        <div className={`mt-3 text-xs ${mutedTextClass}`}>
+          Brak zapisanych serii dla tego treningu. Dodanie pierwszej serii utworzy sesję automatycznie.
+        </div>
+      )}
     </div>
   )
 }

@@ -5,10 +5,8 @@ import React from 'react'
 
 import config from '@/payload.config'
 import LogoutButton from './LogoutButton'
-import WorkoutTracker, { type TWorkout } from './WorkoutTracker'
-import { sectionLabelClass } from './ui'
-import { StatusBadge } from './components/ui/StatusBadge'
-import { Surface } from './components/ui/Surface'
+import type { TWorkout } from './WorkoutTracker'
+import { WorkoutPlansAccordion, type TPlanAccordionItem } from './components/WorkoutPlansAccordion'
 
 const STATUS_LABEL: Record<string, string> = {
   active: 'Aktywny',
@@ -133,6 +131,30 @@ export default async function HomePage() {
     })),
   })
 
+  const accordionPlans: TPlanAccordionItem[] = plans.docs.map((plan) => {
+    const status = (plan.status as string) || 'active'
+
+    return {
+      id: plan.id,
+      title: plan.title,
+      status,
+      statusLabel: STATUS_LABEL[status] || status,
+      dateRange:
+        plan.startDate || plan.endDate
+          ? [plan.startDate, plan.endDate]
+              .map((d) => (d ? new Date(d).toLocaleDateString('pl-PL') : '…'))
+              .join(' – ')
+          : null,
+      description: plan.description ?? null,
+      microcycles: mcByPlan(plan.id).map((mc) => ({
+        id: mc.id,
+        title: mc.title,
+        rpe: mc.rpe ?? null,
+        workouts: woByMc(mc.id).map((w) => serializeWorkout(w)),
+      })),
+    }
+  })
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-6 sm:px-6 sm:py-8">
       <div className="mb-7 flex items-center justify-between gap-4">
@@ -149,38 +171,7 @@ export default async function HomePage() {
         </div>
       )}
 
-      {plans.docs.map((plan) => {
-        const status = (plan.status as string) || 'active'
-
-        return (
-          <Surface className="mb-4 py-4" key={plan.id}>
-            <h2 className="mb-1 text-base font-semibold text-app-text">
-              {plan.title}{' '}
-              <StatusBadge status={status}>{STATUS_LABEL[status] || status}</StatusBadge>
-            </h2>
-            {(plan.startDate || plan.endDate) && (
-              <div className="text-sm text-app-muted">
-                {[plan.startDate, plan.endDate]
-                  .map((d) => (d ? new Date(d).toLocaleDateString('pl-PL') : '…'))
-                  .join(' – ')}
-              </div>
-            )}
-            {plan.description && <div className="mt-1 text-sm text-app-muted">{plan.description}</div>}
-
-            {mcByPlan(plan.id).map((mc) => (
-              <div key={mc.id}>
-                <div className={`mt-5 mb-2.5 ${sectionLabelClass}`}>
-                  {mc.title}
-                  {mc.rpe != null ? ` · RPE ${mc.rpe}` : ''}
-                </div>
-                {woByMc(mc.id).map((w) => (
-                  <WorkoutTracker key={w.id} workout={serializeWorkout(w)} />
-                ))}
-              </div>
-            ))}
-          </Surface>
-        )
-      })}
+      {plans.docs.length > 0 && <WorkoutPlansAccordion plans={accordionPlans} />}
     </div>
   )
 }
