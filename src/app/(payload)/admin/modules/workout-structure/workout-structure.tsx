@@ -14,7 +14,7 @@ export async function WorkoutStructureView({
 
   if (!docId || docId === 'create' || !payload) {
     return (
-      <div style={{ padding: '24px', color: '#9A9FA8', fontSize: 14 }}>
+      <div style={{ padding: '24px', color: 'var(--theme-elevation-500)', fontSize: 14 }}>
         Najpierw zapisz trening, aby zarządzać strukturą.
       </div>
     )

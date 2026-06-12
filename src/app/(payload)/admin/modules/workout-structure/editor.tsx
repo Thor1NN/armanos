@@ -82,6 +82,7 @@ export function WorkoutStructureEditor({
 
   return (
     <div style={s.container}>
+
       {sectionsWithFallback.map((section, si) => {
         const sectionGroups = groupsForSection(section.id)
         const sectionKey = section.id ?? `no-section-${si}`
