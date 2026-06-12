@@ -58,7 +58,10 @@ export function ExerciseForm({ groupId, nextOrder, exerciseCatalog, initial, onS
         ? { id: Number(exerciseId), name: exerciseCatalog.find((e) => e.id === Number(exerciseId))?.name ?? null }
         : null
 
-      onSaved({ ...data.doc, exercise: exerciseObj })
+      const normalizedGroup =
+        typeof data.doc.group === 'object' && data.doc.group !== null ? data.doc.group.id : data.doc.group
+
+      onSaved({ ...data.doc, group: normalizedGroup, exercise: exerciseObj })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Błąd zapisu')
     } finally {
