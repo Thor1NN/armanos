@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import type { ExerciseCatalogItem, ExerciseRow, Group, Section } from './types'
+import { PROTOCOL_LABEL, PROTOCOLS } from './constants'
 
 type Props = {
   workoutId: number
@@ -13,22 +14,6 @@ type Props = {
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const PROTOCOLS = [
-  { value: 'standard', label: 'Standard' },
-  { value: 'emom', label: 'EMOM' },
-  { value: 'amrap', label: 'AMRAP' },
-  { value: 'for_time', label: 'For Time' },
-  { value: 'tabata', label: 'Tabata' },
-]
-
-const PROTOCOL_LABEL: Record<string, string> = {
-  standard: 'Standard',
-  emom: 'EMOM',
-  amrap: 'AMRAP',
-  for_time: 'For Time',
-  tabata: 'Tabata',
-}
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
