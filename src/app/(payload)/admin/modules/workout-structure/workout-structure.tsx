@@ -1,5 +1,5 @@
 import React from 'react'
-import { WorkoutStructureEditor } from './WorkoutStructureEditor'
+import { WorkoutStructureEditor } from './editor'
 import type { ExerciseCatalogItem, ExerciseRow, Group, RawExerciseRow, Section } from './types'
 
 export async function WorkoutStructureView({
