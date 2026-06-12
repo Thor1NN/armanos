@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import type { MetricField } from '../../trackingTypes'
 import { mutedTextClass, panelClass, sectionLabelClass } from './ui'
 import { ExerciseRow } from './components/workout/ExerciseRow'
-import { SessionTimes } from './components/workout/SessionTimes'
+import { SessionTimesBadge, SessionTimesForm } from './components/workout/SessionTimes'
 import type { Session, SetLog, TExercise, TWorkout, Values } from './components/workout/types'
 import { metricBody } from './components/workout/utils'
 
@@ -70,6 +70,7 @@ const api = {
 export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   const [session, setSession] = useState<Session | null>(null)
   const [sets, setSets] = useState<SetLog[]>([])
+  const [timeEditorOpen, setTimeEditorOpen] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -136,13 +137,26 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
 
   return (
     <div className={`mb-3 px-4 py-3 ${panelClass}`}>
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-sm font-semibold text-app-text">
+      <div className="flex items-center justify-between gap-3 text-sm font-semibold text-app-text">
         <span>
           <span className="break-words">{workout.title}</span>
           {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
         </span>
-        <SessionTimes session={session} onSet={setTime} onSave={saveTimes} />
+        <SessionTimesBadge
+          session={session}
+          open={timeEditorOpen}
+          onOpen={() => setTimeEditorOpen(true)}
+        />
       </div>
+
+      {timeEditorOpen && (
+        <SessionTimesForm
+          session={session}
+          onSet={setTime}
+          onSave={saveTimes}
+          onClose={() => setTimeEditorOpen(false)}
+        />
+      )}
 
       {workout.sections.map((section, si) => (
         <div className="mt-3" key={si}>
