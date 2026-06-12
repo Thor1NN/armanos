@@ -8,6 +8,8 @@
 
 /.idea/*
 !/.idea/runConfigurations
+.vscode/
+.yarn/
 
 # testing
 /coverage
