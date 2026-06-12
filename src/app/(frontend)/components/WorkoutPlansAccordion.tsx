@@ -8,6 +8,7 @@ import { Surface } from './ui/Surface'
 import { mutedTextClass, sectionLabelClass } from '../ui'
 
 const STORAGE_KEY = 'training-app:active-workout-selection'
+const SSR_SNAPSHOT = '__SSR_SELECTION__'
 
 const subscribeToSelection = (onStoreChange: () => void) => {
   window.addEventListener('storage', onStoreChange)
@@ -66,10 +67,10 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
   const storedSelectionRaw = useSyncExternalStore(
     subscribeToSelection,
     () => window.localStorage.getItem(STORAGE_KEY),
-    () => null,
+    () => SSR_SNAPSHOT,
   )
   const storedSelection = useMemo(() => {
-    if (!storedSelectionRaw) return initialSelection
+    if (storedSelectionRaw === SSR_SNAPSHOT || !storedSelectionRaw) return initialSelection
 
     try {
       return JSON.parse(storedSelectionRaw) as Selection
@@ -83,9 +84,10 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
   const resolvedSelection = isValidSelection(plans, preferredSelection) ? preferredSelection : initialSelection
 
   useEffect(() => {
+    if (storedSelectionRaw === SSR_SNAPSHOT) return
     if (!isValidSelection(plans, resolvedSelection)) return
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(resolvedSelection))
-  }, [plans, resolvedSelection])
+  }, [plans, resolvedSelection, storedSelectionRaw])
 
   const selectPlan = (plan: TPlanAccordionItem) => {
     const nextMicrocycle = plan.microcycles[0] ?? null
