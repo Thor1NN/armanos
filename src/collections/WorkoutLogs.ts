@@ -1,0 +1,80 @@
+import type { CollectionConfig } from 'payload'
+import { adminOrOwnByClient } from '../access'
+
+export const WorkoutLogs: CollectionConfig = {
+  slug: 'workout-logs',
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'workout', 'startedAt', 'finishedAt', 'client'],
+    group: 'Dziennik treningów',
+  },
+  access: {
+    create: ({ req: { user } }) => Boolean(user),
+    read: adminOrOwnByClient,
+    update: adminOrOwnByClient,
+    delete: adminOrOwnByClient,
+  },
+  hooks: {
+    beforeChange: [
+      async ({ data, req, operation }) => {
+        // Klient zawsze loguje sesję na siebie (ignoruj to, co przyszło z frontu)
+        if (req.user?.collection === 'clients') {
+          data.client = req.user.id
+        }
+        // Auto-tytuł: "Trening — data"
+        if (operation === 'create' && !data.title && data.workout) {
+          try {
+            const w = await req.payload.findByID({
+              collection: 'workouts',
+              id: data.workout,
+              depth: 0,
+            })
+            data.title = `${w?.title ?? 'Trening'} — ${new Date().toLocaleDateString('pl-PL')}`
+          } catch {
+            /* tytuł zostanie pusty — nie blokujemy zapisu */
+          }
+        }
+        return data
+      },
+    ],
+  },
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Opis sesji',
+      admin: { readOnly: true, description: 'Generowany automatycznie' },
+    },
+    {
+      name: 'workout',
+      type: 'relationship',
+      relationTo: 'workouts',
+      required: true,
+      label: 'Trening',
+    },
+    {
+      name: 'client',
+      type: 'relationship',
+      relationTo: 'clients',
+      label: 'Klient',
+      defaultValue: ({ user }) => (user?.collection === 'clients' ? user.id : undefined),
+    },
+    {
+      name: 'startedAt',
+      type: 'date',
+      label: 'Rozpoczęto',
+      admin: { date: { pickerAppearance: 'dayAndTime' } },
+    },
+    {
+      name: 'finishedAt',
+      type: 'date',
+      label: 'Zakończono',
+      admin: { date: { pickerAppearance: 'dayAndTime' } },
+    },
+    {
+      name: 'notes',
+      type: 'textarea',
+      label: 'Notatki ogólne',
+    },
+  ],
+}
