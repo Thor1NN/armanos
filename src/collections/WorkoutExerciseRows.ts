@@ -74,7 +74,8 @@ export const WorkoutExerciseRows: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'reps', type: 'text', label: 'Powtórzenia', admin: { width: '50%' } },
+        { name: 'rounds', type: 'text', label: 'Serie', admin: { width: '25%', description: 'np. 4, 3-4' } },
+        { name: 'reps', type: 'text', label: 'Powtórzenia', admin: { width: '25%' } },
         { name: 'kg', type: 'text', label: 'KG', admin: { width: '50%' } },
       ],
     },

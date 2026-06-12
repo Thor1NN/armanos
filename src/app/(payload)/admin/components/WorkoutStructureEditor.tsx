@@ -27,6 +27,7 @@ type ExerciseRow = {
   numer?: string | null
   exercise?: { id: number; name?: string | null } | null
   note?: string | null
+  rounds?: string | null
   reps?: string | null
   kg?: string | null
   tut?: string | null
@@ -197,6 +198,7 @@ const exerciseLabel = (row: ExerciseRow): string =>
 
 const exerciseMeta = (row: ExerciseRow): string => {
   const parts: string[] = []
+  if (row.rounds) parts.push(`${row.rounds} serie`)
   if (row.reps) parts.push(`${row.reps} powt.`)
   if (row.kg) parts.push(`${row.kg} kg`)
   if (row.rir) parts.push(`RIR ${row.rir}`)
@@ -362,6 +364,7 @@ function ExerciseForm({
   const [exerciseId, setExerciseId] = useState(
     initial?.exercise ? String(initial.exercise.id) : '',
   )
+  const [rounds, setRounds] = useState(initial?.rounds ?? '')
   const [numer, setNumer] = useState(initial?.numer ?? '')
   const [note, setNote] = useState(initial?.note ?? '')
   const [reps, setReps] = useState(initial?.reps ?? '')
@@ -377,6 +380,7 @@ function ExerciseForm({
     setError('')
     try {
       const body: Record<string, unknown> = {
+        rounds: rounds || null,
         numer: numer || null,
         exercise: exerciseId ? Number(exerciseId) : null,
         note: note || null,
@@ -422,6 +426,10 @@ function ExerciseForm({
         <div style={{ flex: '0 0 64px' }}>
           <label style={s.label}>Numer</label>
           <input style={s.input} value={numer} onChange={(e) => setNumer(e.target.value)} placeholder='1a' />
+        </div>
+        <div style={{ flex: '0 0 70px' }}>
+          <label style={s.label}>Serie</label>
+          <input style={s.input} value={rounds} onChange={(e) => setRounds(e.target.value)} placeholder='4' />
         </div>
         <div style={{ flex: 1 }}>
           <label style={s.label}>Ćwiczenie (katalog)</label>

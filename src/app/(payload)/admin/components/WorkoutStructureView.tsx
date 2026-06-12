@@ -24,6 +24,7 @@ type RawExerciseRow = {
   numer?: string | null
   exercise?: { id: number; name?: string | null } | number | null
   note?: string | null
+  rounds?: string | null
   reps?: string | null
   kg?: string | null
   tut?: string | null
@@ -40,6 +41,7 @@ type ExerciseRow = {
   numer?: string | null
   exercise?: { id: number; name?: string | null } | null
   note?: string | null
+  rounds?: string | null
   reps?: string | null
   kg?: string | null
   tut?: string | null
@@ -123,6 +125,7 @@ export async function WorkoutStructureView({
     group: typeof r.group === 'object' && r.group !== null ? r.group.id : (r.group ?? null),
     order: r.order ?? 0,
     numer: r.numer ?? null,
+    rounds: r.rounds ?? null,
     exercise:
       r.exercise && typeof r.exercise === 'object'
         ? { id: (r.exercise as { id: number }).id, name: (r.exercise as { name?: string | null }).name ?? null }
