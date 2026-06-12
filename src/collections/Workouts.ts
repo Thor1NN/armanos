@@ -27,6 +27,23 @@ export const Workouts: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'rpe', 'order', 'microcycle'],
     group: 'Plan treningowy',
+    components: {
+      views: {
+        edit: {
+          structure: {
+            Component: {
+              path: '@/app/(payload)/admin/components/WorkoutStructureView',
+              exportName: 'WorkoutStructureView',
+            },
+            path: '/structure',
+            tab: {
+              label: 'Struktura',
+              href: '/structure',
+            },
+          },
+        },
+      },
+    },
   },
   hooks: {
     beforeDelete: [

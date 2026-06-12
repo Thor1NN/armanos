@@ -1,0 +1,627 @@
+'use client'
+
+import React, { useState } from 'react'
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Section = { id?: string; title?: string | null; subtitle?: string | null }
+
+type Group = {
+  id: number
+  sectionRowId?: string | null
+  order?: number | null
+  protocol?: string | null
+  rounds?: string | null
+  durationMinutes?: number | null
+  intervalSeconds?: number | null
+  workSeconds?: number | null
+  restSeconds?: number | null
+  restBetweenRounds?: string | null
+}
+
+type ExerciseRow = {
+  id: number
+  group?: number | null
+  order?: number | null
+  numer?: string | null
+  exercise?: { id: number; name?: string | null } | null
+  note?: string | null
+  reps?: string | null
+  kg?: string | null
+  tut?: string | null
+  rir?: string | null
+  rest?: string | null
+  durationMin?: number | null
+  durationSec?: number | null
+}
+
+type ExerciseCatalogItem = { id: number; name?: string | null }
+
+type Props = {
+  workoutId: number
+  sections: Section[]
+  initialGroups: Group[]
+  initialExerciseRows: ExerciseRow[]
+  exerciseCatalog: ExerciseCatalogItem[]
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const PROTOCOLS = [
+  { value: 'standard', label: 'Standard' },
+  { value: 'emom', label: 'EMOM' },
+  { value: 'amrap', label: 'AMRAP' },
+  { value: 'for_time', label: 'For Time' },
+  { value: 'tabata', label: 'Tabata' },
+]
+
+const PROTOCOL_LABEL: Record<string, string> = {
+  standard: 'Standard',
+  emom: 'EMOM',
+  amrap: 'AMRAP',
+  for_time: 'For Time',
+  tabata: 'Tabata',
+}
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const s = {
+  container: { padding: '20px 24px', fontFamily: 'inherit' } as React.CSSProperties,
+  sectionBlock: { marginBottom: 28 } as React.CSSProperties,
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase' as const,
+    color: '#6E52EB',
+    marginBottom: 10,
+    paddingBottom: 6,
+    borderBottom: '1px solid #2E3138',
+  },
+  groupCard: {
+    background: '#1A1C23',
+    border: '1px solid #2E3138',
+    borderRadius: 8,
+    marginBottom: 10,
+    overflow: 'hidden',
+  } as React.CSSProperties,
+  groupHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '8px 12px',
+    background: '#1E2028',
+    borderBottom: '1px solid #2E3138',
+  } as React.CSSProperties,
+  groupTitle: { fontSize: 12, fontWeight: 600, color: '#E8E8E8' } as React.CSSProperties,
+  groupMeta: { fontSize: 11, color: '#9A9FA8', marginLeft: 8 } as React.CSSProperties,
+  exerciseRow: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '7px 12px',
+    borderBottom: '1px solid #23252D',
+    gap: 8,
+  } as React.CSSProperties,
+  exerciseNumer: { fontSize: 11, fontWeight: 700, color: '#6E52EB', minWidth: 28 } as React.CSSProperties,
+  exerciseName: { fontSize: 13, color: '#E8E8E8', flex: 1 } as React.CSSProperties,
+  exerciseMeta: { fontSize: 11, color: '#9A9FA8' } as React.CSSProperties,
+  btnDanger: {
+    background: 'transparent',
+    border: 'none',
+    color: '#EF4444',
+    cursor: 'pointer',
+    fontSize: 11,
+    padding: '2px 6px',
+    borderRadius: 4,
+  } as React.CSSProperties,
+  btnAdd: {
+    background: 'transparent',
+    border: '1px dashed #3E4149',
+    color: '#9A9FA8',
+    cursor: 'pointer',
+    fontSize: 12,
+    padding: '6px 12px',
+    borderRadius: 6,
+    width: '100%',
+    textAlign: 'left' as const,
+    marginTop: 4,
+  },
+  btnPrimary: {
+    background: '#6E52EB',
+    border: 'none',
+    color: '#fff',
+    cursor: 'pointer',
+    fontSize: 12,
+    padding: '6px 14px',
+    borderRadius: 6,
+    fontWeight: 600,
+  } as React.CSSProperties,
+  btnSecondary: {
+    background: 'transparent',
+    border: '1px solid #3E4149',
+    color: '#9A9FA8',
+    cursor: 'pointer',
+    fontSize: 12,
+    padding: '6px 14px',
+    borderRadius: 6,
+  } as React.CSSProperties,
+  formBox: {
+    background: '#13141A',
+    border: '1px solid #2E3138',
+    borderRadius: 8,
+    padding: '12px 14px',
+    marginTop: 8,
+  } as React.CSSProperties,
+  formRow: { display: 'flex', gap: 8, flexWrap: 'wrap' as const, marginBottom: 8 } as React.CSSProperties,
+  label: { fontSize: 11, color: '#9A9FA8', display: 'block', marginBottom: 3 } as React.CSSProperties,
+  input: {
+    background: '#1A1C23',
+    border: '1px solid #2E3138',
+    borderRadius: 5,
+    color: '#E8E8E8',
+    fontSize: 13,
+    padding: '5px 8px',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+  },
+  select: {
+    background: '#1A1C23',
+    border: '1px solid #2E3138',
+    borderRadius: 5,
+    color: '#E8E8E8',
+    fontSize: 13,
+    padding: '5px 8px',
+    width: '100%',
+  },
+  formActions: { display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 10 } as React.CSSProperties,
+  empty: { fontSize: 12, color: '#9A9FA8', padding: '8px 12px', fontStyle: 'italic' as const },
+  errorMsg: { fontSize: 12, color: '#EF4444', marginBottom: 8 },
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const groupLabel = (g: Group): string => {
+  const p = g.protocol ?? 'standard'
+  const r = g.rounds
+  const d = g.durationMinutes
+  if (p === 'emom') return r ? `EMOM · ${r} min` : 'EMOM'
+  if (p === 'amrap') return d ? `AMRAP · ${d} min` : 'AMRAP'
+  if (p === 'for_time') return r ? `For Time · ${r} rund` : 'For Time'
+  if (p === 'tabata') return 'Tabata'
+  return r ? `${r} serie` : 'Standard'
+}
+
+const exerciseLabel = (row: ExerciseRow): string =>
+  row.exercise?.name ?? row.note ?? '—'
+
+const exerciseMeta = (row: ExerciseRow): string => {
+  const parts: string[] = []
+  if (row.reps) parts.push(`${row.reps} powt.`)
+  if (row.kg) parts.push(`${row.kg} kg`)
+  if (row.rir) parts.push(`RIR ${row.rir}`)
+  if (row.tut) parts.push(`TUT ${row.tut}`)
+  if (row.rest) parts.push(`przerwa ${row.rest}`)
+  return parts.join(' · ')
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function AddGroupForm({
+  sectionRowId,
+  workoutId,
+  nextOrder,
+  onAdded,
+  onCancel,
+}: {
+  sectionRowId: string | undefined
+  workoutId: number
+  nextOrder: number
+  onAdded: (group: Group) => void
+  onCancel: () => void
+}) {
+  const [protocol, setProtocol] = useState('standard')
+  const [rounds, setRounds] = useState('')
+  const [durationMinutes, setDurationMinutes] = useState('')
+  const [intervalSeconds, setIntervalSeconds] = useState('60')
+  const [workSeconds, setWorkSeconds] = useState('20')
+  const [restSeconds, setRestSeconds] = useState('10')
+  const [restBetweenRounds, setRestBetweenRounds] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSave = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const body: Record<string, unknown> = {
+        workout: workoutId,
+        sectionRowId: sectionRowId ?? '',
+        order: nextOrder,
+        protocol,
+        rounds: rounds || undefined,
+        durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,
+        intervalSeconds: intervalSeconds ? Number(intervalSeconds) : undefined,
+        workSeconds: workSeconds ? Number(workSeconds) : undefined,
+        restSeconds: restSeconds ? Number(restSeconds) : undefined,
+        restBetweenRounds: restBetweenRounds || undefined,
+      }
+
+      const res = await fetch('/api/workout-groups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.errors?.[0]?.message ?? 'Błąd zapisu')
+      onAdded(data.doc)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Błąd zapisu')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div style={s.formBox}>
+      <div style={{ ...s.label, fontSize: 12, fontWeight: 700, color: '#E8E8E8', marginBottom: 10 }}>
+        Nowa grupa
+      </div>
+      {error && <div style={s.errorMsg}>{error}</div>}
+
+      <div style={s.formRow}>
+        <div style={{ flex: '1 1 140px' }}>
+          <label style={s.label}>Protokół</label>
+          <select style={s.select} value={protocol} onChange={(e) => setProtocol(e.target.value)}>
+            {PROTOCOLS.map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {protocol !== 'amrap' && protocol !== 'tabata' && (
+          <div style={{ flex: '1 1 80px' }}>
+            <label style={s.label}>Serie / rundy</label>
+            <input style={s.input} value={rounds} onChange={(e) => setRounds(e.target.value)} placeholder='np. 4, 1-3' />
+          </div>
+        )}
+
+        {protocol === 'amrap' && (
+          <div style={{ flex: '1 1 80px' }}>
+            <label style={s.label}>Czas (min)</label>
+            <input style={s.input} type='number' value={durationMinutes} onChange={(e) => setDurationMinutes(e.target.value)} placeholder='10' />
+          </div>
+        )}
+
+        {protocol === 'emom' && (
+          <div style={{ flex: '1 1 80px' }}>
+            <label style={s.label}>Interwał (s)</label>
+            <input style={s.input} type='number' value={intervalSeconds} onChange={(e) => setIntervalSeconds(e.target.value)} />
+          </div>
+        )}
+
+        {protocol === 'tabata' && (
+          <>
+            <div style={{ flex: '1 1 70px' }}>
+              <label style={s.label}>Praca (s)</label>
+              <input style={s.input} type='number' value={workSeconds} onChange={(e) => setWorkSeconds(e.target.value)} />
+            </div>
+            <div style={{ flex: '1 1 70px' }}>
+              <label style={s.label}>Odpoczynek (s)</label>
+              <input style={s.input} type='number' value={restSeconds} onChange={(e) => setRestSeconds(e.target.value)} />
+            </div>
+          </>
+        )}
+      </div>
+
+      <div style={s.formRow}>
+        <div style={{ flex: '1 1 160px' }}>
+          <label style={s.label}>Przerwa między rundami</label>
+          <input style={s.input} value={restBetweenRounds} onChange={(e) => setRestBetweenRounds(e.target.value)} placeholder='np. 90 sek' />
+        </div>
+      </div>
+
+      <div style={s.formActions}>
+        <button style={s.btnSecondary} onClick={onCancel} disabled={saving}>Anuluj</button>
+        <button style={s.btnPrimary} onClick={handleSave} disabled={saving}>
+          {saving ? 'Zapisuję…' : 'Dodaj grupę'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AddExerciseForm({
+  groupId,
+  nextOrder,
+  exerciseCatalog,
+  onAdded,
+  onCancel,
+}: {
+  groupId: number
+  nextOrder: number
+  exerciseCatalog: ExerciseCatalogItem[]
+  onAdded: (row: ExerciseRow) => void
+  onCancel: () => void
+}) {
+  const [exerciseId, setExerciseId] = useState('')
+  const [numer, setNumer] = useState('')
+  const [note, setNote] = useState('')
+  const [reps, setReps] = useState('')
+  const [kg, setKg] = useState('')
+  const [tut, setTut] = useState('')
+  const [rir, setRir] = useState('')
+  const [rest, setRest] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSave = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const body: Record<string, unknown> = {
+        group: groupId,
+        order: nextOrder,
+        numer: numer || undefined,
+        exercise: exerciseId ? Number(exerciseId) : undefined,
+        note: note || undefined,
+        reps: reps || undefined,
+        kg: kg || undefined,
+        tut: tut || undefined,
+        rir: rir || undefined,
+        rest: rest || undefined,
+      }
+      const res = await fetch('/api/workout-exercise-rows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.errors?.[0]?.message ?? 'Błąd zapisu')
+
+      const exerciseObj = exerciseId
+        ? { id: Number(exerciseId), name: exerciseCatalog.find((e) => e.id === Number(exerciseId))?.name ?? null }
+        : null
+
+      onAdded({ ...data.doc, exercise: exerciseObj })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Błąd zapisu')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div style={s.formBox}>
+      <div style={{ ...s.label, fontSize: 12, fontWeight: 700, color: '#E8E8E8', marginBottom: 10 }}>
+        Nowe ćwiczenie
+      </div>
+      {error && <div style={s.errorMsg}>{error}</div>}
+
+      <div style={s.formRow}>
+        <div style={{ flex: '0 0 64px' }}>
+          <label style={s.label}>Numer</label>
+          <input style={s.input} value={numer} onChange={(e) => setNumer(e.target.value)} placeholder='1a' />
+        </div>
+        <div style={{ flex: 1 }}>
+          <label style={s.label}>Ćwiczenie (katalog)</label>
+          <select style={s.select} value={exerciseId} onChange={(e) => setExerciseId(e.target.value)}>
+            <option value=''>— wybierz —</option>
+            {exerciseCatalog.map((e) => (
+              <option key={e.id} value={e.id}>{e.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={s.formRow}>
+        <div style={{ flex: 1 }}>
+          <label style={s.label}>Uwaga / wariant</label>
+          <input style={s.input} value={note} onChange={(e) => setNote(e.target.value)} placeholder='opcjonalnie' />
+        </div>
+      </div>
+
+      <div style={s.formRow}>
+        <div style={{ flex: '1 1 70px' }}>
+          <label style={s.label}>Powt.</label>
+          <input style={s.input} value={reps} onChange={(e) => setReps(e.target.value)} placeholder='8' />
+        </div>
+        <div style={{ flex: '1 1 70px' }}>
+          <label style={s.label}>KG</label>
+          <input style={s.input} value={kg} onChange={(e) => setKg(e.target.value)} placeholder='60' />
+        </div>
+        <div style={{ flex: '1 1 70px' }}>
+          <label style={s.label}>RIR</label>
+          <input style={s.input} value={rir} onChange={(e) => setRir(e.target.value)} placeholder='2' />
+        </div>
+        <div style={{ flex: '1 1 70px' }}>
+          <label style={s.label}>TUT</label>
+          <input style={s.input} value={tut} onChange={(e) => setTut(e.target.value)} placeholder='3-0-1' />
+        </div>
+        <div style={{ flex: '1 1 90px' }}>
+          <label style={s.label}>Przerwa</label>
+          <input style={s.input} value={rest} onChange={(e) => setRest(e.target.value)} placeholder='90 sek' />
+        </div>
+      </div>
+
+      <div style={s.formActions}>
+        <button style={s.btnSecondary} onClick={onCancel} disabled={saving}>Anuluj</button>
+        <button style={s.btnPrimary} onClick={handleSave} disabled={saving}>
+          {saving ? 'Zapisuję…' : 'Dodaj ćwiczenie'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
+export function WorkoutStructureEditor({
+  workoutId,
+  sections,
+  initialGroups,
+  initialExerciseRows,
+  exerciseCatalog,
+}: Props) {
+  const [groups, setGroups] = useState<Group[]>(initialGroups)
+  const [exerciseRows, setExerciseRows] = useState<ExerciseRow[]>(initialExerciseRows)
+  const [addingGroupFor, setAddingGroupFor] = useState<string | null>(null)
+  const [addingExerciseFor, setAddingExerciseFor] = useState<number | null>(null)
+  const [deletingGroup, setDeletingGroup] = useState<number | null>(null)
+  const [deletingExercise, setDeletingExercise] = useState<number | null>(null)
+
+  const sectionsWithFallback: Section[] =
+    sections.length > 0 ? sections : [{ id: undefined, title: null, subtitle: null }]
+
+  const groupsForSection = (sectionId: string | undefined) =>
+    groups.filter((g) => g.sectionRowId === (sectionId ?? ''))
+
+  const rowsForGroup = (groupId: number) =>
+    exerciseRows.filter((r) => r.group === groupId).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+
+  const handleDeleteGroup = async (groupId: number) => {
+    setDeletingGroup(groupId)
+    try {
+      const res = await fetch(`/api/workout-groups/${groupId}`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        alert(data?.errors?.[0]?.message ?? 'Nie można usunąć grupy')
+        return
+      }
+      setGroups((prev) => prev.filter((g) => g.id !== groupId))
+      setExerciseRows((prev) => prev.filter((r) => r.group !== groupId))
+    } finally {
+      setDeletingGroup(null)
+    }
+  }
+
+  const handleDeleteExercise = async (rowId: number) => {
+    setDeletingExercise(rowId)
+    try {
+      const res = await fetch(`/api/workout-exercise-rows/${rowId}`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        alert(data?.errors?.[0]?.message ?? 'Nie można usunąć ćwiczenia')
+        return
+      }
+      setExerciseRows((prev) => prev.filter((r) => r.id !== rowId))
+    } finally {
+      setDeletingExercise(null)
+    }
+  }
+
+  return (
+    <div style={s.container}>
+      {sectionsWithFallback.map((section, si) => {
+        const sectionGroups = groupsForSection(section.id)
+        const sectionKey = section.id ?? `no-section-${si}`
+        const sectionLabel =
+          [section.title, section.subtitle].filter(Boolean).join(' · ') || 'Sekcja bez tytułu'
+
+        return (
+          <div key={sectionKey} style={s.sectionBlock}>
+            <div style={s.sectionHeader}>
+              {sections.length > 0 ? sectionLabel : 'Grupy treningu'}
+            </div>
+
+            {sectionGroups.length === 0 && (
+              <div style={s.empty}>Brak grup w tej sekcji.</div>
+            )}
+
+            {sectionGroups.map((group) => {
+              const rows = rowsForGroup(group.id)
+
+              return (
+                <div key={group.id} style={s.groupCard}>
+                  <div style={s.groupHeader}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={s.groupTitle}>{PROTOCOL_LABEL[group.protocol ?? 'standard'] ?? group.protocol}</span>
+                      <span style={s.groupMeta}>{groupLabel(group)}</span>
+                    </div>
+                    <button
+                      style={s.btnDanger}
+                      disabled={deletingGroup === group.id}
+                      onClick={() => {
+                        if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
+                          handleDeleteGroup(group.id)
+                        }
+                      }}
+                    >
+                      {deletingGroup === group.id ? '…' : 'Usuń grupę'}
+                    </button>
+                  </div>
+
+                  {rows.length === 0 && <div style={s.empty}>Brak ćwiczeń.</div>}
+
+                  {rows.map((row) => (
+                    <div key={row.id} style={row.id === rows[rows.length - 1]?.id ? { ...s.exerciseRow, borderBottom: 'none' } : s.exerciseRow}>
+                      <span style={s.exerciseNumer}>{row.numer ?? '—'}</span>
+                      <span style={s.exerciseName}>{exerciseLabel(row)}</span>
+                      <span style={s.exerciseMeta}>{exerciseMeta(row)}</span>
+                      <button
+                        style={s.btnDanger}
+                        disabled={deletingExercise === row.id}
+                        onClick={() => {
+                          if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
+                            handleDeleteExercise(row.id)
+                          }
+                        }}
+                      >
+                        {deletingExercise === row.id ? '…' : 'Usuń'}
+                      </button>
+                    </div>
+                  ))}
+
+                  <div style={{ padding: '6px 12px 10px' }}>
+                    {addingExerciseFor === group.id ? (
+                      <AddExerciseForm
+                        groupId={group.id}
+                        nextOrder={rows.length}
+                        exerciseCatalog={exerciseCatalog}
+                        onAdded={(row) => {
+                          setExerciseRows((prev) => [...prev, row])
+                          setAddingExerciseFor(null)
+                        }}
+                        onCancel={() => setAddingExerciseFor(null)}
+                      />
+                    ) : (
+                      <button style={s.btnAdd} onClick={() => setAddingExerciseFor(group.id)}>
+                        + Dodaj ćwiczenie
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+
+            <div style={{ marginTop: 8 }}>
+              {addingGroupFor === sectionKey ? (
+                <AddGroupForm
+                  sectionRowId={section.id}
+                  workoutId={workoutId}
+                  nextOrder={sectionGroups.length}
+                  onAdded={(group) => {
+                    setGroups((prev) => [...prev, group])
+                    setAddingGroupFor(null)
+                  }}
+                  onCancel={() => setAddingGroupFor(null)}
+                />
+              ) : (
+                <button style={s.btnAdd} onClick={() => setAddingGroupFor(sectionKey)}>
+                  + Dodaj grupę do tej sekcji
+                </button>
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
