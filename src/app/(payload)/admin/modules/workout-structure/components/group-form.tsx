@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FieldError, FieldLabel, TextInput, toast, useAuth, useDocumentInfo } from '@payloadcms/ui'
+import { Button, FieldError, FieldLabel, SelectInput, TextInput, toast, useAuth, useDocumentInfo } from '@payloadcms/ui'
+import type { OptionObject } from 'payload'
 import type { Group } from '../types'
 import { PROTOCOLS } from '../constants'
 import { s } from '../styles'
@@ -52,33 +53,29 @@ function Field({ path, label, value, onChange, placeholder, error }: FieldProps)
   )
 }
 
-type SelectOption = { value: string; label: string }
-
 type SelectFieldProps = {
   path: string
   label: string
   value: string
   onChange: (v: string) => void
-  options: SelectOption[]
+  options: OptionObject[]
   error?: string
 }
 
 function SelectField({ path, label, value, onChange, options, error }: SelectFieldProps) {
   return (
-    <div>
-      <FieldLabel label={label} htmlFor={path} required={false} />
-      <select
-        id={path}
-        style={s.select}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-      <FieldError message={error} showError={!!error} />
-    </div>
+    <SelectInput
+      name={path}
+      path={path}
+      Label={<FieldLabel label={label} htmlFor={path} required={false} />}
+      Error={<FieldError message={error} showError={!!error} />}
+      showError={!!error}
+      options={options}
+      value={value}
+      onChange={(opt) => {
+        if (opt && !Array.isArray(opt)) onChange((opt as OptionObject).value)
+      }}
+    />
   )
 }
 
@@ -229,10 +226,10 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
       </div>
 
       <div style={s.formActions}>
-        <button style={s.btnSecondary} onClick={onCancel} disabled={saving}>Anuluj</button>
-        <button style={s.btnPrimary} onClick={handleSave} disabled={saving}>
+        <Button buttonStyle="secondary" margin={false} onClick={onCancel} disabled={saving}>Anuluj</Button>
+        <Button buttonStyle="primary" margin={false} onClick={handleSave} disabled={saving}>
           {saving ? 'Zapisuję…' : isEdit ? 'Zapisz grupę' : 'Dodaj grupę'}
-        </button>
+        </Button>
       </div>
     </div>
   )

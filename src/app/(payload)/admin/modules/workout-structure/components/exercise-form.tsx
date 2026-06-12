@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FieldError, FieldLabel, TextInput, toast, useAuth, useListDrawer } from '@payloadcms/ui'
+import { Button, FieldError, FieldLabel, RelationshipInput, TextInput, toast, useAuth } from '@payloadcms/ui'
+import type { ValueWithRelation } from 'payload'
 import type { ExerciseRow } from '../types'
 import { s } from '../styles'
 
@@ -54,8 +55,9 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
   const { token } = useAuth()
   const isEdit = !!initial
 
-  const [exerciseId, setExerciseId] = useState(initial?.exercise ? String(initial.exercise.id) : '')
-  const [exerciseName, setExerciseName] = useState(initial?.exercise?.name ?? '')
+  const [exerciseValue, setExerciseValue] = useState<ValueWithRelation | null>(
+    initial?.exercise ? { value: initial.exercise.id, relationTo: 'exercises' } : null
+  )
   const [numer, setNumer]   = useState(initial?.numer  ?? '')
   const [rounds, setRounds] = useState(initial?.rounds ?? '')
   const [note, setNote]     = useState(initial?.note   ?? '')
@@ -66,10 +68,6 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
   const [rest, setRest]     = useState(initial?.rest   ?? '')
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
-
-  const [ListDrawer, ListDrawerToggler, { closeDrawer }] = useListDrawer({
-    collectionSlugs: ['exercises'],
-  })
 
   const clearError = (key: string) =>
     setErrors((prev) => { const next = { ...prev }; delete next[key]; return next })
@@ -86,7 +84,7 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
       const body: Record<string, unknown> = {
         numer:    numer    || null,
         rounds:   rounds   || null,
-        exercise: exerciseId ? Number(exerciseId) : null,
+        exercise: exerciseValue ? Number(exerciseValue.value) : null,
         note:     note     || null,
         reps:     reps     || null,
         kg:       kg       || null,
@@ -95,7 +93,9 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
         rest:     rest     || null,
         ...(!isEdit && { group: groupId, order: nextOrder }),
       }
-      const url = isEdit ? `/api/workout-exercise-rows/${initial!.id}` : '/api/workout-exercise-rows'
+      const url = isEdit
+        ? `/api/workout-exercise-rows/${initial!.id}?depth=1`
+        : '/api/workout-exercise-rows?depth=1'
       const res = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
@@ -104,8 +104,9 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
       const data = await res.json()
       if (!res.ok) throw new Error(data?.errors?.[0]?.message ?? 'Błąd zapisu')
 
-      const exerciseObj = exerciseId
-        ? { id: Number(exerciseId), name: exerciseName || null }
+      const exerciseDoc = data.doc.exercise
+      const exerciseObj = exerciseDoc && typeof exerciseDoc === 'object'
+        ? { id: exerciseDoc.id, name: exerciseDoc.name ?? null }
         : null
       const normalizedGroup =
         typeof data.doc.group === 'object' && data.doc.group !== null ? data.doc.group.id : data.doc.group
@@ -117,14 +118,6 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
     } finally {
       setSaving(false)
     }
-  }
-
-  const pickerStyle: React.CSSProperties = {
-    ...s.select,
-    textAlign: 'left',
-    cursor: 'pointer',
-    flex: 1,
-    boxSizing: 'border-box',
   }
 
   return (
@@ -147,23 +140,16 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
           />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ marginBottom: 3 }}>
-            <FieldLabel label="Ćwiczenie (katalog)" />
-          </div>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <ListDrawerToggler style={pickerStyle}>
-              {exerciseName || '— wybierz —'}
-            </ListDrawerToggler>
-            {exerciseId && (
-              <button
-                type='button'
-                style={{ ...s.btnSecondary, padding: '5px 8px' }}
-                onClick={() => { setExerciseId(''); setExerciseName('') }}
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          <RelationshipInput
+            path="exercise"
+            relationTo={['exercises']}
+            hasMany={false}
+            Label={<FieldLabel label="Ćwiczenie (katalog)" htmlFor="exercise" required={false} />}
+            value={exerciseValue}
+            onChange={(val) => setExerciseValue(val as ValueWithRelation)}
+            allowCreate={false}
+            allowEdit={true}
+          />
         </div>
       </div>
 
@@ -210,19 +196,11 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
       </div>
 
       <div style={s.formActions}>
-        <button style={s.btnSecondary} onClick={onCancel} disabled={saving}>Anuluj</button>
-        <button style={s.btnPrimary} onClick={handleSave} disabled={saving}>
+        <Button buttonStyle="secondary" margin={false} onClick={onCancel} disabled={saving}>Anuluj</Button>
+        <Button buttonStyle="primary" margin={false} onClick={handleSave} disabled={saving}>
           {saving ? 'Zapisuję…' : isEdit ? 'Zapisz ćwiczenie' : 'Dodaj ćwiczenie'}
-        </button>
+        </Button>
       </div>
-
-      <ListDrawer
-        onSelect={({ doc }) => {
-          setExerciseId(String(doc.id))
-          setExerciseName(String(doc.name ?? ''))
-          closeDrawer()
-        }}
-      />
     </div>
   )
 }

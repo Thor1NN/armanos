@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { toast, useAuth } from '@payloadcms/ui'
+import { Button, toast, useAuth } from '@payloadcms/ui'
 import type { ExerciseRow, Group, Section } from './types'
 import { PROTOCOL_LABEL } from './constants'
 import { exerciseLabel, exerciseMeta, groupLabel } from './utils'
@@ -122,8 +122,9 @@ export function WorkoutStructureEditor({
                         <span style={s.groupMeta}>{groupLabel(group)}</span>
                       </div>
                       <div style={{ display: 'flex', gap: 4 }}>
-                        <button
-                          style={s.btnSecondary}
+                        <Button
+                          buttonStyle="secondary"
+                          margin={false}
                           onClick={() => {
                             setAddingGroupFor(null)
                             setAddingExerciseFor(null)
@@ -132,10 +133,11 @@ export function WorkoutStructureEditor({
                           }}
                         >
                           Edytuj grupę
-                        </button>
+                        </Button>
                         {!hasLogs && (
-                          <button
-                            style={s.btnDanger}
+                          <Button
+                            buttonStyle="error"
+                            margin={false}
                             disabled={deletingGroup === group.id}
                             onClick={() => {
                               if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
@@ -144,7 +146,7 @@ export function WorkoutStructureEditor({
                             }}
                           >
                             {deletingGroup === group.id ? '…' : 'Usuń grupę'}
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -172,8 +174,10 @@ export function WorkoutStructureEditor({
                           <span style={s.exerciseNumer}>{row.numer ?? '—'}</span>
                           <span style={s.exerciseName}>{exerciseLabel(row)}</span>
                           <span style={s.exerciseMeta}>{exerciseMeta(row)}</span>
-                          <button
-                            style={{ ...s.btnSecondary, fontSize: 11, padding: '2px 6px' }}
+                          <Button
+                            buttonStyle="secondary"
+                            size="xsmall"
+                            margin={false}
                             onClick={() => {
                               setAddingExerciseFor(null)
                               setEditingGroup(null)
@@ -181,10 +185,12 @@ export function WorkoutStructureEditor({
                             }}
                           >
                             Edytuj
-                          </button>
+                          </Button>
                           {!hasLogs && (
-                            <button
-                              style={s.btnDanger}
+                            <Button
+                              buttonStyle="error"
+                              size="xsmall"
+                              margin={false}
                               disabled={deletingExercise === row.id}
                               onClick={() => {
                                 if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
@@ -193,7 +199,7 @@ export function WorkoutStructureEditor({
                               }}
                             >
                               {deletingExercise === row.id ? '…' : 'Usuń'}
-                            </button>
+                            </Button>
                           )}
                         </div>
                       )}
@@ -212,12 +218,17 @@ export function WorkoutStructureEditor({
                         onCancel={() => setAddingExerciseFor(null)}
                       />
                     ) : (
-                      <button style={s.btnAdd} onClick={() => {
-                        setEditingExercise(null)
-                        setAddingExerciseFor(group.id)
-                      }}>
+                      <Button
+                        buttonStyle="dashed"
+                        margin={false}
+                        onClick={() => {
+                          setEditingExercise(null)
+                          setAddingExerciseFor(group.id)
+                        }}
+                        extraButtonProps={{ style: { width: '100%', textAlign: 'left' } }}
+                      >
                         + Dodaj ćwiczenie
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -236,9 +247,14 @@ export function WorkoutStructureEditor({
                   onCancel={() => setAddingGroupFor(null)}
                 />
               ) : (
-                <button style={s.btnAdd} onClick={() => setAddingGroupFor(sectionKey)}>
+                <Button
+                  buttonStyle="dashed"
+                  margin={false}
+                  onClick={() => setAddingGroupFor(sectionKey)}
+                  extraButtonProps={{ style: { width: '100%', textAlign: 'left' } }}
+                >
                   + Dodaj grupę do tej sekcji
-                </button>
+                </Button>
               )}
             </div>
           </div>
