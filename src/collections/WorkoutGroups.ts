@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 import { isAdmin, isAuthenticated } from '../access'
 
 const PROTOCOL_OPTIONS = [
@@ -21,6 +21,31 @@ export const WorkoutGroups: CollectionConfig = {
     read: isAuthenticated,
     update: isAdmin,
     delete: isAdmin,
+  },
+  hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        const rows = await req.payload.find({
+          collection: 'workout-exercise-rows',
+          where: { group: { equals: id } },
+          limit: 1000,
+          depth: 0,
+        })
+        const rowIds = rows.docs.map((r) => r.id)
+        if (rowIds.length === 0) return
+
+        const logs = await req.payload.count({
+          collection: 'set-logs',
+          where: { exerciseRow: { in: rowIds } },
+        })
+        if (logs.totalDocs > 0) {
+          throw new APIError(
+            'Nie mozna usunac grupy, ktora ma cwiczenia z zapisanymi seriami.',
+            400,
+          )
+        }
+      },
+    ],
   },
   fields: [
     {

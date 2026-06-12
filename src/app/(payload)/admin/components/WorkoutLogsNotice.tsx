@@ -39,11 +39,11 @@ export async function WorkoutLogsNotice({ id, payload }: WorkoutLogsNoticeProps)
       }}
     >
       <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 1 }}>
-        Ten trening ma juz zapisane logi.
+        Ten trening ma zapisane logi.
       </div>
       <div style={{ color: '#9a3412', fontSize: 10, lineHeight: 1 }}>
-        Nie mozna go usunac ani usuwac istniejacych wierszy cwiczen. Mozesz nadal edytowac
-        opisy lub dodawac nowe cwiczenia.
+        Nie mozna usunac treningu ani cwiczen z zapisanymi seriami. Mozna edytowac opisy,
+        dodawac nowe cwiczenia i grupy.
       </div>
     </div>
   )
