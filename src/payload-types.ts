@@ -74,7 +74,10 @@ export interface Config {
     plans: Plan;
     microcycles: Microcycle;
     workouts: Workout;
+    'workout-groups': WorkoutGroup;
+    'workout-exercise-rows': WorkoutExerciseRow;
     'workout-logs': WorkoutLog;
+    'round-logs': RoundLog;
     'set-logs': SetLog;
     exercises: Exercise;
     'payload-kv': PayloadKv;
@@ -94,7 +97,10 @@ export interface Config {
     plans: PlansSelect<false> | PlansSelect<true>;
     microcycles: MicrocyclesSelect<false> | MicrocyclesSelect<true>;
     workouts: WorkoutsSelect<false> | WorkoutsSelect<true>;
+    'workout-groups': WorkoutGroupsSelect<false> | WorkoutGroupsSelect<true>;
+    'workout-exercise-rows': WorkoutExerciseRowsSelect<false> | WorkoutExerciseRowsSelect<true>;
     'workout-logs': WorkoutLogsSelect<false> | WorkoutLogsSelect<true>;
+    'round-logs': RoundLogsSelect<false> | RoundLogsSelect<true>;
     'set-logs': SetLogsSelect<false> | SetLogsSelect<true>;
     exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -285,44 +291,98 @@ export interface Workout {
          * np. Upper Body, EMOM
          */
         subtitle?: string | null;
-        groups?:
-          | {
-              /**
-               * np. Serie wstępne / Serie główne
-               */
-              setType?: string | null;
-              exercises?:
-                | {
-                    numer?: string | null;
-                    /**
-                     * Powiązanie z katalogiem — do wideo i progresu
-                     */
-                    exercise?: (number | null) | Exercise;
-                    /**
-                     * Opcjonalnie — gdy nazwa z katalogu nie wystarcza (wskazówka, wariant, instrukcja)
-                     */
-                    note?: string | null;
-                    series?: string | null;
-                    reps?: string | null;
-                    durationMin?: number | null;
-                    durationSec?: number | null;
-                    rest?: string | null;
-                    tut?: string | null;
-                    rir?: string | null;
-                    kg?: string | null;
-                    /**
-                     * Nietypowe kolumny (EMOM itd.)
-                     */
-                    extra?: string | null;
-                    id?: string | null;
-                  }[]
-                | null;
-              id?: string | null;
-            }[]
-          | null;
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workout-groups".
+ */
+export interface WorkoutGroup {
+  id: number;
+  workout: number | Workout;
+  /**
+   * Row ID sekcji z workout.sections
+   */
+  sectionRowId?: string | null;
+  order?: number | null;
+  protocol?: ('standard' | 'emom' | 'amrap' | 'for_time' | 'tabata') | null;
+  /**
+   * np. "4", "1-3"
+   */
+  rounds?: string | null;
+  /**
+   * Używane dla AMRAP
+   */
+  durationMinutes?: number | null;
+  /**
+   * Używane dla EMOM — domyślnie 60
+   */
+  intervalSeconds?: number | null;
+  /**
+   * Używane dla Tabata — domyślnie 20
+   */
+  workSeconds?: number | null;
+  /**
+   * Używane dla Tabata — domyślnie 10
+   */
+  restSeconds?: number | null;
+  /**
+   * Przerwa po ukończeniu pełnej rundy/obwodu
+   */
+  restBetweenRounds?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workout-exercise-rows".
+ */
+export interface WorkoutExerciseRow {
+  id: number;
+  group: number | WorkoutGroup;
+  order?: number | null;
+  /**
+   * np. "1a", "2b"
+   */
+  numer?: string | null;
+  /**
+   * Powiązanie z katalogiem — do wideo i progresu
+   */
+  exercise?: (number | null) | Exercise;
+  note?: string | null;
+  reps?: string | null;
+  kg?: string | null;
+  tut?: string | null;
+  rir?: string | null;
+  rest?: string | null;
+  durationMin?: number | null;
+  durationSec?: number | null;
+  /**
+   * Wypełnij tylko dla drop setów / piramidy. Puste = wszystkie serie identyczne.
+   */
+  setParameters?:
+    | {
+        setNumber: number;
+        reps?: string | null;
+        kg?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Zostaw puste jeśli ćwiczenie dziedziczy protokół z grupy.
+   */
+  override?: {
+    protocol?: ('' | 'standard' | 'emom' | 'amrap' | 'for_time' | 'tabata') | null;
+    rounds?: string | null;
+    durationMinutes?: number | null;
+    intervalSeconds?: number | null;
+    workSeconds?: number | null;
+    restSeconds?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -367,6 +427,22 @@ export interface WorkoutLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "round-logs".
+ */
+export interface RoundLog {
+  id: number;
+  session: number | WorkoutLog;
+  group: number | WorkoutGroup;
+  client?: (number | null) | Client;
+  roundNumber: number;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+  status?: ('completed' | 'partial' | 'skipped') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "set-logs".
  */
 export interface SetLog {
@@ -375,7 +451,8 @@ export interface SetLog {
   client?: (number | null) | Client;
   exercise?: (number | null) | Exercise;
   exerciseName?: string | null;
-  workoutExerciseRowId?: string | null;
+  exerciseRow?: (number | null) | WorkoutExerciseRow;
+  roundLog?: (number | null) | RoundLog;
   setNumber?: number | null;
   weight?: number | null;
   distanceM?: number | null;
@@ -436,8 +513,20 @@ export interface PayloadLockedDocument {
         value: number | Workout;
       } | null)
     | ({
+        relationTo: 'workout-groups';
+        value: number | WorkoutGroup;
+      } | null)
+    | ({
+        relationTo: 'workout-exercise-rows';
+        value: number | WorkoutExerciseRow;
+      } | null)
+    | ({
         relationTo: 'workout-logs';
         value: number | WorkoutLog;
+      } | null)
+    | ({
+        relationTo: 'round-logs';
+        value: number | RoundLog;
       } | null)
     | ({
         relationTo: 'set-logs';
@@ -605,30 +694,63 @@ export interface WorkoutsSelect<T extends boolean = true> {
     | {
         title?: T;
         subtitle?: T;
-        groups?:
-          | T
-          | {
-              setType?: T;
-              exercises?:
-                | T
-                | {
-                    numer?: T;
-                    exercise?: T;
-                    note?: T;
-                    series?: T;
-                    reps?: T;
-                    durationMin?: T;
-                    durationSec?: T;
-                    rest?: T;
-                    tut?: T;
-                    rir?: T;
-                    kg?: T;
-                    extra?: T;
-                    id?: T;
-                  };
-              id?: T;
-            };
         id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workout-groups_select".
+ */
+export interface WorkoutGroupsSelect<T extends boolean = true> {
+  workout?: T;
+  sectionRowId?: T;
+  order?: T;
+  protocol?: T;
+  rounds?: T;
+  durationMinutes?: T;
+  intervalSeconds?: T;
+  workSeconds?: T;
+  restSeconds?: T;
+  restBetweenRounds?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workout-exercise-rows_select".
+ */
+export interface WorkoutExerciseRowsSelect<T extends boolean = true> {
+  group?: T;
+  order?: T;
+  numer?: T;
+  exercise?: T;
+  note?: T;
+  reps?: T;
+  kg?: T;
+  tut?: T;
+  rir?: T;
+  rest?: T;
+  durationMin?: T;
+  durationSec?: T;
+  setParameters?:
+    | T
+    | {
+        setNumber?: T;
+        reps?: T;
+        kg?: T;
+        id?: T;
+      };
+  override?:
+    | T
+    | {
+        protocol?: T;
+        rounds?: T;
+        durationMinutes?: T;
+        intervalSeconds?: T;
+        workSeconds?: T;
+        restSeconds?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -649,6 +771,21 @@ export interface WorkoutLogsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "round-logs_select".
+ */
+export interface RoundLogsSelect<T extends boolean = true> {
+  session?: T;
+  group?: T;
+  client?: T;
+  roundNumber?: T;
+  startedAt?: T;
+  finishedAt?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "set-logs_select".
  */
 export interface SetLogsSelect<T extends boolean = true> {
@@ -656,7 +793,8 @@ export interface SetLogsSelect<T extends boolean = true> {
   client?: T;
   exercise?: T;
   exerciseName?: T;
-  workoutExerciseRowId?: T;
+  exerciseRow?: T;
+  roundLog?: T;
   setNumber?: T;
   weight?: T;
   distanceM?: T;

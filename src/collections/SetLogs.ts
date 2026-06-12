@@ -85,10 +85,17 @@ export const SetLogs: CollectionConfig = {
       label: 'Ćwiczenie (nazwa, migawka)',
     },
     {
-      // Które zlecenie w treningu (id wiersza tablicy) — grupowanie w UI sesji
-      name: 'workoutExerciseRowId',
-      type: 'text',
-      label: 'ID zlecenia w treningu',
+      name: 'exerciseRow',
+      type: 'relationship',
+      relationTo: 'workout-exercise-rows',
+      label: 'Zlecenie w treningu',
+      admin: { readOnly: true },
+    },
+    {
+      name: 'roundLog',
+      type: 'relationship',
+      relationTo: 'round-logs',
+      label: 'Runda',
       admin: { readOnly: true },
     },
     {

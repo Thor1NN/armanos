@@ -14,12 +14,18 @@ const STATUS_LABEL: Record<string, string> = {
   completed: 'Zakończony',
 }
 
+const PROTOCOL_LABEL: Record<string, string> = {
+  emom: 'EMOM',
+  amrap: 'AMRAP',
+  for_time: 'For Time',
+  tabata: 'Tabata',
+}
+
 export default async function HomePage() {
   const headers = await getHeaders()
   const payload = await getPayload({ config: await config })
   const { user } = await payload.auth({ headers })
 
-  // Tylko zalogowany klient; admini/niezalogowani → na logowanie
   if (!user || user.collection !== 'clients') {
     redirect('/login')
   }
@@ -51,8 +57,32 @@ export default async function HomePage() {
         collection: 'workouts',
         where: { microcycle: { in: mcIds } },
         sort: 'order',
-        depth: 1, // populuje relację `exercise` w wierszach (wideo/opis z katalogu)
+        depth: 0,
         limit: 1000,
+      })
+    : { docs: [] }
+
+  const workoutIds = workouts.docs.map((w) => w.id)
+
+  const workoutGroups = workoutIds.length
+    ? await payload.find({
+        collection: 'workout-groups',
+        where: { workout: { in: workoutIds } },
+        sort: 'order',
+        depth: 0,
+        limit: 10000,
+      })
+    : { docs: [] }
+
+  const groupIds = workoutGroups.docs.map((g) => g.id)
+
+  const exerciseRows = groupIds.length
+    ? await payload.find({
+        collection: 'workout-exercise-rows',
+        where: { group: { in: groupIds } },
+        sort: 'order',
+        depth: 1,
+        limit: 10000,
       })
     : { docs: [] }
 
@@ -63,8 +93,11 @@ export default async function HomePage() {
     microcycles.docs.filter((m) => relId(m.plan) === planId)
   const woByMc = (mcId: number | string) =>
     workouts.docs.filter((w) => relId(w.microcycle) === mcId)
+  const groupsByWorkout = (workoutId: number | string) =>
+    workoutGroups.docs.filter((g) => relId(g.workout) === workoutId)
+  const rowsByGroup = (groupId: number | string) =>
+    exerciseRows.docs.filter((r) => relId(r.group) === groupId)
 
-  // Parametry ćwiczenia → lista czytelnych etykiet (pomija puste / "x")
   const fmtDuration = (min?: number | null, sec?: number | null): string | null => {
     const m = min ?? 0
     const s = sec ?? 0
@@ -75,8 +108,9 @@ export default async function HomePage() {
     return p.join(' ')
   }
 
+  const ok = (v?: string | null) => v && v.trim() !== '' && v.trim().toLowerCase() !== 'x'
+
   const exMeta = (ex: {
-    series?: string | null
     reps?: string | null
     durationMin?: number | null
     durationSec?: number | null
@@ -84,11 +118,8 @@ export default async function HomePage() {
     tut?: string | null
     rir?: string | null
     kg?: string | null
-    extra?: string | null
   }): string[] => {
     const parts: string[] = []
-    const ok = (v?: string | null) => v && v.trim() !== '' && v.trim().toLowerCase() !== 'x'
-    if (ok(ex.series)) parts.push(`Serie: ${ex.series}`)
     if (ok(ex.reps)) parts.push(`Powt.: ${ex.reps}`)
     const dur = fmtDuration(ex.durationMin, ex.durationSec)
     if (dur) parts.push(`Czas: ${dur}`)
@@ -96,40 +127,80 @@ export default async function HomePage() {
     if (ok(ex.tut)) parts.push(`TUT: ${ex.tut}`)
     if (ok(ex.rir)) parts.push(`RIR: ${ex.rir}`)
     if (ok(ex.kg)) parts.push(`${ex.kg} kg`)
-    if (ok(ex.extra)) parts.push(ex.extra as string)
     return parts
   }
 
-  // Dokument Workout → serializowalny kształt dla komponentu klienckiego (z id wierszy)
-  const serializeWorkout = (w: (typeof workouts.docs)[number]): TWorkout => ({
-    id: w.id,
-    title: w.title,
-    rpe: w.rpe ?? null,
-    sections: (w.sections || []).map((section) => ({
-      title: section.title ?? null,
-      subtitle: section.subtitle ?? null,
-      groups: (section.groups || []).map((group) => ({
-        setType: group.setType ?? null,
-        exercises: (group.exercises || []).map((ex) => {
-          const cat = ex.exercise && typeof ex.exercise === 'object' ? ex.exercise : null
-          const name = cat?.name || ex.note || ''
-          const extraNote = cat && ex.note && ex.note !== cat.name ? ex.note : null
-          return {
-            rowId: String(ex.id),
-            numer: ex.numer ?? null,
-            name,
-            note: extraNote,
-            exerciseId: cat?.id ?? (typeof ex.exercise === 'number' ? ex.exercise : null),
-            exerciseName: name,
-            trackingType: cat?.trackingType ?? null,
-            videoUrl: cat?.videoUrl ?? null,
-            meta: exMeta(ex),
-            prefill: { reps: ex.reps ?? null, rir: ex.rir ?? null },
-          }
-        }),
-      })),
-    })),
-  })
+  const groupLabel = (g: (typeof workoutGroups.docs)[number]): string => {
+    const protocol = g.protocol as string
+    const rounds = g.rounds as string | null | undefined
+    const durationMinutes = g.durationMinutes as number | null | undefined
+
+    if (protocol === 'emom') return rounds ? `EMOM · ${rounds} min` : 'EMOM'
+    if (protocol === 'amrap') return durationMinutes ? `AMRAP · ${durationMinutes} min` : 'AMRAP'
+    if (protocol === 'for_time') return rounds ? `For Time · ${rounds} rund` : 'For Time'
+    if (protocol === 'tabata') return 'Tabata'
+    return rounds ? `${rounds} serie` : ''
+  }
+
+  const serializeWorkout = (w: (typeof workouts.docs)[number]): TWorkout => {
+    const sections = (w.sections ?? []) as Array<{
+      id?: string
+      title?: string | null
+      subtitle?: string | null
+    }>
+
+    const groups = groupsByWorkout(w.id)
+
+    return {
+      id: w.id,
+      title: w.title,
+      rpe: w.rpe ?? null,
+      sections: sections.map((section) => {
+        const sectionGroups = groups.filter(
+          (g) => (g.sectionRowId as string | null | undefined) === section.id,
+        )
+
+        return {
+          title: section.title ?? null,
+          subtitle: section.subtitle ?? null,
+          groups: sectionGroups.map((group) => {
+            const rows = rowsByGroup(group.id)
+
+            return {
+              protocol: (group.protocol as string) ?? 'standard',
+              label: groupLabel(group),
+              exercises: rows.map((ex) => {
+                const cat =
+                  ex.exercise && typeof ex.exercise === 'object'
+                    ? (ex.exercise as { id: number; name?: string; trackingType?: string; videoUrl?: string })
+                    : null
+                const name = cat?.name || ex.note || ''
+                const extraNote = cat && ex.note && ex.note !== cat.name ? ex.note : null
+
+                return {
+                  rowId: String(ex.id),
+                  numer: (ex.numer as string | null) ?? null,
+                  name,
+                  note: extraNote as string | null,
+                  exerciseId: cat?.id ?? null,
+                  exerciseName: name,
+                  trackingType: cat?.trackingType ?? null,
+                  videoUrl: (cat?.videoUrl as string | null | undefined) ?? null,
+                  meta: exMeta(ex as Parameters<typeof exMeta>[0]),
+                  prefill: {
+                    reps: (ex.reps as string | null) ?? null,
+                    rir: (ex.rir as string | null) ?? null,
+                  },
+                  setParameters:
+                    (ex.setParameters as Array<{ setNumber: number; reps?: string | null; kg?: string | null }> | null | undefined) ?? null,
+                }
+              }),
+            }
+          }),
+        }
+      }),
+    }
+  }
 
   const accordionPlans: TPlanAccordionItem[] = plans.docs.map((plan) => {
     const status = (plan.status as string) || 'active'

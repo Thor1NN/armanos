@@ -45,7 +45,7 @@ const api = {
     return (await res.json()).docs ?? []
   },
   async addSet(body: Record<string, unknown>): Promise<SetLog> {
-    const res = await fetch('/api/set-logs', {
+    const res = await fetch('/api/set-logs?depth=0', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'same-origin',
@@ -129,7 +129,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
 
   const setsForRow = (rowId: string) =>
     displayedSets
-      .filter((s) => s.workoutExerciseRowId === rowId)
+      .filter((s) => String(s.exerciseRow) === rowId)
       .sort((a, b) => (a.setNumber ?? 0) - (b.setNumber ?? 0))
 
   const onAdd = async (ex: TExercise, fields: MetricField[], v: Values) => {
@@ -139,7 +139,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
       session: s.id,
       exercise: ex.exerciseId ?? undefined,
       exerciseName: ex.exerciseName,
-      workoutExerciseRowId: ex.rowId,
+      exerciseRow: Number(ex.rowId),
       setNumber,
       ...metricBody(fields, v),
     })
@@ -189,7 +189,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
           )}
           {section.groups.map((group, gi) => (
             <div className="my-2 mb-3" key={gi}>
-              {group.setType && <div className={`mb-1 ${sectionLabelClass}`}>{group.setType}</div>}
+              {group.label && <div className={`mb-1 ${sectionLabelClass}`}>{group.label}</div>}
               {group.exercises.map((ex) => (
                 <ExerciseRow
                   key={ex.rowId}

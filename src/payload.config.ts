@@ -11,7 +11,10 @@ import { Media } from './collections/Media'
 import { Plans } from './collections/Plans'
 import { Microcycles } from './collections/Microcycles'
 import { Workouts } from './collections/Workouts'
+import { WorkoutGroups } from './collections/WorkoutGroups'
+import { WorkoutExerciseRows } from './collections/WorkoutExerciseRows'
 import { WorkoutLogs } from './collections/WorkoutLogs'
+import { RoundLogs } from './collections/RoundLogs'
 import { SetLogs } from './collections/SetLogs'
 import { Exercises } from './collections/Exercises'
 
@@ -32,7 +35,10 @@ export default buildConfig({
     Plans,
     Microcycles,
     Workouts,
+    WorkoutGroups,
+    WorkoutExerciseRows,
     WorkoutLogs,
+    RoundLogs,
     SetLogs,
     Exercises,
   ],
