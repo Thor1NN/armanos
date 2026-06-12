@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { trackingFields, type MetricField } from '../../../../trackingTypes'
-import { dashedButtonClass, mutedTextClass } from '../../ui'
+import { mutedTextClass } from '../../ui'
+import { Button } from '../ui/Button'
 import { SetForm } from './SetForm'
 import { SetItem } from './SetItem'
 import type { SetLog, TExercise, Values } from './types'
@@ -27,7 +28,7 @@ export function ExerciseRow({
     <div className="border-t border-app-border py-2 first:border-t-0">
       <div className="break-words text-sm text-app-text">
         {ex.numer ? (
-          <span className={`inline-block min-w-[26px] font-semibold ${mutedTextClass}`}>{ex.numer}</span>
+          <span className={`inline-block min-w-7 font-semibold ${mutedTextClass}`}>{ex.numer}</span>
         ) : null}
         {ex.name}
         {ex.videoUrl && (
@@ -43,9 +44,9 @@ export function ExerciseRow({
       </div>
 
       {ex.meta.length > 0 && (
-        <div className={`mt-0.5 pl-[26px] text-xs ${mutedTextClass}`}>{ex.meta.join(' · ')}</div>
+        <div className={`mt-0.5 pl-7 text-xs ${mutedTextClass}`}>{ex.meta.join(' · ')}</div>
       )}
-      {ex.note && <div className={`mt-0.5 pl-[26px] text-xs ${mutedTextClass}`}>{ex.note}</div>}
+      {ex.note && <div className={`mt-0.5 pl-7 text-xs ${mutedTextClass}`}>{ex.note}</div>}
 
       {sets.length > 0 && (
         <ul className="mt-2 mb-1 list-none p-0">
@@ -66,9 +67,9 @@ export function ExerciseRow({
           onCancel={() => setOpen(false)}
         />
       ) : (
-        <button className={`mt-1.5 ${dashedButtonClass}`} onClick={() => setOpen(true)}>
+        <Button className="mt-1.5" variant="dashed" onClick={() => setOpen(true)}>
           + dodaj serię
-        </button>
+        </Button>
       )}
     </div>
   )

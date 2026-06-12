@@ -6,7 +6,9 @@ import React from 'react'
 import config from '@/payload.config'
 import LogoutButton from './LogoutButton'
 import WorkoutTracker, { type TWorkout } from './WorkoutTracker'
-import { sectionLabelClass, statusBadgeClass, surfaceClass } from './ui'
+import { sectionLabelClass } from './ui'
+import { StatusBadge } from './components/ui/StatusBadge'
+import { Surface } from './components/ui/Surface'
 
 const STATUS_LABEL: Record<string, string> = {
   active: 'Aktywny',
@@ -151,10 +153,10 @@ export default async function HomePage() {
         const status = (plan.status as string) || 'active'
 
         return (
-          <div className={`mb-4 px-5 py-4 ${surfaceClass}`} key={plan.id}>
+          <Surface className="mb-4 py-4" key={plan.id}>
             <h2 className="mb-1 text-base font-semibold text-app-text">
               {plan.title}{' '}
-              <span className={statusBadgeClass(status)}>{STATUS_LABEL[status] || status}</span>
+              <StatusBadge status={status}>{STATUS_LABEL[status] || status}</StatusBadge>
             </h2>
             {(plan.startDate || plan.endDate) && (
               <div className="text-sm text-app-muted">
@@ -176,7 +178,7 @@ export default async function HomePage() {
                 ))}
               </div>
             ))}
-          </div>
+          </Surface>
         )
       })}
     </div>

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { secondaryButtonClass } from './ui'
+import { Button } from './components/ui/Button'
 
 export default function LogoutButton() {
   const router = useRouter()
@@ -16,12 +16,8 @@ export default function LogoutButton() {
   }
 
   return (
-    <button
-      className={secondaryButtonClass}
-      onClick={onClick}
-      disabled={loading}
-    >
+    <Button variant="secondary" onClick={onClick} disabled={loading}>
       {loading ? '…' : 'Wyloguj'}
-    </button>
+    </Button>
   )
 }

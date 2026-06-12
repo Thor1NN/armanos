@@ -2,14 +2,8 @@
 
 import React, { useState } from 'react'
 import { METRIC_FIELDS, type MetricField } from '../../../../trackingTypes'
-import {
-  compactInputClass,
-  compactUnitInputClass,
-  inputClass,
-  primaryButtonClass,
-  secondaryButtonClass,
-  selectClass,
-} from '../../ui'
+import { Button } from '../ui/Button'
+import { Input, Select } from '../ui/Input'
 import type { Values } from './types'
 
 export function SetForm({
@@ -45,8 +39,8 @@ export function SetForm({
         if (meta.composite === 'duration') {
           return (
             <span className="inline-flex items-stretch gap-1" key={f}>
-              <input
-                className={compactUnitInputClass}
+              <Input
+                variant="compact-unit"
                 type="number"
                 min="0"
                 placeholder="min"
@@ -55,8 +49,8 @@ export function SetForm({
                 autoFocus={i === 0}
               />
               <span className="flex items-center text-xs text-app-muted">min</span>
-              <input
-                className={compactUnitInputClass}
+              <Input
+                variant="compact-unit"
                 type="number"
                 min="0"
                 max="59"
@@ -73,8 +67,8 @@ export function SetForm({
           const unit = values[`${f}__unit`] ?? meta.units.default
           return (
             <span className="inline-flex items-stretch gap-1" key={f}>
-              <input
-                className={compactUnitInputClass}
+              <Input
+                variant="compact-unit"
                 type="number"
                 step="any"
                 placeholder={meta.placeholder}
@@ -82,25 +76,21 @@ export function SetForm({
                 onChange={(e) => set(f, e.target.value)}
                 autoFocus={i === 0}
               />
-              <select
-                className={selectClass}
-                value={unit}
-                onChange={(e) => set(`${f}__unit`, e.target.value)}
-              >
+              <Select value={unit} onChange={(e) => set(`${f}__unit`, e.target.value)}>
                 {meta.units.options.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </span>
           )
         }
 
         return (
-          <input
+          <Input
             key={f}
-            className={compactInputClass}
+            variant="compact"
             type={meta.numeric ? 'number' : 'text'}
             step={meta.numeric ? '0.5' : undefined}
             placeholder={meta.placeholder}
@@ -111,20 +101,20 @@ export function SetForm({
         )
       })}
 
-      <input
-        className={`min-w-[90px] flex-1 ${inputClass}`}
+      <Input
+        className="min-w-24 flex-1"
         type="text"
         placeholder="notatka"
         value={values.note ?? ''}
         onChange={(e) => set('note', e.target.value)}
       />
-      <button className={primaryButtonClass} type="submit" disabled={saving}>
+      <Button type="submit" disabled={saving}>
         {saving ? '…' : 'Zapisz'}
-      </button>
+      </Button>
       {onCancel && (
-        <button className={secondaryButtonClass} type="button" onClick={onCancel}>
+        <Button variant="secondary" onClick={onCancel}>
           Anuluj
-        </button>
+        </Button>
       )}
     </form>
   )

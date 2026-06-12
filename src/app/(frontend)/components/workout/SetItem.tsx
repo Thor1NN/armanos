@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { METRIC_FIELDS, type MetricField } from '../../../../trackingTypes'
-import { dangerIconButtonClass, iconButtonClass, joinClasses, panelClass } from '../../ui'
+import { joinClasses, panelClass } from '../../ui'
+import { Button } from '../ui/Button'
 import { SetForm } from './SetForm'
 import type { SetLog, Values } from './types'
 import { setSummary, toDefaultUnit } from './utils'
@@ -61,12 +62,12 @@ export function SetItem({
         Seria {set.setNumber}: {setSummary(set)}
       </span>
       <span className="flex shrink-0 gap-0.5">
-        <button className={iconButtonClass} onClick={() => setEditing(true)} aria-label="Edytuj">
+        <Button variant="icon" onClick={() => setEditing(true)} aria-label="Edytuj">
           ✎
-        </button>
-        <button className={dangerIconButtonClass} onClick={() => onDelete(set.id)} aria-label="Usuń">
+        </Button>
+        <Button variant="danger" onClick={() => onDelete(set.id)} aria-label="Usuń">
           ✕
-        </button>
+        </Button>
       </span>
     </li>
   )

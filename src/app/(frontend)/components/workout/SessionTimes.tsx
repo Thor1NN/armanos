@@ -1,14 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import {
-  inputClass,
-  joinClasses,
-  mutedTextClass,
-  panelClass,
-  primaryButtonClass,
-  secondaryButtonClass,
-} from '../../ui'
+import { joinClasses, mutedTextClass } from '../../ui'
+import { Button } from '../ui/Button'
+import { Input } from '../ui/Input'
+import { Surface } from '../ui/Surface'
 import type { Session } from './types'
 import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from './utils'
 
@@ -62,10 +58,9 @@ export function SessionTimes({
     const e = compact(finishIso)
 
     return (
-      <button
-        type="button"
+      <Button
+        variant="secondary"
         className={joinClasses(
-          secondaryButtonClass,
           'rounded-full bg-app-panel px-3 py-1.5 text-xs font-normal text-app-text',
         )}
         onClick={() => setOpen(true)}
@@ -78,70 +73,58 @@ export function SessionTimes({
         ) : (
           <span className={mutedTextClass}>＋ Czas treningu</span>
         )}
-      </button>
+      </Button>
     )
   }
 
   return (
-    <div className={`mt-1 basis-full p-3 font-normal ${panelClass}`}>
+      <Surface className="mt-1 basis-full p-3 font-normal" variant="panel">
       <div className="flex flex-wrap items-center gap-1.5 text-sm">
-        <span className={`w-[86px] shrink-0 text-xs ${mutedTextClass}`}>Rozpoczęto</span>
-        <input
-          className={inputClass}
+        <span className={`w-20 shrink-0 text-xs ${mutedTextClass}`}>Rozpoczęto</span>
+        <Input
           type="date"
           value={sd}
           onChange={(e) => setSd(e.target.value)}
           onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
         />
-        <input
-          className={inputClass}
+        <Input
           type="time"
           value={st}
           onChange={(e) => setSt(e.target.value)}
           onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
         />
-        <button
-          type="button"
-          className={secondaryButtonClass}
-          onClick={() => onSet('startedAt', new Date().toISOString())}
-        >
+        <Button variant="secondary" onClick={() => onSet('startedAt', new Date().toISOString())}>
           teraz
-        </button>
+        </Button>
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5 text-sm">
-        <span className={`w-[86px] shrink-0 text-xs ${mutedTextClass}`}>Zakończono</span>
-        <input
-          className={inputClass}
+        <span className={`w-20 shrink-0 text-xs ${mutedTextClass}`}>Zakończono</span>
+        <Input
           type="date"
           value={ed}
           onChange={(e) => setEd(e.target.value)}
           onBlur={() => onSet('finishedAt', combineDateTime(ed, et))}
         />
-        <input
-          className={inputClass}
+        <Input
           type="time"
           value={et}
           onChange={(e) => setEt(e.target.value)}
           onBlur={() => onSet('finishedAt', combineDateTime(ed, et))}
         />
-        <button
-          type="button"
-          className={secondaryButtonClass}
-          onClick={() => onSet('finishedAt', new Date().toISOString())}
-        >
+        <Button variant="secondary" onClick={() => onSet('finishedAt', new Date().toISOString())}>
           teraz
-        </button>
+        </Button>
       </div>
 
       <div className="mt-2 flex flex-wrap gap-2">
-        <button type="button" className={primaryButtonClass} onClick={save} disabled={saving}>
+        <Button onClick={save} disabled={saving}>
           {saving ? '…' : 'Zapisz'}
-        </button>
-        <button type="button" className={secondaryButtonClass} onClick={() => setOpen(false)}>
+        </Button>
+        <Button variant="secondary" onClick={() => setOpen(false)}>
           Zwiń
-        </button>
+        </Button>
       </div>
-    </div>
+    </Surface>
   )
 }
