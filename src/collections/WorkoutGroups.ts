@@ -37,6 +37,12 @@ export const WorkoutGroups: CollectionConfig = {
       admin: { description: 'Row ID sekcji z workout.sections' },
     },
     {
+      name: 'label',
+      type: 'text',
+      label: 'Nazwa grupy',
+      admin: { description: 'np. "Superset górny", "Część główna A" (opcjonalne)' },
+    },
+    {
       name: 'order',
       type: 'number',
       label: 'Kolejność',

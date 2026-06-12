@@ -7,6 +7,7 @@ type Group = {
   id: number
   sectionRowId?: string | null
   order?: number | null
+  label?: string | null
   protocol?: string | null
   rounds?: string | null
   durationMinutes?: number | null
@@ -16,12 +17,28 @@ type Group = {
   restBetweenRounds?: string | null
 }
 
-type ExerciseRow = {
+type RawExerciseRow = {
   id: number
   group?: number | { id: number } | null
   order?: number | null
   numer?: string | null
   exercise?: { id: number; name?: string | null } | number | null
+  note?: string | null
+  reps?: string | null
+  kg?: string | null
+  tut?: string | null
+  rir?: string | null
+  rest?: string | null
+  durationMin?: number | null
+  durationSec?: number | null
+}
+
+type ExerciseRow = {
+  id: number
+  group?: number | null
+  order?: number | null
+  numer?: string | null
+  exercise?: { id: number; name?: string | null } | null
   note?: string | null
   reps?: string | null
   kg?: string | null
@@ -91,6 +108,7 @@ export async function WorkoutStructureView({
     id: g.id,
     sectionRowId: g.sectionRowId ?? null,
     order: g.order ?? 0,
+    label: g.label ?? null,
     protocol: g.protocol ?? 'standard',
     rounds: g.rounds ?? null,
     durationMinutes: g.durationMinutes ?? null,
@@ -100,7 +118,7 @@ export async function WorkoutStructureView({
     restBetweenRounds: g.restBetweenRounds ?? null,
   }))
 
-  const exerciseRows: ExerciseRow[] = exerciseRowsResult.docs.map((r: ExerciseRow) => ({
+  const exerciseRows: ExerciseRow[] = exerciseRowsResult.docs.map((r: RawExerciseRow) => ({
     id: r.id,
     group: typeof r.group === 'object' && r.group !== null ? r.group.id : (r.group ?? null),
     order: r.order ?? 0,

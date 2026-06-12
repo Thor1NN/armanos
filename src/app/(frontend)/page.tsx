@@ -131,6 +131,7 @@ export default async function HomePage() {
   }
 
   const groupLabel = (g: (typeof workoutGroups.docs)[number]): string => {
+    if (g.label) return g.label as string
     const protocol = g.protocol as string
     const rounds = g.rounds as string | null | undefined
     const durationMinutes = g.durationMinutes as number | null | undefined

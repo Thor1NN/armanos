@@ -10,6 +10,7 @@ type Group = {
   id: number
   sectionRowId?: string | null
   order?: number | null
+  label?: string | null
   protocol?: string | null
   rounds?: string | null
   durationMinutes?: number | null
@@ -206,26 +207,30 @@ const exerciseMeta = (row: ExerciseRow): string => {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function AddGroupForm({
+function GroupForm({
   sectionRowId,
   workoutId,
   nextOrder,
-  onAdded,
+  initial,
+  onSaved,
   onCancel,
 }: {
   sectionRowId: string | undefined
   workoutId: number
   nextOrder: number
-  onAdded: (group: Group) => void
+  initial?: Group
+  onSaved: (group: Group) => void
   onCancel: () => void
 }) {
-  const [protocol, setProtocol] = useState('standard')
-  const [rounds, setRounds] = useState('')
-  const [durationMinutes, setDurationMinutes] = useState('')
-  const [intervalSeconds, setIntervalSeconds] = useState('60')
-  const [workSeconds, setWorkSeconds] = useState('20')
-  const [restSeconds, setRestSeconds] = useState('10')
-  const [restBetweenRounds, setRestBetweenRounds] = useState('')
+  const isEdit = !!initial
+  const [label, setLabel] = useState(initial?.label ?? '')
+  const [protocol, setProtocol] = useState(initial?.protocol ?? 'standard')
+  const [rounds, setRounds] = useState(initial?.rounds ?? '')
+  const [durationMinutes, setDurationMinutes] = useState(String(initial?.durationMinutes ?? ''))
+  const [intervalSeconds, setIntervalSeconds] = useState(String(initial?.intervalSeconds ?? '60'))
+  const [workSeconds, setWorkSeconds] = useState(String(initial?.workSeconds ?? '20'))
+  const [restSeconds, setRestSeconds] = useState(String(initial?.restSeconds ?? '10'))
+  const [restBetweenRounds, setRestBetweenRounds] = useState(initial?.restBetweenRounds ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -234,27 +239,27 @@ function AddGroupForm({
     setError('')
     try {
       const body: Record<string, unknown> = {
-        workout: workoutId,
-        sectionRowId: sectionRowId ?? '',
-        order: nextOrder,
+        label: label || null,
         protocol,
-        rounds: rounds || undefined,
-        durationMinutes: durationMinutes ? Number(durationMinutes) : undefined,
-        intervalSeconds: intervalSeconds ? Number(intervalSeconds) : undefined,
-        workSeconds: workSeconds ? Number(workSeconds) : undefined,
-        restSeconds: restSeconds ? Number(restSeconds) : undefined,
-        restBetweenRounds: restBetweenRounds || undefined,
+        rounds: rounds || null,
+        durationMinutes: durationMinutes ? Number(durationMinutes) : null,
+        intervalSeconds: intervalSeconds ? Number(intervalSeconds) : null,
+        workSeconds: workSeconds ? Number(workSeconds) : null,
+        restSeconds: restSeconds ? Number(restSeconds) : null,
+        restBetweenRounds: restBetweenRounds || null,
+        ...(!isEdit && { workout: workoutId, sectionRowId: sectionRowId ?? '', order: nextOrder }),
       }
 
-      const res = await fetch('/api/workout-groups', {
-        method: 'POST',
+      const url = isEdit ? `/api/workout-groups/${initial!.id}` : '/api/workout-groups'
+      const res = await fetch(url, {
+        method: isEdit ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify(body),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.errors?.[0]?.message ?? 'Błąd zapisu')
-      onAdded(data.doc)
+      onSaved(data.doc)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Błąd zapisu')
     } finally {
@@ -265,9 +270,16 @@ function AddGroupForm({
   return (
     <div style={s.formBox}>
       <div style={{ ...s.label, fontSize: 12, fontWeight: 700, color: '#E8E8E8', marginBottom: 10 }}>
-        Nowa grupa
+        {isEdit ? 'Edytuj grupę' : 'Nowa grupa'}
       </div>
       {error && <div style={s.errorMsg}>{error}</div>}
+
+      <div style={s.formRow}>
+        <div style={{ flex: '1 1 200px' }}>
+          <label style={s.label}>Nazwa grupy (opcjonalna)</label>
+          <input style={s.input} value={label} onChange={(e) => setLabel(e.target.value)} placeholder='np. Superset górny, Część A' />
+        </div>
+      </div>
 
       <div style={s.formRow}>
         <div style={{ flex: '1 1 140px' }}>
@@ -324,34 +336,39 @@ function AddGroupForm({
       <div style={s.formActions}>
         <button style={s.btnSecondary} onClick={onCancel} disabled={saving}>Anuluj</button>
         <button style={s.btnPrimary} onClick={handleSave} disabled={saving}>
-          {saving ? 'Zapisuję…' : 'Dodaj grupę'}
+          {saving ? 'Zapisuję…' : isEdit ? 'Zapisz grupę' : 'Dodaj grupę'}
         </button>
       </div>
     </div>
   )
 }
 
-function AddExerciseForm({
+function ExerciseForm({
   groupId,
   nextOrder,
   exerciseCatalog,
-  onAdded,
+  initial,
+  onSaved,
   onCancel,
 }: {
   groupId: number
   nextOrder: number
   exerciseCatalog: ExerciseCatalogItem[]
-  onAdded: (row: ExerciseRow) => void
+  initial?: ExerciseRow
+  onSaved: (row: ExerciseRow) => void
   onCancel: () => void
 }) {
-  const [exerciseId, setExerciseId] = useState('')
-  const [numer, setNumer] = useState('')
-  const [note, setNote] = useState('')
-  const [reps, setReps] = useState('')
-  const [kg, setKg] = useState('')
-  const [tut, setTut] = useState('')
-  const [rir, setRir] = useState('')
-  const [rest, setRest] = useState('')
+  const isEdit = !!initial
+  const [exerciseId, setExerciseId] = useState(
+    initial?.exercise ? String(initial.exercise.id) : '',
+  )
+  const [numer, setNumer] = useState(initial?.numer ?? '')
+  const [note, setNote] = useState(initial?.note ?? '')
+  const [reps, setReps] = useState(initial?.reps ?? '')
+  const [kg, setKg] = useState(initial?.kg ?? '')
+  const [tut, setTut] = useState(initial?.tut ?? '')
+  const [rir, setRir] = useState(initial?.rir ?? '')
+  const [rest, setRest] = useState(initial?.rest ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -360,19 +377,21 @@ function AddExerciseForm({
     setError('')
     try {
       const body: Record<string, unknown> = {
-        group: groupId,
-        order: nextOrder,
-        numer: numer || undefined,
-        exercise: exerciseId ? Number(exerciseId) : undefined,
-        note: note || undefined,
-        reps: reps || undefined,
-        kg: kg || undefined,
-        tut: tut || undefined,
-        rir: rir || undefined,
-        rest: rest || undefined,
+        numer: numer || null,
+        exercise: exerciseId ? Number(exerciseId) : null,
+        note: note || null,
+        reps: reps || null,
+        kg: kg || null,
+        tut: tut || null,
+        rir: rir || null,
+        rest: rest || null,
+        ...(!isEdit && { group: groupId, order: nextOrder }),
       }
-      const res = await fetch('/api/workout-exercise-rows', {
-        method: 'POST',
+      const url = isEdit
+        ? `/api/workout-exercise-rows/${initial!.id}`
+        : '/api/workout-exercise-rows'
+      const res = await fetch(url, {
+        method: isEdit ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify(body),
@@ -384,7 +403,7 @@ function AddExerciseForm({
         ? { id: Number(exerciseId), name: exerciseCatalog.find((e) => e.id === Number(exerciseId))?.name ?? null }
         : null
 
-      onAdded({ ...data.doc, exercise: exerciseObj })
+      onSaved({ ...data.doc, exercise: exerciseObj })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Błąd zapisu')
     } finally {
@@ -395,7 +414,7 @@ function AddExerciseForm({
   return (
     <div style={s.formBox}>
       <div style={{ ...s.label, fontSize: 12, fontWeight: 700, color: '#E8E8E8', marginBottom: 10 }}>
-        Nowe ćwiczenie
+        {isEdit ? 'Edytuj ćwiczenie' : 'Nowe ćwiczenie'}
       </div>
       {error && <div style={s.errorMsg}>{error}</div>}
 
@@ -448,7 +467,7 @@ function AddExerciseForm({
       <div style={s.formActions}>
         <button style={s.btnSecondary} onClick={onCancel} disabled={saving}>Anuluj</button>
         <button style={s.btnPrimary} onClick={handleSave} disabled={saving}>
-          {saving ? 'Zapisuję…' : 'Dodaj ćwiczenie'}
+          {saving ? 'Zapisuję…' : isEdit ? 'Zapisz ćwiczenie' : 'Dodaj ćwiczenie'}
         </button>
       </div>
     </div>
@@ -467,7 +486,9 @@ export function WorkoutStructureEditor({
   const [groups, setGroups] = useState<Group[]>(initialGroups)
   const [exerciseRows, setExerciseRows] = useState<ExerciseRow[]>(initialExerciseRows)
   const [addingGroupFor, setAddingGroupFor] = useState<string | null>(null)
+  const [editingGroup, setEditingGroup] = useState<number | null>(null)
   const [addingExerciseFor, setAddingExerciseFor] = useState<number | null>(null)
+  const [editingExercise, setEditingExercise] = useState<number | null>(null)
   const [deletingGroup, setDeletingGroup] = useState<number | null>(null)
   const [deletingExercise, setDeletingExercise] = useState<number | null>(null)
 
@@ -540,59 +561,117 @@ export function WorkoutStructureEditor({
 
               return (
                 <div key={group.id} style={s.groupCard}>
-                  <div style={s.groupHeader}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span style={s.groupTitle}>{PROTOCOL_LABEL[group.protocol ?? 'standard'] ?? group.protocol}</span>
-                      <span style={s.groupMeta}>{groupLabel(group)}</span>
-                    </div>
-                    <button
-                      style={s.btnDanger}
-                      disabled={deletingGroup === group.id}
-                      onClick={() => {
-                        if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
-                          handleDeleteGroup(group.id)
-                        }
+                  {editingGroup === group.id ? (
+                    <GroupForm
+                      sectionRowId={group.sectionRowId ?? undefined}
+                      workoutId={workoutId}
+                      nextOrder={group.order ?? 0}
+                      initial={group}
+                      onSaved={(updated) => {
+                        setGroups((prev) => prev.map((g) => g.id === updated.id ? { ...g, ...updated } : g))
+                        setEditingGroup(null)
                       }}
-                    >
-                      {deletingGroup === group.id ? '…' : 'Usuń grupę'}
-                    </button>
-                  </div>
+                      onCancel={() => setEditingGroup(null)}
+                    />
+                  ) : (
+                    <div style={s.groupHeader}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={s.groupTitle}>{group.label ?? PROTOCOL_LABEL[group.protocol ?? 'standard'] ?? group.protocol}</span>
+                        <span style={s.groupMeta}>{groupLabel(group)}</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button
+                          style={s.btnSecondary}
+                          onClick={() => {
+                            setAddingGroupFor(null)
+                            setAddingExerciseFor(null)
+                            setEditingExercise(null)
+                            setEditingGroup(group.id)
+                          }}
+                        >
+                          Edytuj grupę
+                        </button>
+                        <button
+                          style={s.btnDanger}
+                          disabled={deletingGroup === group.id}
+                          onClick={() => {
+                            if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
+                              handleDeleteGroup(group.id)
+                            }
+                          }}
+                        >
+                          {deletingGroup === group.id ? '…' : 'Usuń grupę'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-                  {rows.length === 0 && <div style={s.empty}>Brak ćwiczeń.</div>}
+                  {rows.length === 0 && editingGroup !== group.id && <div style={s.empty}>Brak ćwiczeń.</div>}
 
                   {rows.map((row) => (
-                    <div key={row.id} style={row.id === rows[rows.length - 1]?.id ? { ...s.exerciseRow, borderBottom: 'none' } : s.exerciseRow}>
-                      <span style={s.exerciseNumer}>{row.numer ?? '—'}</span>
-                      <span style={s.exerciseName}>{exerciseLabel(row)}</span>
-                      <span style={s.exerciseMeta}>{exerciseMeta(row)}</span>
-                      <button
-                        style={s.btnDanger}
-                        disabled={deletingExercise === row.id}
-                        onClick={() => {
-                          if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
-                            handleDeleteExercise(row.id)
-                          }
-                        }}
-                      >
-                        {deletingExercise === row.id ? '…' : 'Usuń'}
-                      </button>
+                    <div key={row.id}>
+                      {editingExercise === row.id ? (
+                        <div style={{ padding: '6px 12px' }}>
+                          <ExerciseForm
+                            groupId={group.id}
+                            nextOrder={row.order ?? 0}
+                            exerciseCatalog={exerciseCatalog}
+                            initial={row}
+                            onSaved={(updated) => {
+                              setExerciseRows((prev) => prev.map((r) => r.id === updated.id ? { ...r, ...updated } : r))
+                              setEditingExercise(null)
+                            }}
+                            onCancel={() => setEditingExercise(null)}
+                          />
+                        </div>
+                      ) : (
+                        <div style={row.id === rows[rows.length - 1]?.id ? { ...s.exerciseRow, borderBottom: 'none' } : s.exerciseRow}>
+                          <span style={s.exerciseNumer}>{row.numer ?? '—'}</span>
+                          <span style={s.exerciseName}>{exerciseLabel(row)}</span>
+                          <span style={s.exerciseMeta}>{exerciseMeta(row)}</span>
+                          <button
+                            style={{ ...s.btnSecondary, fontSize: 11, padding: '2px 6px' }}
+                            onClick={() => {
+                              setAddingExerciseFor(null)
+                              setEditingGroup(null)
+                              setEditingExercise(row.id)
+                            }}
+                          >
+                            Edytuj
+                          </button>
+                          <button
+                            style={s.btnDanger}
+                            disabled={deletingExercise === row.id}
+                            onClick={() => {
+                              if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
+                                handleDeleteExercise(row.id)
+                              }
+                            }}
+                          >
+                            {deletingExercise === row.id ? '…' : 'Usuń'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
 
                   <div style={{ padding: '6px 12px 10px' }}>
                     {addingExerciseFor === group.id ? (
-                      <AddExerciseForm
+                      <ExerciseForm
                         groupId={group.id}
                         nextOrder={rows.length}
                         exerciseCatalog={exerciseCatalog}
-                        onAdded={(row) => {
+                        onSaved={(row) => {
                           setExerciseRows((prev) => [...prev, row])
                           setAddingExerciseFor(null)
                         }}
                         onCancel={() => setAddingExerciseFor(null)}
                       />
                     ) : (
-                      <button style={s.btnAdd} onClick={() => setAddingExerciseFor(group.id)}>
+                      <button style={s.btnAdd} onClick={() => {
+                        setEditingExercise(null)
+                        setAddingExerciseFor(group.id)
+                      }}>
                         + Dodaj ćwiczenie
                       </button>
                     )}
@@ -603,11 +682,11 @@ export function WorkoutStructureEditor({
 
             <div style={{ marginTop: 8 }}>
               {addingGroupFor === sectionKey ? (
-                <AddGroupForm
+                <GroupForm
                   sectionRowId={section.id}
                   workoutId={workoutId}
                   nextOrder={sectionGroups.length}
-                  onAdded={(group) => {
+                  onSaved={(group) => {
                     setGroups((prev) => [...prev, group])
                     setAddingGroupFor(null)
                   }}
