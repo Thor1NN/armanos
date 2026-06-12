@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 
 type WorkoutSection = {
   groups?: Array<{
@@ -69,8 +69,9 @@ export const Workouts: CollectionConfig = {
         const removedRowIds = [...previousRowIds].filter((rowId) => !nextRowIds.has(rowId))
 
         if (removedRowIds.length > 0) {
-          throw new Error(
+          throw new APIError(
             'Nie mozna usuwac istniejacych cwiczen z treningu, ktory ma juz zapisane logi. Dodaj nowa wersje treningu zamiast przebudowywac stara.',
+            400,
           )
         }
 
@@ -80,8 +81,9 @@ export const Workouts: CollectionConfig = {
     beforeDelete: [
       async ({ id, req }) => {
         if (await hasWorkoutLogs(req, id)) {
-          throw new Error(
+          throw new APIError(
             'Nie mozna usunac treningu, ktory ma juz zapisane logi. Najpierw usun logi albo utworz nowa wersje treningu.',
+            400,
           )
         }
       },
