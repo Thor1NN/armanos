@@ -1,5 +1,50 @@
 import type { CollectionConfig } from 'payload'
 
+type WorkoutSection = {
+  groups?: Array<{
+    exercises?: Array<{
+      id?: string | null
+    }>
+  }>
+}
+
+const getWorkoutExerciseRowIds = (sections?: WorkoutSection[] | null) => {
+  const rowIds = new Set<string>()
+
+  for (const section of sections ?? []) {
+    for (const group of section.groups ?? []) {
+      for (const exercise of group.exercises ?? []) {
+        if (exercise.id) {
+          rowIds.add(String(exercise.id))
+        }
+      }
+    }
+  }
+
+  return rowIds
+}
+
+const hasWorkoutLogs = async (
+  req: {
+    payload: {
+      count: (args: {
+        collection: 'workout-logs'
+        limit: number
+        where: { workout: { equals: number | string } }
+      }) => Promise<{ totalDocs: number }>
+    }
+  },
+  workoutId: number | string,
+) => {
+  const result = await req.payload.count({
+    collection: 'workout-logs',
+    limit: 1,
+    where: { workout: { equals: workoutId } },
+  })
+
+  return result.totalDocs > 0
+}
+
 export const Workouts: CollectionConfig = {
   slug: 'workouts',
   admin: {
@@ -7,7 +52,55 @@ export const Workouts: CollectionConfig = {
     defaultColumns: ['title', 'rpe', 'order', 'microcycle'],
     group: 'Plan treningowy',
   },
+  hooks: {
+    beforeChange: [
+      async ({ data, operation, originalDoc, req }) => {
+        if (operation !== 'update' || !originalDoc?.id || !data.sections) {
+          return data
+        }
+
+        if (!(await hasWorkoutLogs(req, originalDoc.id))) {
+          return data
+        }
+
+        const previousRowIds = getWorkoutExerciseRowIds(originalDoc.sections as WorkoutSection[] | null)
+        const nextRowIds = getWorkoutExerciseRowIds(data.sections as WorkoutSection[] | null)
+
+        const removedRowIds = [...previousRowIds].filter((rowId) => !nextRowIds.has(rowId))
+
+        if (removedRowIds.length > 0) {
+          throw new Error(
+            'Nie mozna usuwac istniejacych cwiczen z treningu, ktory ma juz zapisane logi. Dodaj nowa wersje treningu zamiast przebudowywac stara.',
+          )
+        }
+
+        return data
+      },
+    ],
+    beforeDelete: [
+      async ({ id, req }) => {
+        if (await hasWorkoutLogs(req, id)) {
+          throw new Error(
+            'Nie mozna usunac treningu, ktory ma juz zapisane logi. Najpierw usun logi albo utworz nowa wersje treningu.',
+          )
+        }
+      },
+    ],
+  },
   fields: [
+    {
+      name: 'workoutLogsNotice',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/app/(payload)/admin/components/WorkoutLogsNotice',
+            exportName: 'WorkoutLogsNotice',
+          },
+        },
+      },
+      label: '',
+    },
     {
       name: 'title',
       type: 'text',
