@@ -121,7 +121,7 @@ export default async function HomePage() {
     kg?: string | null
   }): string[] => {
     const parts: string[] = []
-    if (ok(ex.rounds)) parts.push(`${ex.rounds}×`)
+    if (ok(ex.rounds)) parts.push(`Serie: ${ex.rounds}`)
     if (ok(ex.reps)) parts.push(`Powt.: ${ex.reps}`)
     const dur = fmtDuration(ex.durationMin, ex.durationSec)
     if (dur) parts.push(`Czas: ${dur}`)

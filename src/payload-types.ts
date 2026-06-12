@@ -308,6 +308,10 @@ export interface WorkoutGroup {
    * Row ID sekcji z workout.sections
    */
   sectionRowId?: string | null;
+  /**
+   * np. "Superset górny", "Część główna A" (opcjonalne)
+   */
+  label?: string | null;
   order?: number | null;
   protocol?: ('standard' | 'emom' | 'amrap' | 'for_time' | 'tabata') | null;
   /**
@@ -354,6 +358,10 @@ export interface WorkoutExerciseRow {
    */
   exercise?: (number | null) | Exercise;
   note?: string | null;
+  /**
+   * np. 4, 3-4
+   */
+  rounds?: string | null;
   reps?: string | null;
   kg?: string | null;
   tut?: string | null;
@@ -706,6 +714,7 @@ export interface WorkoutsSelect<T extends boolean = true> {
 export interface WorkoutGroupsSelect<T extends boolean = true> {
   workout?: T;
   sectionRowId?: T;
+  label?: T;
   order?: T;
   protocol?: T;
   rounds?: T;
@@ -727,6 +736,7 @@ export interface WorkoutExerciseRowsSelect<T extends boolean = true> {
   numer?: T;
   exercise?: T;
   note?: T;
+  rounds?: T;
   reps?: T;
   kg?: T;
   tut?: T;
