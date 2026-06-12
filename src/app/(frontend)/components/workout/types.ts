@@ -7,6 +7,7 @@ export type TExercise = {
   exerciseName: string
   trackingType?: string | null
   videoUrl?: string | null
+  rounds?: string | null
   meta: string[]
   prefill: { reps?: string | null; rir?: string | null }
   setParameters?: Array<{ setNumber: number; reps?: string | null; kg?: string | null }> | null

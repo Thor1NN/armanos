@@ -111,6 +111,7 @@ export default async function HomePage() {
   const ok = (v?: string | null) => v && v.trim() !== '' && v.trim().toLowerCase() !== 'x'
 
   const exMeta = (ex: {
+    rounds?: string | null
     reps?: string | null
     durationMin?: number | null
     durationSec?: number | null
@@ -120,6 +121,7 @@ export default async function HomePage() {
     kg?: string | null
   }): string[] => {
     const parts: string[] = []
+    if (ok(ex.rounds)) parts.push(`${ex.rounds}×`)
     if (ok(ex.reps)) parts.push(`Powt.: ${ex.reps}`)
     const dur = fmtDuration(ex.durationMin, ex.durationSec)
     if (dur) parts.push(`Czas: ${dur}`)
@@ -187,6 +189,7 @@ export default async function HomePage() {
                   exerciseName: name,
                   trackingType: cat?.trackingType ?? null,
                   videoUrl: (cat?.videoUrl as string | null | undefined) ?? null,
+                  rounds: (ex.rounds as string | null) ?? null,
                   meta: exMeta(ex as Parameters<typeof exMeta>[0]),
                   prefill: {
                     reps: (ex.reps as string | null) ?? null,
