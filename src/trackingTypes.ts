@@ -18,11 +18,11 @@ export type MetricMeta = {
 }
 
 export const METRIC_FIELDS: Record<MetricField, MetricMeta> = {
-  weight: { label: 'Ciężar (kg)', placeholder: 'kg', numeric: true },
-  reps: { label: 'Powtórzenia', placeholder: 'powt.', numeric: false },
-  rir: { label: 'RIR', placeholder: 'RIR', numeric: false },
-  distanceM: { label: 'Dystans (m)', placeholder: 'm', numeric: true },
-  durationSec: { label: 'Czas', placeholder: 'czas', numeric: true, composite: 'duration' },
+  weight: { label: 'Ciężar (kg)', placeholder: 'ciężar', numeric: true },
+  reps: { label: 'Powtórzenia', placeholder: 'powtórzenia', numeric: false },
+  rir: { label: 'RIR', placeholder: 'RIR (rezerwa)', numeric: false },
+  distanceM: { label: 'Dystans (m)', placeholder: 'dystans', numeric: true },
+  durationSec: { label: 'Czas', placeholder: 'minuty / sekundy', numeric: true, composite: 'duration' },
 }
 
 export const ALL_METRIC_FIELDS = Object.keys(METRIC_FIELDS) as MetricField[]
