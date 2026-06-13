@@ -254,7 +254,7 @@
   }
 
   body {
-    @apply bg-app-bg text-app-text font-sans antialiased;
+    @apply bg-ui-bg-base text-ui-fg-base font-sans antialiased;
   }
 
   main {
@@ -266,7 +266,7 @@
   }
 
   a {
-    @apply text-app-accent no-underline transition-colors;
+    @apply text-ui-fg-interactive no-underline transition-colors;
   }
 
   a:hover {
