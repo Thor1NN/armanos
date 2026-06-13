@@ -101,7 +101,8 @@ export function SessionTimesForm({
   const save = async () => {
     setSaving(true)
     try {
-      await onSave(combineDateTime(sd, st), combineDateTime(ed, et))
+      await onSave(combineDateTime(sd, st), combineDateTime(ed || sd, et))
+      onClose()
     } finally {
       setSaving(false)
     }
