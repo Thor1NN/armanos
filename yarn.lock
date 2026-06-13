@@ -8212,7 +8212,7 @@ __metadata:
     react-hook-form: "npm:^7.79.0"
     sharp: "npm:0.34.2"
     tailwindcss: "npm:^4.3.0"
-    tsx: "npm:4.22.4"
+    tsx: "npm:^4.22.4"
     typescript: "npm:6.0.3"
   languageName: unknown
   linkType: soft
@@ -8266,7 +8266,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:4.22.4":
+"tsx@npm:4.22.4, tsx@npm:^4.22.4":
   version: 4.22.4
   resolution: "tsx@npm:4.22.4"
   dependencies:

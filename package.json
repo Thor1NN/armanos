@@ -14,8 +14,10 @@
     "import:plan": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/import-plan.ts",
     "import:plan-v2": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/import-plan-v2.ts",
     "migrate:data": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/migrate-to-workout-groups.ts",
+    "seed:export": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/export-seed.ts",
+    "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/seed.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
-    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation tsx node_modules/payload/bin.js --disable-transpile",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {
@@ -44,7 +46,7 @@
     "postcss": "^8.5.15",
     "prettier": "^3.4.2",
     "tailwindcss": "^4.3.0",
-    "tsx": "4.22.4",
+    "tsx": "^4.22.4",
     "typescript": "6.0.3"
   },
   "engines": {
