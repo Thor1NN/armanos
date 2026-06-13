@@ -5,7 +5,7 @@ import { joinClasses, mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Surface } from '../ui/Surface'
-import type { Session } from './types'
+import type { Session } from '../../types/types'
 import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from '../../utils/date'
 
 export function SessionTimesBadge({

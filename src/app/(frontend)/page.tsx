@@ -7,19 +7,7 @@ import config from '@/payload.config'
 import LogoutButton from './LogoutButton'
 import type { TWorkout } from './WorkoutTracker'
 import { WorkoutPlansAccordion, type TPlanAccordionItem } from './components/WorkoutPlansAccordion'
-
-const STATUS_LABEL: Record<string, string> = {
-  active: 'Aktywny',
-  paused: 'Wstrzymany',
-  completed: 'Zakończony',
-}
-
-const PROTOCOL_LABEL: Record<string, string> = {
-  emom: 'EMOM',
-  amrap: 'AMRAP',
-  for_time: 'For Time',
-  tabata: 'Tabata',
-}
+import { STATUS_LABEL } from './types/constants'
 
 export default async function HomePage() {
   const headers = await getHeaders()

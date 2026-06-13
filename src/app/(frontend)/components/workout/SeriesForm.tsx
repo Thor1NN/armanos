@@ -6,7 +6,7 @@ import { METRIC_FIELDS, type MetricField } from '../../../../trackingTypes'
 import { errorBannerClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { Input, Select } from '../ui/Input'
-import type { Values } from './types'
+import type { Values } from '../../types/types'
 
 export function SeriesForm({
   fields,

@@ -5,7 +5,7 @@ import type { MetricField } from '../../../../trackingTypes'
 import { joinClasses, panelClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { SeriesForm } from './SeriesForm'
-import type { SetLog, Values } from './types'
+import type { SetLog, Values } from '../../types/types'
 import { setLogToFormValues, setSummary } from '../../utils/metrics'
 
 export function SeriesRow({

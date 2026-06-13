@@ -5,11 +5,11 @@ import type { MetricField } from '../../trackingTypes'
 import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from './ui'
 import { ExerciseCard } from './components/workout/ExerciseCard'
 import { SessionTimesBadge, SessionTimesForm } from './components/workout/SessionTimes'
-import type { Session, SetLog, TExercise, TWorkout, Values } from './components/workout/types'
+import type { Session, SetLog, TExercise, TWorkout, Values } from './types/types'
 import { metricBody } from './utils/metrics'
 import { sdk } from '@/lib/sdk'
 
-export type { TWorkout } from './components/workout/types'
+export type { TWorkout } from './types/types'
 
 export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   const [session, setSession] = useState<Session | null>(null)

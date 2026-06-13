@@ -6,7 +6,7 @@ import { mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { SeriesForm } from './SeriesForm'
 import { SeriesRow } from './SeriesRow'
-import type { SetLog, TExercise, Values } from './types'
+import type { SetLog, TExercise, Values } from '../../types/types'
 
 export function ExerciseCard({
   ex,

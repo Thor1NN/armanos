@@ -6,9 +6,7 @@ import { Button } from './ui/Button'
 import { StatusBadge } from './ui/StatusBadge'
 import { Surface } from './ui/Surface'
 import { mutedTextClass, sectionLabelClass } from '../ui'
-
-const STORAGE_KEY = 'training-app:active-workout-selection'
-const SSR_SNAPSHOT = '__SSR_SELECTION__'
+import { STORAGE_KEY, SSR_SNAPSHOT } from '../types/constants'
 
 const subscribeToSelection = (onStoreChange: () => void) => {
   window.addEventListener('storage', onStoreChange)

@@ -1,5 +1,5 @@
 import { METRIC_FIELDS, type MetricField } from '../../../trackingTypes'
-import type { SetLog, Values } from '../components/workout/types'
+import type { SetLog, Values } from '../types/types'
 import { fmtSec } from './date'
 
 export const metricBody = (fields: MetricField[], v: Values): Record<string, unknown> => {
