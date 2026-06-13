@@ -1,6 +1,10 @@
 import React from 'react'
 import './styles.css'
 
+export const viewport = {
+  colorScheme: 'dark',
+}
+
 export const metadata = {
   description: 'Aplikacja treningowa',
   title: 'Trening',
@@ -8,7 +12,6 @@ export const metadata = {
     index: false,
     follow: false,
   },
-  colorScheme: 'dark',
   icons: {
     icon: [
       { url: '/favicon/favicon.ico', sizes: 'any' },
