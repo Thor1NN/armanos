@@ -20,11 +20,9 @@ export async function WorkoutStructureView({
     )
   }
 
-  const [workout, logsCount] = await Promise.all([
+  const [workout] = await Promise.all([
     payload.findByID({ collection: 'workouts', id: docId, depth: 0 }),
-    payload.count({ collection: 'workout-logs', where: { workout: { equals: docId } } }),
   ])
-  const hasLogs = logsCount.totalDocs > 0
 
   const groupsResult = await payload.find({
     collection: 'workout-groups',
@@ -45,6 +43,33 @@ export async function WorkoutStructureView({
         depth: 1,
       })
     : { docs: [] }
+
+  const exerciseRowIds = exerciseRowsResult.docs.map((r: RawExerciseRow) => r.id)
+
+  const [roundLogsResult, setLogsResult] = await Promise.all([
+    groupIds.length
+      ? payload.find({ collection: 'round-logs', where: { group: { in: groupIds } }, limit: 5000, depth: 0 })
+      : { docs: [] },
+    exerciseRowIds.length
+      ? payload.find({ collection: 'set-logs', where: { exerciseRow: { in: exerciseRowIds } }, limit: 5000, depth: 0 })
+      : { docs: [] },
+  ])
+
+  const groupIdsWithLogs: number[] = [
+    ...new Set(
+      roundLogsResult.docs.map((r: { group: number | { id: number } }) =>
+        typeof r.group === 'object' ? r.group.id : r.group
+      ) as number[]
+    ),
+  ]
+
+  const exerciseRowIdsWithLogs: number[] = [
+    ...new Set(
+      setLogsResult.docs.map((r: { exerciseRow: number | { id: number } }) =>
+        typeof r.exerciseRow === 'object' ? r.exerciseRow.id : r.exerciseRow
+      ) as number[]
+    ),
+  ]
 
   const sections: Section[] = (workout.sections ?? []) as Section[]
 
@@ -87,7 +112,8 @@ export async function WorkoutStructureView({
       sections={sections}
       initialGroups={groups}
       initialExerciseRows={exerciseRows}
-      hasLogs={hasLogs}
+      groupIdsWithLogs={groupIdsWithLogs}
+      exerciseRowIdsWithLogs={exerciseRowIdsWithLogs}
     />
   )
 }

@@ -14,15 +14,19 @@ type Props = {
   sections: Section[]
   initialGroups: Group[]
   initialExerciseRows: ExerciseRow[]
-  hasLogs?: boolean
+  groupIdsWithLogs?: number[]
+  exerciseRowIdsWithLogs?: number[]
 }
 
 export function WorkoutStructureEditor({
   sections,
   initialGroups,
   initialExerciseRows,
-  hasLogs = false,
+  groupIdsWithLogs = [],
+  exerciseRowIdsWithLogs = [],
 }: Props) {
+  const groupsWithLogs = new Set(groupIdsWithLogs)
+  const exerciseRowsWithLogs = new Set(exerciseRowIdsWithLogs)
   const [groups, setGroups] = useState<Group[]>(initialGroups)
   const [exerciseRows, setExerciseRows] = useState<ExerciseRow[]>(initialExerciseRows)
   const [addingGroupFor, setAddingGroupFor] = useState<string | null>(null)
@@ -122,7 +126,7 @@ export function WorkoutStructureEditor({
                         >
                           Edytuj grupę
                         </Button>
-                        {!hasLogs && (
+                        {!groupsWithLogs.has(group.id) && (
                           <Button
                             buttonStyle="error"
                             margin={false}
@@ -174,7 +178,7 @@ export function WorkoutStructureEditor({
                           >
                             Edytuj
                           </Button>
-                          {!hasLogs && (
+                          {!exerciseRowsWithLogs.has(row.id) && (
                             <Button
                               buttonStyle="error"
                               size="xsmall"
