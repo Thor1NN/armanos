@@ -75,6 +75,12 @@ export function WorkoutStructureEditor({
   return (
     <div style={s.container}>
 
+      {exerciseRowsWithLogs.size === 0 && (
+        <div style={s.infoMsg}>
+          Brak zapisanych serii dla tego treningu. Dodanie pierwszej serii utworzy sesję automatycznie.
+        </div>
+      )}
+
       {sectionsWithFallback.map((section, si) => {
         const sectionGroups = groupsForSection(section.id)
         const sectionKey = section.id ?? `no-section-${si}`

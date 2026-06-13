@@ -71,4 +71,13 @@ export const s = {
   formActions: { display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 10 } as React.CSSProperties,
   empty: { fontSize: 12, color: 'var(--theme-elevation-500)', padding: '8px 12px', fontStyle: 'italic' as const },
   errorMsg: { fontSize: 12, color: 'var(--theme-error-500)', marginBottom: 8 },
+  infoMsg: {
+    fontSize: 12,
+    color: 'var(--theme-elevation-500)',
+    background: 'var(--theme-elevation-50)',
+    border: '1px solid var(--theme-border-color)',
+    borderRadius: 'var(--style-radius-m)',
+    padding: '8px 12px',
+    marginBottom: 20,
+  } as React.CSSProperties,
 }

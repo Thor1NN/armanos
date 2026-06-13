@@ -174,6 +174,12 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
         </div>
       )}
 
+      {hasLoadedWorkout && !displayedSession && (
+        <div className={`mt-3 text-xs ${mutedTextClass}`}>
+          Brak zapisanych serii dla tego treningu. Dodanie pierwszej serii utworzy sesję automatycznie.
+        </div>
+      )}
+
       {workout.sections.map((section, si) => (
         <div className="mt-3" key={si}>
           {(section.title || section.subtitle) && (
@@ -200,11 +206,6 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
         </div>
       ))}
 
-      {hasLoadedWorkout && !displayedSession && (
-        <div className={`mt-3 text-xs ${mutedTextClass}`}>
-          Brak zapisanych serii dla tego treningu. Dodanie pierwszej serii utworzy sesję automatycznie.
-        </div>
-      )}
     </div>
   )
 }
