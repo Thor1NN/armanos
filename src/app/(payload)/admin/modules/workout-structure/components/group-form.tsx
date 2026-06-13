@@ -38,7 +38,7 @@ type AnyFields = Record<string, { value: unknown } | undefined>
 function FormFields({ onCancel }: { onCancel: () => void }) {
   const processing = useFormProcessing()
   const protocol = useFormFields(
-    (fields) => ((fields as unknown as AnyFields)['protocol']?.value as string) ?? 'standard'
+    ([fields]) => ((fields as unknown as AnyFields)['protocol']?.value as string) ?? 'standard'
   )
 
   return (
