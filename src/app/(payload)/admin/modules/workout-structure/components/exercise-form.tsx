@@ -1,48 +1,37 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Button, FieldError, FieldLabel, RelationshipInput, TextInput, toast } from '@payloadcms/ui'
-import type { ValueWithRelation } from 'payload'
-import type { WorkoutExerciseRow } from '@/payload-types'
+import { Button, Form, RelationshipField, TextField, toast, useFormProcessing } from '@payloadcms/ui'
+import type { FormState, SingleRelationshipFieldClient, TextFieldClient, TextFieldValidation, ValueWithRelation } from 'payload'
 import type { ExerciseRow } from '../types'
 import { s } from '../styles'
 import { sdk } from '@/lib/sdk'
 
-type Errors = Partial<Record<string, string>>
+const textField = (name: string, label: string, placeholder?: string): TextFieldClient =>
+  ({ name, label, type: 'text', admin: { placeholder } }) as TextFieldClient
 
-function validate(fields: { reps: string; kg: string; rounds: string }): Errors {
-  const errors: Errors = {}
-  if (!fields.reps && !fields.kg) {
-    errors.reps = 'Podaj powtórzenia lub obciążenie'
-    errors.kg   = 'Podaj powtórzenia lub obciążenie'
-  }
-  if (fields.rounds && !/^[\d\-–]+$/.test(fields.rounds)) {
-    errors.rounds = 'Format: liczba lub zakres (np. 4, 3–4)'
-  }
-  return errors
+const exerciseRelField: SingleRelationshipFieldClient = {
+  name: 'exercise',
+  type: 'relationship',
+  relationTo: 'exercises',
+  hasMany: false,
+  label: 'Ćwiczenie (katalog)',
+} as SingleRelationshipFieldClient
+
+type SiblingData = Record<string, unknown>
+
+const validateRepsOrKg: TextFieldValidation = (value, { siblingData }) => {
+  if (!value && !(siblingData as SiblingData)?.kg) return 'Podaj powtórzenia lub obciążenie'
+  return true
 }
 
-type FieldProps = {
-  path: string
-  label: string
-  value: string
-  onChange: (v: string) => void
-  placeholder?: string
-  error?: string
+const validateKgOrReps: TextFieldValidation = (value, { siblingData }) => {
+  if (!value && !(siblingData as SiblingData)?.reps) return 'Podaj powtórzenia lub obciążenie'
+  return true
 }
 
-function Field({ path, label, value, onChange, placeholder, error }: FieldProps) {
-  return (
-    <TextInput
-      path={path}
-      value={value}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
-      Label={<FieldLabel label={label} htmlFor={path} required={false} />}
-      Error={<FieldError message={error} showError={!!error} />}
-      showError={!!error}
-      placeholder={placeholder}
-    />
-  )
+const validateRounds: TextFieldValidation = (value) => {
+  if (value && !/^[\d\-–]+$/.test(String(value))) return 'Format: liczba lub zakres (np. 4, 3–4)'
+  return true
 }
 
 type Props = {
@@ -53,50 +42,93 @@ type Props = {
   onCancel: () => void
 }
 
+function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => void }) {
+  const processing = useFormProcessing()
+
+  return (
+    <>
+      <div style={s.formRow}>
+        <div style={{ flex: '0 0 64px' }}>
+          <TextField path="numer" field={textField('numer', 'Numer', '1a')} />
+        </div>
+        <div style={{ flex: '0 0 80px' }}>
+          <TextField path="rounds" field={textField('rounds', 'Serie', '4')} validate={validateRounds} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <RelationshipField path="exercise" field={exerciseRelField} />
+        </div>
+      </div>
+
+      <div style={s.formRow}>
+        <div style={{ flex: 1 }}>
+          <TextField path="note" field={textField('note', 'Uwaga / wariant', 'opcjonalnie')} />
+        </div>
+      </div>
+
+      <div style={s.formRow}>
+        <div style={{ flex: '1 1 70px' }}>
+          <TextField path="reps" field={textField('reps', 'Powt.', '8')} validate={validateRepsOrKg} />
+        </div>
+        <div style={{ flex: '1 1 70px' }}>
+          <TextField path="kg" field={textField('kg', 'KG', '60')} validate={validateKgOrReps} />
+        </div>
+        <div style={{ flex: '1 1 70px' }}>
+          <TextField path="rir" field={textField('rir', 'RIR', '2')} />
+        </div>
+        <div style={{ flex: '1 1 70px' }}>
+          <TextField path="tut" field={textField('tut', 'TUT', '3-0-1')} />
+        </div>
+        <div style={{ flex: '1 1 90px' }}>
+          <TextField path="rest" field={textField('rest', 'Przerwa', '90 sek')} />
+        </div>
+      </div>
+
+      <div style={s.formActions}>
+        <Button buttonStyle="secondary" margin={false} type="button" onClick={onCancel}>
+          Anuluj
+        </Button>
+        <Button buttonStyle="primary" margin={false} type="submit" disabled={processing}>
+          {processing ? 'Zapisuję…' : isEdit ? 'Zapisz ćwiczenie' : 'Dodaj ćwiczenie'}
+        </Button>
+      </div>
+    </>
+  )
+}
+
 export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }: Props) {
   const isEdit = !!initial
 
-  const [exerciseValue, setExerciseValue] = useState<ValueWithRelation | null>(
-    initial?.exercise ? { value: initial.exercise.id, relationTo: 'exercises' } : null
-  )
-  const [numer, setNumer]   = useState(initial?.numer  ?? '')
-  const [rounds, setRounds] = useState(initial?.rounds ?? '')
-  const [note, setNote]     = useState(initial?.note   ?? '')
-  const [reps, setReps]     = useState(initial?.reps   ?? '')
-  const [kg, setKg]         = useState(initial?.kg     ?? '')
-  const [tut, setTut]       = useState(initial?.tut    ?? '')
-  const [rir, setRir]       = useState(initial?.rir    ?? '')
-  const [rest, setRest]     = useState(initial?.rest   ?? '')
-  const [saving, setSaving] = useState(false)
-  const [errors, setErrors] = useState<Errors>({})
+  const initialState: FormState = {
+    numer:    { value: initial?.numer    ?? '' },
+    rounds:   { value: initial?.rounds   ?? '' },
+    exercise: { value: initial?.exercise ? { value: initial.exercise.id, relationTo: 'exercises' } : null },
+    note:     { value: initial?.note     ?? '' },
+    reps:     { value: initial?.reps     ?? '' },
+    kg:       { value: initial?.kg       ?? '' },
+    rir:      { value: initial?.rir      ?? '' },
+    tut:      { value: initial?.tut      ?? '' },
+    rest:     { value: initial?.rest     ?? '' },
+  }
 
-  const clearError = (key: string) =>
-    setErrors((prev) => { const next = { ...prev }; delete next[key]; return next })
-
-  const handleSave = async () => {
-    const validationErrors = validate({ reps, kg, rounds })
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
+  const handleSubmit = async (_: FormState, data: Record<string, unknown>) => {
+    const exerciseRaw = data.exercise as ValueWithRelation | null
+    const body = {
+      numer:    (data.numer   as string) || null,
+      rounds:   (data.rounds  as string) || null,
+      exercise: exerciseRaw ? Number(exerciseRaw.value) : null,
+      note:     (data.note    as string) || null,
+      reps:     (data.reps    as string) || null,
+      kg:       (data.kg      as string) || null,
+      rir:      (data.rir     as string) || null,
+      tut:      (data.tut     as string) || null,
+      rest:     (data.rest    as string) || null,
+      ...(!isEdit && { group: groupId, order: nextOrder }),
     }
 
-    setSaving(true)
     try {
-      const body: Record<string, unknown> = {
-        numer:    numer    || null,
-        rounds:   rounds   || null,
-        exercise: exerciseValue ? Number(exerciseValue.value) : null,
-        note:     note     || null,
-        reps:     reps     || null,
-        kg:       kg       || null,
-        tut:      tut      || null,
-        rir:      rir      || null,
-        rest:     rest     || null,
-        ...(!isEdit && { group: groupId, order: nextOrder }),
-      }
       const doc = isEdit
-        ? await sdk.update({ collection: 'workout-exercise-rows', id: initial!.id, data: body as unknown as WorkoutExerciseRow, depth: 1 })
-        : await sdk.create({ collection: 'workout-exercise-rows', data: body as unknown as WorkoutExerciseRow, depth: 1 })
+        ? await sdk.update({ collection: 'workout-exercise-rows', id: initial!.id, data: body as never, depth: 1 })
+        : await sdk.create({ collection: 'workout-exercise-rows', data: body as never, depth: 1 })
 
       const exerciseDoc = doc.exercise
       const exerciseObj = exerciseDoc && typeof exerciseDoc === 'object'
@@ -106,11 +138,9 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
         typeof doc.group === 'object' && doc.group !== null ? (doc.group as { id: number }).id : doc.group
 
       toast.success(isEdit ? 'Ćwiczenie zaktualizowane' : 'Ćwiczenie dodane')
-      onSaved({ ...doc, group: normalizedGroup, exercise: exerciseObj })
+      onSaved({ ...doc, group: normalizedGroup, exercise: exerciseObj } as ExerciseRow)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Błąd zapisu')
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -120,81 +150,9 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
         {isEdit ? 'Edytuj ćwiczenie' : 'Nowe ćwiczenie'}
       </div>
 
-      <div style={s.formRow}>
-        <div style={{ flex: '0 0 64px' }}>
-          <Field path="numer" label="Numer" value={numer}
-            onChange={(v) => { setNumer(v); clearError('numer') }}
-            placeholder="1a" error={errors.numer}
-          />
-        </div>
-        <div style={{ flex: '0 0 80px' }}>
-          <Field path="rounds" label="Serie" value={rounds}
-            onChange={(v) => { setRounds(v); clearError('rounds') }}
-            placeholder="4" error={errors.rounds}
-          />
-        </div>
-        <div style={{ flex: 1 }}>
-          <RelationshipInput
-            path="exercise"
-            relationTo={['exercises']}
-            hasMany={false}
-            Label={<FieldLabel label="Ćwiczenie (katalog)" htmlFor="exercise" required={false} />}
-            value={exerciseValue}
-            onChange={(val) => setExerciseValue(val as ValueWithRelation)}
-            allowCreate={false}
-            allowEdit={true}
-          />
-        </div>
-      </div>
-
-      <div style={s.formRow}>
-        <div style={{ flex: 1 }}>
-          <Field path="note" label="Uwaga / wariant" value={note}
-            onChange={(v) => { setNote(v); clearError('note') }}
-            placeholder="opcjonalnie" error={errors.note}
-          />
-        </div>
-      </div>
-
-      <div style={s.formRow}>
-        <div style={{ flex: '1 1 70px' }}>
-          <Field path="reps" label="Powt." value={reps}
-            onChange={(v) => { setReps(v); clearError('reps'); clearError('kg') }}
-            placeholder="8" error={errors.reps}
-          />
-        </div>
-        <div style={{ flex: '1 1 70px' }}>
-          <Field path="kg" label="KG" value={kg}
-            onChange={(v) => { setKg(v); clearError('kg'); clearError('reps') }}
-            placeholder="60" error={errors.kg}
-          />
-        </div>
-        <div style={{ flex: '1 1 70px' }}>
-          <Field path="rir" label="RIR" value={rir}
-            onChange={(v) => { setRir(v); clearError('rir') }}
-            placeholder="2" error={errors.rir}
-          />
-        </div>
-        <div style={{ flex: '1 1 70px' }}>
-          <Field path="tut" label="TUT" value={tut}
-            onChange={(v) => { setTut(v); clearError('tut') }}
-            placeholder="3-0-1" error={errors.tut}
-          />
-        </div>
-        <div style={{ flex: '1 1 90px' }}>
-          <Field path="rest" label="Przerwa" value={rest}
-            onChange={(v) => { setRest(v); clearError('rest') }}
-            placeholder="90 sek" error={errors.rest}
-          />
-        </div>
-      </div>
-
-      <div style={s.formActions}>
-        <Button buttonStyle="secondary" margin={false} onClick={onCancel} disabled={saving}>Anuluj</Button>
-        <Button buttonStyle="primary" margin={false} onClick={handleSave} disabled={saving}>
-          {saving ? 'Zapisuję…' : isEdit ? 'Zapisz ćwiczenie' : 'Dodaj ćwiczenie'}
-        </Button>
-      </div>
+      <Form initialState={initialState} onSubmit={handleSubmit}>
+        <FormFields isEdit={isEdit} onCancel={onCancel} />
+      </Form>
     </div>
   )
 }
