@@ -189,10 +189,11 @@
   }
 }
 
+@variant dark (&:where(.dark, .dark *));
+
 /* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
+.dark {
+  color-scheme: dark;
 
     --color-ui-fg-base: #e8eaed;
     --color-ui-fg-subtle: #94a3b8;
@@ -267,7 +268,6 @@
     --color-app-accent-hover: #3b78f0;
     --color-app-danger: #ff5a5a;
     --color-app-warn: #ffb446;
-  }
 }
 
 @layer base {
