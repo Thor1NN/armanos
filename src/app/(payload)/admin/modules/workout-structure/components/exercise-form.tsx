@@ -7,6 +7,14 @@ import { s } from '../styles'
 import { sdk } from '@/lib/sdk'
 import { validateKgOrReps, validateRepsOrKg, validateRounds } from '../utils'
 
+type Props = {
+  groupId: number
+  nextOrder: number
+  initial?: ExerciseRow
+  onSaved: (row: ExerciseRow) => void
+  onCancel: () => void
+}
+
 const textField = (name: string, label: string, placeholder?: string): TextFieldClient =>
   ({ name, label, type: 'text', admin: { placeholder } }) as TextFieldClient
 
@@ -17,14 +25,6 @@ const exerciseRelField: SingleRelationshipFieldClient = {
   hasMany: false,
   label: 'Ćwiczenie (katalog)',
 } as SingleRelationshipFieldClient
-
-type Props = {
-  groupId: number
-  nextOrder: number
-  initial?: ExerciseRow
-  onSaved: (row: ExerciseRow) => void
-  onCancel: () => void
-}
 
 function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => void }) {
   const processing = useFormProcessing()
