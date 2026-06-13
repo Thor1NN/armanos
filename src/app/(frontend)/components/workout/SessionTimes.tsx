@@ -83,6 +83,21 @@ export function SessionTimesForm({
     setEt(isoToTimeInput(finishIso))
   }
 
+  const setStartNow = () => {
+    const iso = new Date().toISOString()
+    setSd(isoToDateInput(iso))
+    setSt(isoToTimeInput(iso))
+    onSet('startedAt', iso)
+  }
+
+  const addToStart = (hours: number) => {
+    const base = combineDateTime(sd, st) ?? new Date().toISOString()
+    const iso = new Date(new Date(base).getTime() + hours * 3600 * 1000).toISOString()
+    setEd(sd || isoToDateInput(iso))
+    setEt(isoToTimeInput(iso))
+    onSet('finishedAt', combineDateTime(sd || isoToDateInput(iso), isoToTimeInput(iso)))
+  }
+
   const save = async () => {
     setSaving(true)
     try {
@@ -109,7 +124,7 @@ export function SessionTimesForm({
             onChange={(e) => setSt(e.target.value)}
             onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
           />
-          <Button variant="secondary" onClick={() => onSet('startedAt', new Date().toISOString())}>
+          <Button variant="secondary" onClick={setStartNow}>
             teraz
           </Button>
         </div>
@@ -128,9 +143,11 @@ export function SessionTimesForm({
             onChange={(e) => setEt(e.target.value)}
             onBlur={() => onSet('finishedAt', combineDateTime(ed, et))}
           />
-          <Button variant="secondary" onClick={() => onSet('finishedAt', new Date().toISOString())}>
-            teraz
-          </Button>
+          {([1, 1.5, 2] as const).map((h) => (
+            <Button key={h} variant="secondary" onClick={() => addToStart(h)}>
+              +{h}h
+            </Button>
+          ))}
         </div>
 
         <div className="flex flex-wrap gap-2">
