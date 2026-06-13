@@ -43,7 +43,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-5 py-6">
       <Surface as="form" className="w-full max-w-sm p-6 sm:p-8" onSubmit={onSubmit}>
         <div className="mb-6 flex justify-center">
-          <img src="/images/logo.svg" alt="Logo" className="h-10 w-auto" />
+          <img src="/images/logo.svg" alt="Logo" className="h-24 w-auto" />
         </div>
         <h1 className="text-xl font-semibold text-ui-fg-base">Zaloguj się</h1>
         <p className="mt-1 mb-6 text-sm text-ui-fg-muted">Wpisz dane otrzymane od trenera.</p>
