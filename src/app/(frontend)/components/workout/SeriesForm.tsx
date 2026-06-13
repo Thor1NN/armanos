@@ -125,11 +125,11 @@ export function SeriesForm({
         {...register('note')}
       />
 
-      <Button className="min-h-8 px-3 py-1 text-xs" type="submit" disabled={isSubmitting}>
+      <Button size="sm" type="submit" disabled={isSubmitting}>
         {isSubmitting ? '…' : 'Zapisz'}
       </Button>
       {onCancel && (
-        <Button className="min-h-8 px-3 py-1 text-xs" variant="secondary" type="button" onClick={onCancel}>
+        <Button size="sm" variant="secondary" type="button" onClick={onCancel}>
           Anuluj
         </Button>
       )}

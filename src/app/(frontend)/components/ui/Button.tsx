@@ -11,9 +11,11 @@ import {
 } from '../../ui'
 
 type Variant = 'primary' | 'secondary' | 'dashed' | 'icon' | 'danger' | 'ghost'
+type Size = 'md' | 'sm'
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant
+  size?: Size
 }
 
 const variantClass: Record<Variant, string> = {
@@ -25,11 +27,23 @@ const variantClass: Record<Variant, string> = {
   ghost: 'cursor-pointer text-left transition-colors',
 }
 
+const sizeClass: Record<Size, string> = {
+  md: '',
+  sm: 'min-h-8 px-3 py-1 text-xs',
+}
+
 export function Button({
   className,
   type = 'button',
   variant = 'primary',
+  size = 'md',
   ...props
 }: ButtonProps) {
-  return <button className={joinClasses(variantClass[variant], className)} type={type} {...props} />
+  return (
+    <button
+      className={joinClasses(variantClass[variant], sizeClass[size], className)}
+      type={type}
+      {...props}
+    />
+  )
 }
