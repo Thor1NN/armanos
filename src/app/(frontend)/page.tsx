@@ -221,9 +221,12 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-3xl px-5 py-6 sm:px-6 sm:py-8">
       <div className="mb-4 flex items-center justify-between gap-3 sm:mb-7 sm:gap-4">
-        <div>
-          <h1 className="text-sm font-semibold text-ui-fg-base sm:text-xl">Cześć, {user.name || user.email}</h1>
-          <span className="mt-0.5 block text-xs text-ui-fg-muted sm:mt-1">Twoje plany treningowe</span>
+        <div className="flex items-center gap-3">
+          <img src="/images/logo.svg" alt="Logo" className="h-7 w-auto sm:h-8" />
+          <div>
+            <h1 className="text-sm font-semibold text-ui-fg-base sm:text-xl">Cześć, {user.name || user.email}</h1>
+            <span className="mt-0.5 block text-xs text-ui-fg-muted sm:mt-1">Twoje plany treningowe</span>
+          </div>
         </div>
         <LogoutButton />
       </div>
