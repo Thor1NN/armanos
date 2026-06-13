@@ -132,16 +132,10 @@ export function SessionTimesForm({
         <div className="flex flex-wrap items-center gap-1.5 text-sm">
           <span className={`w-20 shrink-0 text-xs ${mutedTextClass}`}>Zakończono</span>
           <Input
-            type="date"
-            value={ed}
-            onChange={(e) => setEd(e.target.value)}
-            onBlur={() => onSet('finishedAt', combineDateTime(ed, et))}
-          />
-          <Input
             type="time"
             value={et}
             onChange={(e) => setEt(e.target.value)}
-            onBlur={() => onSet('finishedAt', combineDateTime(ed, et))}
+            onBlur={() => onSet('finishedAt', combineDateTime(ed || sd, et))}
           />
           {([1, 1.5, 2] as const).map((h) => (
             <Button key={h} variant="secondary" onClick={() => addToStart(h)}>
