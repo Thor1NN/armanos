@@ -6,7 +6,7 @@ import { joinClasses, panelClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { SeriesForm } from './SeriesForm'
 import type { SetLog, Values } from './types'
-import { setLogToFormValues, setSummary } from './utils'
+import { setLogToFormValues, setSummary } from '../../utils/metrics'
 
 export function SeriesRow({
   set,

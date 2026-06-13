@@ -6,7 +6,7 @@ import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Surface } from '../ui/Surface'
 import type { Session } from './types'
-import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from './utils'
+import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from '../../utils/date'
 
 export function SessionTimesBadge({
   session,

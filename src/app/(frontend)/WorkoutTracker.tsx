@@ -6,7 +6,7 @@ import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from 
 import { ExerciseCard } from './components/workout/ExerciseCard'
 import { SessionTimesBadge, SessionTimesForm } from './components/workout/SessionTimes'
 import type { Session, SetLog, TExercise, TWorkout, Values } from './components/workout/types'
-import { metricBody } from './components/workout/utils'
+import { metricBody } from './utils/metrics'
 import { sdk } from '@/lib/sdk'
 
 export type { TWorkout } from './components/workout/types'
