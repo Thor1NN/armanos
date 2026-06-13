@@ -1,11 +1,13 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button, FieldError, FieldLabel, SelectInput, TextInput, toast, useAuth, useDocumentInfo } from '@payloadcms/ui'
+import { Button, FieldError, FieldLabel, SelectInput, TextInput, toast, useDocumentInfo } from '@payloadcms/ui'
 import type { OptionObject } from 'payload'
 import type { Group } from '../types'
 import { PROTOCOLS } from '../constants'
 import { s } from '../styles'
+import type { WorkoutGroup } from '@/payload-types'
+import { sdk } from '@/lib/sdk'
 
 type Errors = Partial<Record<string, string>>
 
@@ -88,7 +90,6 @@ type Props = {
 }
 
 export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel }: Props) {
-  const { token } = useAuth()
   const { id: docId } = useDocumentInfo()
   const isEdit = !!initial
 
@@ -127,16 +128,11 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
         ...(!isEdit && { workout: docId, sectionRowId: sectionRowId ?? '', order: nextOrder }),
       }
 
-      const url = isEdit ? `/api/workout-groups/${initial!.id}` : '/api/workout-groups'
-      const res = await fetch(url, {
-        method: isEdit ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
-        body: JSON.stringify(body),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.errors?.[0]?.message ?? 'Błąd zapisu')
+      const doc = isEdit
+        ? await sdk.update({ collection: 'workout-groups', id: initial!.id, data: body as unknown as WorkoutGroup })
+        : await sdk.create({ collection: 'workout-groups', data: body as unknown as WorkoutGroup })
       toast.success(isEdit ? 'Grupa zaktualizowana' : 'Grupa dodana')
-      onSaved(data.doc)
+      onSaved(doc as unknown as Group)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Błąd zapisu')
     } finally {

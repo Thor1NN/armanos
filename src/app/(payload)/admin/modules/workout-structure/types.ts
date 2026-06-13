@@ -35,5 +35,3 @@ export type RawExerciseRow = Omit<ExerciseRow, 'group' | 'exercise'> & {
   group?: number | { id: number } | null
   exercise?: { id: number; name?: string | null } | number | null
 }
-
-export type ExerciseCatalogItem = { id: number; name?: string | null }

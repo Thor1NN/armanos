@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button, toast, useAuth } from '@payloadcms/ui'
+import { Button, toast } from '@payloadcms/ui'
+import { sdk } from '@/lib/sdk'
 import type { ExerciseRow, Group, Section } from './types'
 import { PROTOCOL_LABEL } from './constants'
 import { exerciseLabel, exerciseMeta, groupLabel } from './utils'
@@ -22,7 +23,6 @@ export function WorkoutStructureEditor({
   initialExerciseRows,
   hasLogs = false,
 }: Props) {
-  const { token } = useAuth()
   const [groups, setGroups] = useState<Group[]>(initialGroups)
   const [exerciseRows, setExerciseRows] = useState<ExerciseRow[]>(initialExerciseRows)
   const [addingGroupFor, setAddingGroupFor] = useState<string | null>(null)
@@ -44,18 +44,12 @@ export function WorkoutStructureEditor({
   const handleDeleteGroup = async (groupId: number) => {
     setDeletingGroup(groupId)
     try {
-      const res = await fetch(`/api/workout-groups/${groupId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `JWT ${token}` },
-      })
-      if (!res.ok) {
-        const data = await res.json()
-        toast.error(data?.errors?.[0]?.message ?? 'Nie można usunąć grupy')
-        return
-      }
+      await sdk.delete({ collection: 'workout-groups', id: groupId })
       setGroups((prev) => prev.filter((g) => g.id !== groupId))
       setExerciseRows((prev) => prev.filter((r) => r.group !== groupId))
       toast.success('Grupa usunięta')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Nie można usunąć grupy')
     } finally {
       setDeletingGroup(null)
     }
@@ -64,17 +58,11 @@ export function WorkoutStructureEditor({
   const handleDeleteExercise = async (rowId: number) => {
     setDeletingExercise(rowId)
     try {
-      const res = await fetch(`/api/workout-exercise-rows/${rowId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `JWT ${token}` },
-      })
-      if (!res.ok) {
-        const data = await res.json()
-        toast.error(data?.errors?.[0]?.message ?? 'Nie można usunąć ćwiczenia')
-        return
-      }
+      await sdk.delete({ collection: 'workout-exercise-rows', id: rowId })
       setExerciseRows((prev) => prev.filter((r) => r.id !== rowId))
       toast.success('Ćwiczenie usunięte')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Nie można usunąć ćwiczenia')
     } finally {
       setDeletingExercise(null)
     }

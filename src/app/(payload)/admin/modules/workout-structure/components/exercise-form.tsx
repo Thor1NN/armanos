@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button, FieldError, FieldLabel, RelationshipInput, TextInput, toast, useAuth } from '@payloadcms/ui'
+import { Button, FieldError, FieldLabel, RelationshipInput, TextInput, toast } from '@payloadcms/ui'
 import type { ValueWithRelation } from 'payload'
+import type { WorkoutExerciseRow } from '@/payload-types'
 import type { ExerciseRow } from '../types'
 import { s } from '../styles'
+import { sdk } from '@/lib/sdk'
 
 type Errors = Partial<Record<string, string>>
 
@@ -52,7 +54,6 @@ type Props = {
 }
 
 export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }: Props) {
-  const { token } = useAuth()
   const isEdit = !!initial
 
   const [exerciseValue, setExerciseValue] = useState<ValueWithRelation | null>(
@@ -93,26 +94,19 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
         rest:     rest     || null,
         ...(!isEdit && { group: groupId, order: nextOrder }),
       }
-      const url = isEdit
-        ? `/api/workout-exercise-rows/${initial!.id}?depth=1`
-        : '/api/workout-exercise-rows?depth=1'
-      const res = await fetch(url, {
-        method: isEdit ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
-        body: JSON.stringify(body),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.errors?.[0]?.message ?? 'Błąd zapisu')
+      const doc = isEdit
+        ? await sdk.update({ collection: 'workout-exercise-rows', id: initial!.id, data: body as unknown as WorkoutExerciseRow, depth: 1 })
+        : await sdk.create({ collection: 'workout-exercise-rows', data: body as unknown as WorkoutExerciseRow, depth: 1 })
 
-      const exerciseDoc = data.doc.exercise
+      const exerciseDoc = doc.exercise
       const exerciseObj = exerciseDoc && typeof exerciseDoc === 'object'
-        ? { id: exerciseDoc.id, name: exerciseDoc.name ?? null }
+        ? { id: (exerciseDoc as { id: number }).id, name: (exerciseDoc as { name?: string | null }).name ?? null }
         : null
       const normalizedGroup =
-        typeof data.doc.group === 'object' && data.doc.group !== null ? data.doc.group.id : data.doc.group
+        typeof doc.group === 'object' && doc.group !== null ? (doc.group as { id: number }).id : doc.group
 
       toast.success(isEdit ? 'Ćwiczenie zaktualizowane' : 'Ćwiczenie dodane')
-      onSaved({ ...data.doc, group: normalizedGroup, exercise: exerciseObj })
+      onSaved({ ...doc, group: normalizedGroup, exercise: exerciseObj })
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Błąd zapisu')
     } finally {
