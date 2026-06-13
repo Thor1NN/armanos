@@ -144,11 +144,11 @@ export function SessionTimesForm({
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={save} disabled={saving}>
+        <div className="flex flex-wrap gap-1.5">
+          <Button className="min-h-8 px-3 py-1 text-xs" onClick={save} disabled={saving}>
             {saving ? '…' : 'Zapisz'}
           </Button>
-          <Button variant="secondary" onClick={onClose}>
+          <Button className="min-h-8 px-3 py-1 text-xs" variant="secondary" onClick={onClose}>
             Zwiń
           </Button>
         </div>
