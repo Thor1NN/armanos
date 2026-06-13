@@ -1,7 +1,7 @@
 'use client'
 
-import { Button, Form, RelationshipField, TextField, toast, useFormFields, useFormProcessing, useFormSubmitted } from '@payloadcms/ui'
-import type { FormState, SingleRelationshipFieldClient, TextFieldClient, ValueWithRelation } from 'payload'
+import { Button, Form, RelationshipField, TextField, toast, useFormProcessing } from '@payloadcms/ui'
+import type { FormState, SingleRelationshipFieldClient, TextFieldClient, TextFieldValidation, ValueWithRelation } from 'payload'
 import type { ExerciseRow } from '../types'
 import { s } from '../styles'
 import { sdk } from '@/lib/sdk'
@@ -17,6 +17,23 @@ const exerciseRelField: SingleRelationshipFieldClient = {
   label: 'Ćwiczenie (katalog)',
 } as SingleRelationshipFieldClient
 
+type SiblingData = Record<string, unknown>
+
+const validateRepsOrKg: TextFieldValidation = (value, { siblingData }) => {
+  if (!value && !(siblingData as SiblingData)?.kg) return 'Podaj powtórzenia lub obciążenie'
+  return true
+}
+
+const validateKgOrReps: TextFieldValidation = (value, { siblingData }) => {
+  if (!value && !(siblingData as SiblingData)?.reps) return 'Podaj powtórzenia lub obciążenie'
+  return true
+}
+
+const validateRounds: TextFieldValidation = (value) => {
+  if (value && !/^[\d\-–]+$/.test(String(value))) return 'Format: liczba lub zakres (np. 4, 3–4)'
+  return true
+}
+
 type Props = {
   groupId: number
   nextOrder: number
@@ -27,14 +44,6 @@ type Props = {
 
 function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => void }) {
   const processing = useFormProcessing()
-  const submitted  = useFormSubmitted()
-  type AnyFields = Record<string, { value: unknown } | undefined>
-  const reps = useFormFields((fields) => ((fields as unknown as AnyFields)['reps']?.value as string) ?? '')
-  const kg   = useFormFields((fields) => ((fields as unknown as AnyFields)['kg']?.value   as string) ?? '')
-
-  const repsKgError = submitted && !reps && !kg
-    ? 'Podaj powtórzenia lub obciążenie'
-    : null
 
   return (
     <>
@@ -43,7 +52,7 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
           <TextField path="numer" field={textField('numer', 'Numer', '1a')} />
         </div>
         <div style={{ flex: '0 0 80px' }}>
-          <TextField path="rounds" field={textField('rounds', 'Serie', '4')} />
+          <TextField path="rounds" field={textField('rounds', 'Serie', '4')} validate={validateRounds} />
         </div>
         <div style={{ flex: 1 }}>
           <RelationshipField path="exercise" field={exerciseRelField} />
@@ -58,10 +67,10 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
 
       <div style={s.formRow}>
         <div style={{ flex: '1 1 70px' }}>
-          <TextField path="reps" field={textField('reps', 'Powt.', '8')} />
+          <TextField path="reps" field={textField('reps', 'Powt.', '8')} validate={validateRepsOrKg} />
         </div>
         <div style={{ flex: '1 1 70px' }}>
-          <TextField path="kg" field={textField('kg', 'KG', '60')} />
+          <TextField path="kg" field={textField('kg', 'KG', '60')} validate={validateKgOrReps} />
         </div>
         <div style={{ flex: '1 1 70px' }}>
           <TextField path="rir" field={textField('rir', 'RIR', '2')} />
@@ -73,8 +82,6 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
           <TextField path="rest" field={textField('rest', 'Przerwa', '90 sek')} />
         </div>
       </div>
-
-      {repsKgError && <div style={s.errorMsg}>{repsKgError}</div>}
 
       <div style={s.formActions}>
         <Button buttonStyle="secondary" margin={false} type="button" onClick={onCancel}>
@@ -104,28 +111,17 @@ export function ExerciseFormV2({ groupId, nextOrder, initial, onSaved, onCancel 
   }
 
   const handleSubmit = async (_: FormState, data: Record<string, unknown>) => {
-    const reps   = data.reps   as string
-    const kg     = data.kg     as string
-    const rounds = data.rounds as string
-
-    if (!reps && !kg) return
-
-    if (rounds && !/^[\d\-–]+$/.test(rounds)) {
-      toast.error('Serie: podaj liczbę lub zakres (np. 4, 3–4)')
-      return
-    }
-
     const exerciseRaw = data.exercise as ValueWithRelation | null
     const body = {
-      numer:    (data.numer as string) || null,
-      rounds:   rounds                 || null,
+      numer:    (data.numer   as string) || null,
+      rounds:   (data.rounds  as string) || null,
       exercise: exerciseRaw ? Number(exerciseRaw.value) : null,
-      note:     (data.note  as string) || null,
-      reps:     reps                   || null,
-      kg:       kg                     || null,
-      rir:      (data.rir   as string) || null,
-      tut:      (data.tut   as string) || null,
-      rest:     (data.rest  as string) || null,
+      note:     (data.note    as string) || null,
+      reps:     (data.reps    as string) || null,
+      kg:       (data.kg      as string) || null,
+      rir:      (data.rir     as string) || null,
+      tut:      (data.tut     as string) || null,
+      rest:     (data.rest    as string) || null,
       ...(!isEdit && { group: groupId, order: nextOrder }),
     }
 
