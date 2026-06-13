@@ -10,7 +10,7 @@ import {
   secondaryButtonClass,
 } from '../../ui'
 
-type Variant = 'primary' | 'secondary' | 'dashed' | 'icon' | 'danger'
+type Variant = 'primary' | 'secondary' | 'dashed' | 'icon' | 'danger' | 'ghost'
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant
@@ -22,6 +22,7 @@ const variantClass: Record<Variant, string> = {
   dashed: dashedButtonClass,
   icon: iconButtonClass,
   danger: dangerIconButtonClass,
+  ghost: 'cursor-pointer text-left transition-colors',
 }
 
 export function Button({

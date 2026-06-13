@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import type { MetricField } from '../../trackingTypes'
 import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from './ui'
-import { ExerciseRow } from './components/workout/ExerciseRow'
+import { ExerciseCard } from './components/workout/ExerciseCard'
 import { SessionTimesBadge, SessionTimesForm } from './components/workout/SessionTimes'
 import type { Session, SetLog, TExercise, TWorkout, Values } from './components/workout/types'
 import { metricBody } from './components/workout/utils'
@@ -186,7 +186,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
             <div className="my-2 mb-3" key={gi}>
               {group.label && <div className={`mb-1 ${sectionLabelClass}`}>{group.label}</div>}
               {group.exercises.map((ex) => (
-                <ExerciseRow
+                <ExerciseCard
                   key={ex.rowId}
                   ex={ex}
                   sets={setsForRow(ex.rowId)}

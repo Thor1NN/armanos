@@ -8,7 +8,7 @@ import { Button } from '../ui/Button'
 import { Input, Select } from '../ui/Input'
 import type { Values } from './types'
 
-export function SetForm({
+export function SeriesForm({
   fields,
   initial,
   onSubmit,

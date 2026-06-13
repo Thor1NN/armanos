@@ -4,11 +4,11 @@ import React, { useState } from 'react'
 import { trackingFields, type MetricField } from '../../../../trackingTypes'
 import { mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
-import { SetForm } from './SetForm'
-import { SetItem } from './SetItem'
+import { SeriesForm } from './SeriesForm'
+import { SeriesRow } from './SeriesRow'
 import type { SetLog, TExercise, Values } from './types'
 
-export function ExerciseRow({
+export function ExerciseCard({
   ex,
   sets,
   onAdd,
@@ -51,7 +51,7 @@ export function ExerciseRow({
       {sets.length > 0 && (
         <ul className="mt-2 mb-1 list-none p-0">
           {sets.map((s) => (
-            <SetItem
+            <SeriesRow
               key={s.id}
               set={s}
               fields={fields}
@@ -63,7 +63,7 @@ export function ExerciseRow({
       )}
 
       {open ? (
-        <SetForm
+        <SeriesForm
           fields={fields}
           initial={{ reps: ex.prefill.reps ?? '', rir: ex.prefill.rir ?? '', note: '' }}
           onSubmit={async (v) => {

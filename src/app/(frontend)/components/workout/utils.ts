@@ -75,6 +75,27 @@ export const fmtSec = (s: number): string => {
   return rest ? `${m} min ${rest} s` : `${m} min`
 }
 
+export const setLogToFormValues = (set: SetLog, fields: MetricField[]): Values => {
+  const initial: Values = { note: set.note ?? '' }
+  for (const f of fields) {
+    const v = (set as Record<string, unknown>)[f]
+    if (v == null) {
+      initial[f] = ''
+    } else if (METRIC_FIELDS[f].composite === 'duration') {
+      const base = Number(v)
+      initial[`${f}__min`] = String(Math.floor(base / 60))
+      initial[`${f}__sec`] = String(base % 60)
+    } else if (METRIC_FIELDS[f].units) {
+      const conv = toDefaultUnit(f, Number(v))
+      initial[f] = conv.value
+      initial[`${f}__unit`] = conv.unit
+    } else {
+      initial[f] = String(v)
+    }
+  }
+  return initial
+}
+
 export const setSummary = (s: SetLog): string => {
   const parts: string[] = []
   if (s.weight != null) parts.push(`${s.weight} kg`)

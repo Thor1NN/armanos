@@ -123,10 +123,10 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
 
           return (
             <div className="border-t border-app-border first:border-t-0" key={plan.id}>
-              <button
-                className="flex w-full items-center justify-between gap-3 px-4 py-2 text-left transition-colors hover:bg-app-panel/60"
+              <Button
+                variant="ghost"
+                className="flex w-full items-center justify-between gap-3 px-4 py-2 hover:bg-app-panel/60"
                 onClick={() => selectPlan(plan)}
-                type="button"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -136,7 +136,7 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
                   {plan.dateRange && <div className="mt-0.5 text-xs text-app-muted">{plan.dateRange}</div>}
                 </div>
                 <span className={`shrink-0 text-xs ${mutedTextClass}`}>{isActivePlan ? '−' : '+'}</span>
-              </button>
+              </Button>
 
               {isActivePlan && (
                 <div className="border-t border-app-border bg-app-panel/40 px-4 py-2">
@@ -148,10 +148,10 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
 
                       return (
                         <div key={microcycle.id}>
-                          <button
-                            className="flex w-full items-center justify-between gap-3 rounded-lg border border-app-border bg-app-panel px-3 py-1.5 text-left transition-colors hover:border-app-muted"
+                          <Button
+                            variant="ghost"
+                            className="flex w-full items-center justify-between gap-3 rounded-lg border border-app-border bg-app-panel px-3 py-1.5 hover:border-app-muted"
                             onClick={() => selectMicrocycle(plan, microcycle.id)}
-                            type="button"
                           >
                             <div className="flex min-w-0 items-center gap-2">
                               <div className="text-sm font-medium text-app-text">{microcycle.title}</div>
@@ -162,7 +162,7 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
                             <span className={`shrink-0 text-xs ${mutedTextClass}`}>
                               {microcycle.workouts.length} trening{microcycle.workouts.length === 1 ? '' : microcycle.workouts.length < 5 ? 'i' : 'ów'}
                             </span>
-                          </button>
+                          </Button>
 
                           {isActiveMicrocycle && microcycle.workouts.length > 0 && (
                             <div className="mt-1 flex flex-wrap gap-1 pl-0.5">

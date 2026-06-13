@@ -1,14 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
-import { METRIC_FIELDS, type MetricField } from '../../../../trackingTypes'
+import type { MetricField } from '../../../../trackingTypes'
 import { joinClasses, panelClass } from '../../ui'
 import { Button } from '../ui/Button'
-import { SetForm } from './SetForm'
+import { SeriesForm } from './SeriesForm'
 import type { SetLog, Values } from './types'
-import { setSummary, toDefaultUnit } from './utils'
+import { setLogToFormValues, setSummary } from './utils'
 
-export function SetItem({
+export function SeriesRow({
   set,
   fields,
   onUpdate,
@@ -22,30 +22,11 @@ export function SetItem({
   const [editing, setEditing] = useState(false)
 
   if (editing) {
-    const initial: Values = { note: set.note ?? '' }
-
-    for (const f of fields) {
-      const v = (set as Record<string, unknown>)[f]
-      if (v == null) {
-        initial[f] = ''
-      } else if (METRIC_FIELDS[f].composite === 'duration') {
-        const base = Number(v)
-        initial[`${f}__min`] = String(Math.floor(base / 60))
-        initial[`${f}__sec`] = String(base % 60)
-      } else if (METRIC_FIELDS[f].units) {
-        const conv = toDefaultUnit(f, Number(v))
-        initial[f] = conv.value
-        initial[`${f}__unit`] = conv.unit
-      } else {
-        initial[f] = String(v)
-      }
-    }
-
     return (
       <li className={`px-2.5 py-2 ${joinClasses(panelClass, 'rounded-lg bg-app-bg')}`}>
-        <SetForm
+        <SeriesForm
           fields={fields}
-          initial={initial}
+          initial={setLogToFormValues(set, fields)}
           onSubmit={async (v) => {
             await onUpdate(v)
             setEditing(false)
