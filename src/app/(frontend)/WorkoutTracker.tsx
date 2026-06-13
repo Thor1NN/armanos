@@ -2,76 +2,21 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import type { MetricField } from '../../trackingTypes'
-import { mutedTextClass, panelClass, sectionLabelClass } from './ui'
+import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from './ui'
 import { ExerciseRow } from './components/workout/ExerciseRow'
 import { SessionTimesBadge, SessionTimesForm } from './components/workout/SessionTimes'
 import type { Session, SetLog, TExercise, TWorkout, Values } from './components/workout/types'
 import { metricBody } from './components/workout/utils'
+import { sdk } from '@/lib/sdk'
 
 export type { TWorkout } from './components/workout/types'
-
-const api = {
-  async findSession(workoutId: number): Promise<Session | null> {
-    const res = await fetch(
-      `/api/workout-logs?where[workout][equals]=${workoutId}&limit=1&depth=0&sort=-updatedAt`,
-      { credentials: 'same-origin', cache: 'no-store' },
-    )
-    const data = await res.json()
-    return data.docs?.[0] ?? null
-  },
-  async createSession(workoutId: number): Promise<Session> {
-    const res = await fetch('/api/workout-logs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify({ workout: workoutId }),
-    })
-    return (await res.json()).doc
-  },
-  async patchSession(id: number, body: Record<string, unknown>): Promise<Session> {
-    const res = await fetch(`/api/workout-logs/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(body),
-    })
-    return (await res.json()).doc
-  },
-  async loadSets(sessionId: number): Promise<SetLog[]> {
-    const res = await fetch(
-      `/api/set-logs?where[session][equals]=${sessionId}&limit=500&depth=0&sort=setNumber`,
-      { credentials: 'same-origin', cache: 'no-store' },
-    )
-    return (await res.json()).docs ?? []
-  },
-  async addSet(body: Record<string, unknown>): Promise<SetLog> {
-    const res = await fetch('/api/set-logs?depth=0', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(body),
-    })
-    return (await res.json()).doc
-  },
-  async updateSet(id: number, body: Record<string, unknown>): Promise<SetLog> {
-    const res = await fetch(`/api/set-logs/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify(body),
-    })
-    return (await res.json()).doc
-  },
-  async deleteSet(id: number) {
-    await fetch(`/api/set-logs/${id}`, { method: 'DELETE', credentials: 'same-origin' })
-  },
-}
 
 export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   const [session, setSession] = useState<Session | null>(null)
   const [sets, setSets] = useState<SetLog[]>([])
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
   const [loadedWorkoutId, setLoadedWorkoutId] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const hasLoadedWorkout = loadedWorkoutId === workout.id
   const displayedSession = hasLoadedWorkout ? session : null
@@ -80,24 +25,30 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   useEffect(() => {
     let active = true
 
-    api.findSession(workout.id).then(async (s) => {
-      if (!active) return
+    sdk.find({ collection: 'workout-logs', where: { workout: { equals: workout.id } }, limit: 1, depth: 0, sort: '-updatedAt' })
+      .then(async (result) => {
+        if (!active) return
+        const s = (result.docs[0] ?? null) as Session | null
 
-      if (!s) {
-        setSession(null)
-        setSets([])
+        if (!s) {
+          setSession(null)
+          setSets([])
+          setLoadedWorkoutId(workout.id)
+          return
+        }
+
+        setSession(s)
+        const setsResult = await sdk.find({ collection: 'set-logs', where: { session: { equals: s.id } }, limit: 500, depth: 0, sort: 'setNumber' })
+        if (!active) return
+
+        setSets(setsResult.docs as unknown as SetLog[])
         setLoadedWorkoutId(workout.id)
-        return
-      }
-
-      setSession(s)
-
-      const loadedSets = await api.loadSets(s.id)
-      if (!active) return
-
-      setSets(loadedSets)
-      setLoadedWorkoutId(workout.id)
-    })
+      })
+      .catch((e) => {
+        if (!active) return
+        setError(e instanceof Error ? e.message : 'Błąd ładowania sesji')
+        setLoadedWorkoutId(workout.id)
+      })
 
     return () => {
       active = false
@@ -108,23 +59,36 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
   const ensureSession = async (): Promise<Session> => {
     if (displayedSession) return displayedSession
     if (!creating.current) {
-      creating.current = api.createSession(workout.id).then((s) => {
-        setSession(s)
-        setLoadedWorkoutId(workout.id)
-        return s
-      })
+      creating.current = sdk
+        .create({ collection: 'workout-logs', data: { workout: workout.id } as never })
+        .then((doc) => {
+          const s = doc as unknown as Session
+          setSession(s)
+          setLoadedWorkoutId(workout.id)
+          return s
+        })
     }
     return creating.current
   }
 
   const setTime = async (field: 'startedAt' | 'finishedAt', iso: string | null) => {
-    const s = await ensureSession()
-    setSession(await api.patchSession(s.id, { [field]: iso }))
+    try {
+      const s = await ensureSession()
+      const doc = await sdk.update({ collection: 'workout-logs', id: s.id, data: { [field]: iso } as never })
+      setSession(doc as unknown as Session)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Błąd zapisu czasu')
+    }
   }
 
   const saveTimes = async (startedAt: string | null, finishedAt: string | null) => {
-    const s = await ensureSession()
-    setSession(await api.patchSession(s.id, { startedAt, finishedAt }))
+    try {
+      const s = await ensureSession()
+      const doc = await sdk.update({ collection: 'workout-logs', id: s.id, data: { startedAt, finishedAt } as never })
+      setSession(doc as unknown as Session)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Błąd zapisu czasu')
+    }
   }
 
   const setsForRow = (rowId: string) =>
@@ -133,27 +97,46 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
       .sort((a, b) => (a.setNumber ?? 0) - (b.setNumber ?? 0))
 
   const onAdd = async (ex: TExercise, fields: MetricField[], v: Values) => {
-    const s = await ensureSession()
-    const setNumber = setsForRow(ex.rowId).length + 1
-    const doc = await api.addSet({
-      session: s.id,
-      exercise: ex.exerciseId ?? undefined,
-      exerciseName: ex.exerciseName,
-      exerciseRow: Number(ex.rowId),
-      setNumber,
-      ...metricBody(fields, v),
-    })
-    setSets((prev) => [...prev, doc])
+    try {
+      const s = await ensureSession()
+      const setNumber = setsForRow(ex.rowId).length + 1
+      const doc = await sdk.create({
+        collection: 'set-logs',
+        depth: 0,
+        data: {
+          session: s.id,
+          exercise: ex.exerciseId ?? undefined,
+          exerciseName: ex.exerciseName,
+          exerciseRow: Number(ex.rowId),
+          setNumber,
+          ...metricBody(fields, v),
+        } as never,
+      })
+      setSets((prev) => [...prev, doc as unknown as SetLog])
+      setError(null)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Błąd zapisu serii')
+    }
   }
 
   const onUpdate = async (id: number, fields: MetricField[], v: Values) => {
-    const doc = await api.updateSet(id, metricBody(fields, v))
-    setSets((prev) => prev.map((s) => (s.id === id ? { ...s, ...doc } : s)))
+    try {
+      const doc = await sdk.update({ collection: 'set-logs', id, depth: 0, data: metricBody(fields, v) as never })
+      setSets((prev) => prev.map((s) => (s.id === id ? { ...s, ...(doc as unknown as SetLog) } : s)))
+      setError(null)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Błąd aktualizacji serii')
+    }
   }
 
   const onDelete = async (id: number) => {
-    await api.deleteSet(id)
-    setSets((prev) => prev.filter((s) => s.id !== id))
+    try {
+      await sdk.delete({ collection: 'set-logs', id })
+      setSets((prev) => prev.filter((s) => s.id !== id))
+      setError(null)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Błąd usunięcia serii')
+    }
   }
 
   return (
@@ -177,6 +160,18 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
           onSave={saveTimes}
           onClose={() => setTimeEditorOpen(false)}
         />
+      )}
+
+      {error && (
+        <div className={`mt-2 ${errorBannerClass}`} role="alert">
+          {error}
+          <button
+            className="ml-3 underline opacity-70 hover:opacity-100"
+            onClick={() => setError(null)}
+          >
+            ✕
+          </button>
+        </div>
       )}
 
       {workout.sections.map((section, si) => (
