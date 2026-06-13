@@ -8,7 +8,7 @@ import { PROTOCOL_LABEL } from './constants'
 import { exerciseLabel, exerciseMeta, groupLabel } from './utils'
 import { s } from './styles'
 import { GroupForm } from './components/group-form'
-import { ExerciseForm } from './components/exercise-form'
+import { ExerciseFormV2 as ExerciseForm } from './components/exercise-form-v2'
 
 type Props = {
   sections: Section[]
