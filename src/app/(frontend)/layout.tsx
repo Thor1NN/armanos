@@ -8,6 +8,7 @@ export const metadata = {
     index: false,
     follow: false,
   },
+  colorScheme: 'dark',
   icons: {
     icon: [
       { url: '/favicon/favicon.ico', sizes: 'any' },
