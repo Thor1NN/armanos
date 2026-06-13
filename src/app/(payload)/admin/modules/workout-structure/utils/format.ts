@@ -1,4 +1,4 @@
-import type { ExerciseRow, Group } from './types'
+import type { ExerciseRow, Group } from '../types'
 
 export const groupLabel = (g: Group): string => {
   const p = g.protocol ?? 'standard'

@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Form, RelationshipField, TextField, toast, useFormProcessing } from '@payloadcms/ui'
-import type { FormState, SingleRelationshipFieldClient, TextFieldClient, TextFieldValidation, ValueWithRelation } from 'payload'
+import type { FormState, SingleRelationshipFieldClient, TextFieldClient, ValueWithRelation } from 'payload'
 import type { ExerciseRow } from '../types'
 import { s } from '../styles'
 import { sdk } from '@/lib/sdk'
@@ -17,22 +17,7 @@ const exerciseRelField: SingleRelationshipFieldClient = {
   label: 'Ćwiczenie (katalog)',
 } as SingleRelationshipFieldClient
 
-type SiblingData = Record<string, unknown>
-
-const validateRepsOrKg: TextFieldValidation = (value, { siblingData }) => {
-  if (!value && !(siblingData as SiblingData)?.kg) return 'Podaj powtórzenia lub obciążenie'
-  return true
-}
-
-const validateKgOrReps: TextFieldValidation = (value, { siblingData }) => {
-  if (!value && !(siblingData as SiblingData)?.reps) return 'Podaj powtórzenia lub obciążenie'
-  return true
-}
-
-const validateRounds: TextFieldValidation = (value) => {
-  if (value && !/^[\d\-–]+$/.test(String(value))) return 'Format: liczba lub zakres (np. 4, 3–4)'
-  return true
-}
+import { validateKgOrReps, validateRepsOrKg, validateRounds } from '../utils'
 
 type Props = {
   groupId: number
