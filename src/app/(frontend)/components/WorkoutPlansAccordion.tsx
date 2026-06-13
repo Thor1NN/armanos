@@ -120,26 +120,26 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
           const isActivePlan = plan.id === resolvedSelection.planId
 
           return (
-            <div className="border-t border-app-border first:border-t-0" key={plan.id}>
+            <div className="border-t border-ui-border-base first:border-t-0" key={plan.id}>
               <Button
                 variant="ghost"
-                className="flex w-full items-center justify-between gap-3 pl-0 pr-4 py-2 hover:bg-app-panel/60"
+                className="flex w-full items-center justify-between gap-3 pl-0 pr-4 py-2 hover:bg-ui-bg-subtle/60"
                 onClick={() => selectPlan(plan)}
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-semibold text-app-text">{plan.title}</span>
+                    <span className="text-sm font-semibold text-ui-fg-base">{plan.title}</span>
                     <StatusBadge status={plan.status}>{plan.statusLabel}</StatusBadge>
                   </div>
-                  {plan.dateRange && <div className="mt-0.5 text-xs text-app-muted">{plan.dateRange}</div>}
+                  {plan.dateRange && <div className="mt-0.5 text-xs text-ui-fg-muted">{plan.dateRange}</div>}
                 </div>
                 <span className={`shrink-0 text-xs ${mutedTextClass}`}>{isActivePlan ? '−' : '+'}</span>
               </Button>
 
               {isActivePlan && (
-                <div className="border-t border-app-border bg-app-panel/40 py-2 space-y-1.5">
+                <div className="border-t border-ui-border-base bg-ui-bg-subtle/40 py-2 space-y-1.5">
                   {plan.description && (
-                    <div className="text-sm text-app-muted">{plan.description}</div>
+                    <div className="text-sm text-ui-fg-muted">{plan.description}</div>
                   )}
 
                   <div className="flex gap-1.5">
@@ -183,9 +183,9 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
 
       {activePlan && activeMicrocycle && activeWorkout && (
         <div className="space-y-2.5">
-          <div className="rounded-lg border border-app-border bg-app-panel/60 px-4 py-2">
+          <div className="rounded-lg border border-ui-border-base bg-ui-bg-subtle/60 px-4 py-2">
             <div className={sectionLabelClass}>Aktywny kontekst</div>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-app-text">
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ui-fg-base">
               <span>{activePlan.title}</span>
               <span className={mutedTextClass}>/</span>
               <span>{activeMicrocycle.title}</span>

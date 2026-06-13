@@ -34,7 +34,7 @@ const sizeClass: Record<Size, string> = {
 }
 
 const activeClass: Partial<Record<Variant, string>> = {
-  secondary: 'border-app-accent bg-app-accent/10 text-app-text',
+  secondary: 'border-ui-border-interactive bg-ui-bg-interactive/10 text-ui-fg-base',
 }
 
 export function Button({

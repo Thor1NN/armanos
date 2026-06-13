@@ -141,7 +141,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
 
   return (
     <div className={`mb-3 px-4 py-3 ${panelClass}`}>
-      <div className="flex items-center justify-between gap-3 border-b border-app-border pb-2.5 text-sm font-semibold text-app-text">
+      <div className="flex items-center justify-between gap-3 border-b border-ui-border-base pb-2.5 text-sm font-semibold text-ui-fg-base">
         <span>
           <span className="break-words">{workout.title}</span>
           {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
@@ -183,7 +183,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
       {workout.sections.map((section, si) => (
         <div className="mt-3" key={si}>
           {(section.title || section.subtitle) && (
-            <div className="mb-2 text-sm font-semibold text-app-accent">
+            <div className="mb-2 text-sm font-semibold text-ui-fg-interactive">
               {section.title}
               {section.subtitle ? ` · ${section.subtitle}` : ''}
             </div>

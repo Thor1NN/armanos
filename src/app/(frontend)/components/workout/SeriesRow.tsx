@@ -23,7 +23,7 @@ export function SeriesRow({
 
   if (editing) {
     return (
-      <li className={`px-2.5 py-2 ${joinClasses(panelClass, 'rounded-lg bg-app-bg')}`}>
+      <li className={`px-2.5 py-2 ${joinClasses(panelClass, 'rounded-lg bg-ui-bg-base')}`}>
         <SeriesForm
           fields={fields}
           initial={setLogToFormValues(set, fields)}
@@ -38,7 +38,7 @@ export function SeriesRow({
   }
 
   return (
-    <li className="mb-1 flex items-center justify-between gap-2 rounded-lg border border-app-border bg-app-bg px-2.5 py-1.5 text-sm">
+    <li className="mb-1 flex items-center justify-between gap-2 rounded-lg border border-ui-border-base bg-ui-bg-base px-2.5 py-1.5 text-sm">
       <span>
         Seria {set.setNumber}: {setSummary(set)}
       </span>

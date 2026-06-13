@@ -86,18 +86,6 @@
   --color-ui-tag-neutral-border: #e5e7eb;
   --color-ui-tag-neutral-icon: #6b7280;
 
-  /* app-* aliases → light defaults (overridden in dark) */
-  --color-app-bg: #ffffff;
-  --color-app-card: #f8fafc;
-  --color-app-panel: #f1f5f9;
-  --color-app-border: #e5e7eb;
-  --color-app-text: #0f1419;
-  --color-app-muted: #64748b;
-  --color-app-accent: #3d5eff;
-  --color-app-accent-hover: #1a3de0;
-  --color-app-danger: #f43f5e;
-  --color-app-warn: #f59e0b;
-
   /* Shadows */
   --shadow-borders-base: 0 0 0 1px #e5e7eb;
   --shadow-borders-strong: 0 0 0 1px #d1d5db;
@@ -257,17 +245,6 @@
     --shadow-borders-interactive-w-focus: 0 0 0 2px #6c84ff;
     --shadow-borders-error: 0 0 0 1px #ff5a5a;
 
-    /* app-* in dark */
-    --color-app-bg: #0f1115;
-    --color-app-card: #181b22;
-    --color-app-panel: #14171d;
-    --color-app-border: #262a33;
-    --color-app-text: #e8eaed;
-    --color-app-muted: #9aa0aa;
-    --color-app-accent: #4f8cff;
-    --color-app-accent-hover: #3b78f0;
-    --color-app-danger: #ff5a5a;
-    --color-app-warn: #ffb446;
 }
 
 @layer base {

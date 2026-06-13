@@ -42,13 +42,13 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-5 py-6">
       <Surface as="form" className="w-full max-w-sm p-6 sm:p-8" onSubmit={onSubmit}>
-        <h1 className="text-xl font-semibold text-app-text">Zaloguj się</h1>
-        <p className="mt-1 mb-6 text-sm text-app-muted">Wpisz dane otrzymane od trenera.</p>
+        <h1 className="text-xl font-semibold text-ui-fg-base">Zaloguj się</h1>
+        <p className="mt-1 mb-6 text-sm text-ui-fg-muted">Wpisz dane otrzymane od trenera.</p>
 
         {error && <div className={`mb-4 ${errorBannerClass}`}>{error}</div>}
 
         <div className="mb-4">
-          <label className="mb-1.5 block text-xs text-app-muted" htmlFor="email">
+          <label className="mb-1.5 block text-xs text-ui-fg-muted" htmlFor="email">
             E-mail
           </label>
           <Input
@@ -62,7 +62,7 @@ export default function LoginPage() {
           />
         </div>
         <div className="mb-4">
-          <label className="mb-1.5 block text-xs text-app-muted" htmlFor="password">
+          <label className="mb-1.5 block text-xs text-ui-fg-muted" htmlFor="password">
             Hasło
           </label>
           <Input

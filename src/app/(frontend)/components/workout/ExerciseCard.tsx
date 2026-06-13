@@ -25,15 +25,15 @@ export function ExerciseCard({
   const fields = trackingFields(ex.trackingType)
 
   return (
-    <div className="border-t border-app-border py-2 first:border-t-0">
-      <div className="break-words text-sm text-app-text">
+    <div className="border-t border-ui-border-base py-2 first:border-t-0">
+      <div className="break-words text-sm text-ui-fg-base">
         {ex.numer ? (
           <span className={`inline-block min-w-7 font-semibold ${mutedTextClass}`}>{ex.numer}</span>
         ) : null}
         {ex.name}
         {ex.videoUrl && (
           <a
-            className="ml-2 whitespace-nowrap text-xs text-app-accent"
+            className="ml-2 whitespace-nowrap text-xs text-ui-fg-interactive"
             href={ex.videoUrl}
             target="_blank"
             rel="noopener noreferrer"

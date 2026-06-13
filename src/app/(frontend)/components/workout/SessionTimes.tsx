@@ -28,7 +28,7 @@ export function SessionTimesBadge({
       variant="secondary"
       className={joinClasses(
         'rounded-full px-2.5 text-xs font-normal',
-        open ? 'border-app-accent bg-app-accent text-white' : 'bg-app-panel text-app-text',
+        open ? 'border-ui-border-interactive bg-ui-bg-interactive text-white' : 'bg-ui-bg-subtle text-ui-fg-base',
       )}
       onClick={onOpen}
     >
@@ -39,7 +39,7 @@ export function SessionTimesBadge({
       ) : dateLabel || duration ? (
         <span className="flex items-center gap-1.5 whitespace-nowrap">
           {dateLabel && <span>{dateLabel}</span>}
-          {duration && <span className="font-bold text-app-accent">{duration}</span>}
+          {duration && <span className="font-bold text-ui-fg-interactive">{duration}</span>}
         </span>
       ) : (
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={iconClass}>
