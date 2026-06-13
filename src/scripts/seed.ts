@@ -25,8 +25,9 @@ type SeedData = {
   workoutExerciseRows: Record<string, unknown>[]
 }
 
-function pick<T extends Record<string, unknown>>(obj: T, keys: string[]): Partial<T> {
-  return Object.fromEntries(keys.filter((k) => k in obj).map((k) => [k, obj[k]])) as Partial<T>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function pick(obj: Record<string, unknown>, keys: string[]): any {
+  return Object.fromEntries(keys.filter((k) => k in obj).map((k) => [k, obj[k]]))
 }
 
 async function run() {
