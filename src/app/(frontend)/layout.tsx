@@ -4,6 +4,10 @@ import './styles.css'
 export const metadata = {
   description: 'Aplikacja treningowa',
   title: 'Trening',
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
