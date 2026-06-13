@@ -5,6 +5,7 @@ import type { FormState, SingleRelationshipFieldClient, TextFieldClient, ValueWi
 import type { ExerciseRow } from '../types'
 import { s } from '../styles'
 import { sdk } from '@/lib/sdk'
+import { validateKgOrReps, validateRepsOrKg, validateRounds } from '../utils'
 
 const textField = (name: string, label: string, placeholder?: string): TextFieldClient =>
   ({ name, label, type: 'text', admin: { placeholder } }) as TextFieldClient
@@ -16,8 +17,6 @@ const exerciseRelField: SingleRelationshipFieldClient = {
   hasMany: false,
   label: 'Ćwiczenie (katalog)',
 } as SingleRelationshipFieldClient
-
-import { validateKgOrReps, validateRepsOrKg, validateRounds } from '../utils'
 
 type Props = {
   groupId: number
