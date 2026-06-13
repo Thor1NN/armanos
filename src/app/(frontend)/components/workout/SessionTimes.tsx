@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { joinClasses, mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
-import { Surface } from '../ui/Surface'
 import type { Session } from '../../types/types'
 import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from '../../utils/date'
 
@@ -20,30 +19,32 @@ export function SessionTimesBadge({
   const startIso = session?.startedAt ?? null
   const finishIso = session?.finishedAt ?? null
   const duration = fmtDuration(startIso, finishIso)
-  const compact = (iso: string | null) =>
-    iso ? `${isoToDateInput(iso).slice(5).replace('-', '.')} ${isoToTimeInput(iso)}` : null
-  const s = compact(startIso)
-  const e = compact(finishIso)
+  const dateLabel = startIso ? isoToDateInput(startIso).slice(5).replace('-', '.') : null
+
+  const iconClass = open ? 'text-white' : mutedTextClass
 
   return (
     <Button
       variant="secondary"
       className={joinClasses(
-        'rounded-full bg-app-panel px-3 py-1.5 text-xs font-normal text-app-text',
-        open && 'border-app-accent text-app-text',
+        'rounded-full px-2.5 text-xs font-normal',
+        open ? 'border-app-accent bg-app-accent text-white' : 'bg-app-panel text-app-text',
       )}
       onClick={onOpen}
     >
-      {s || e ? (
-        <span className="flex items-center gap-2">
-          <span>
-            {s ?? '—'}
-            {e ? ` – ${e}` : ''}
-          </span>
-          {duration && <span className="font-semibold text-app-accent">{duration}</span>}
+      {open ? (
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={iconClass}>
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      ) : dateLabel || duration ? (
+        <span className="flex items-center gap-1.5 whitespace-nowrap">
+          {dateLabel && <span>{dateLabel}</span>}
+          {duration && <span className="font-bold text-app-accent">{duration}</span>}
         </span>
       ) : (
-        <span className={mutedTextClass}>Ustaw czas treningu</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={iconClass}>
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
       )}
     </Button>
   )
@@ -109,51 +110,54 @@ export function SessionTimesForm({
   }
 
   return (
-    <Surface className="mt-2 p-3 font-normal" variant="panel">
+    <div className="mt-2 font-normal">
       <div className="flex flex-col gap-2.5">
-        <div className="flex flex-wrap items-center gap-1.5 text-sm">
-          <span className={`w-20 shrink-0 text-xs ${mutedTextClass}`}>Rozpoczęto</span>
-          <Input
-            type="date"
-            value={sd}
-            onChange={(e) => setSd(e.target.value)}
-            onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
-          />
-          <Input
-            type="time"
-            value={st}
-            onChange={(e) => setSt(e.target.value)}
-            onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
-          />
-          <Button variant="secondary" onClick={setStartNow}>
-            teraz
-          </Button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1.5 text-sm">
-          <span className={`w-20 shrink-0 text-xs ${mutedTextClass}`}>Zakończono</span>
-          <Input
-            type="time"
-            value={et}
-            onChange={(e) => setEt(e.target.value)}
-            onBlur={() => onSet('finishedAt', combineDateTime(ed || sd, et))}
-          />
-          {([1, 1.5, 2] as const).map((h) => (
-            <Button key={h} variant="secondary" onClick={() => addToStart(h)}>
-              +{h}h
+        <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
+          <span className={`text-xs ${mutedTextClass}`}>Rozpoczęto</span>
+          <div className="flex items-center gap-1.5">
+            <Input
+              type="date"
+              className="w-31.5 [&::-webkit-calendar-picker-indicator]:hidden"
+              value={sd}
+              onChange={(e) => setSd(e.target.value)}
+              onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
+            />
+            <Input
+              type="time"
+              className="w-22 [&::-webkit-calendar-picker-indicator]:hidden"
+              value={st}
+              onChange={(e) => setSt(e.target.value)}
+              onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
+            />
+            <Button variant="secondary" onClick={setStartNow}>
+              teraz
             </Button>
-          ))}
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
+          <span className={`text-xs ${mutedTextClass}`}>Zakończono</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Input
+              type="time"
+              value={et}
+              onChange={(e) => setEt(e.target.value)}
+              onBlur={() => onSet('finishedAt', combineDateTime(ed || sd, et))}
+            />
+            {([1, 1.5, 2] as const).map((h) => (
+              <Button key={h} variant="secondary" onClick={() => addToStart(h)}>
+                +{h}h
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5">
           <Button size="sm" onClick={save} disabled={saving}>
             {saving ? '…' : 'Zapisz'}
           </Button>
-          <Button size="sm" variant="secondary" onClick={onClose}>
-            Zwiń
-          </Button>
         </div>
       </div>
-    </Surface>
+    </div>
   )
 }

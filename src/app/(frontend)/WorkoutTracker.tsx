@@ -141,7 +141,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
 
   return (
     <div className={`mb-3 px-4 py-3 ${panelClass}`}>
-      <div className="flex items-center justify-between gap-3 text-sm font-semibold text-app-text">
+      <div className="flex items-center justify-between gap-3 border-b border-app-border pb-2.5 text-sm font-semibold text-app-text">
         <span>
           <span className="break-words">{workout.title}</span>
           {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
@@ -149,7 +149,7 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
         <SessionTimesBadge
           session={displayedSession}
           open={timeEditorOpen}
-          onOpen={() => setTimeEditorOpen(true)}
+          onOpen={() => setTimeEditorOpen((p) => !p)}
         />
       </div>
 

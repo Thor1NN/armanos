@@ -16,6 +16,7 @@ type Size = 'md' | 'sm'
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant
   size?: Size
+  active?: boolean
 }
 
 const variantClass: Record<Variant, string> = {
@@ -28,8 +29,12 @@ const variantClass: Record<Variant, string> = {
 }
 
 const sizeClass: Record<Size, string> = {
-  md: '',
-  sm: 'min-h-8 px-3 py-1 text-xs',
+  md: 'min-h-8',
+  sm: 'min-h-6 px-2.5 text-xs',
+}
+
+const activeClass: Partial<Record<Variant, string>> = {
+  secondary: 'border-app-accent bg-app-accent/10 text-app-text',
 }
 
 export function Button({
@@ -37,11 +42,17 @@ export function Button({
   type = 'button',
   variant = 'primary',
   size = 'md',
+  active,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={joinClasses(variantClass[variant], sizeClass[size], className)}
+      className={joinClasses(
+        variantClass[variant],
+        sizeClass[size],
+        active && activeClass[variant],
+        className,
+      )}
       type={type}
       {...props}
     />

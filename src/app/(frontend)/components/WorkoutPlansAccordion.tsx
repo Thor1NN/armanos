@@ -123,7 +123,7 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
             <div className="border-t border-app-border first:border-t-0" key={plan.id}>
               <Button
                 variant="ghost"
-                className="flex w-full items-center justify-between gap-3 px-4 py-2 hover:bg-app-panel/60"
+                className="flex w-full items-center justify-between gap-3 pl-0 pr-4 py-2 hover:bg-app-panel/60"
                 onClick={() => selectPlan(plan)}
               >
                 <div className="min-w-0">
@@ -137,61 +137,43 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
               </Button>
 
               {isActivePlan && (
-                <div className="border-t border-app-border bg-app-panel/40 px-4 py-2">
-                  {plan.description && <div className="mb-1.5 text-sm text-app-muted">{plan.description}</div>}
+                <div className="border-t border-app-border bg-app-panel/40 py-2 space-y-1.5">
+                  {plan.description && (
+                    <div className="text-sm text-app-muted">{plan.description}</div>
+                  )}
 
-                  <div className="space-y-1.5">
-                    {plan.microcycles.map((microcycle) => {
+                  <div className="flex gap-1.5">
+                    {plan.microcycles.map((microcycle, idx) => {
                       const isActiveMicrocycle = microcycle.id === resolvedSelection.microcycleId
-
                       return (
-                        <div key={microcycle.id}>
-                          <Button
-                            variant="ghost"
-                            className="flex w-full items-center justify-between gap-3 rounded-lg border border-app-border bg-app-panel px-3 py-1.5 hover:border-app-muted"
-                            onClick={() => selectMicrocycle(plan, microcycle.id)}
-                          >
-                            <div className="flex min-w-0 items-center gap-2">
-                              <div className="text-sm font-medium text-app-text">{microcycle.title}</div>
-                              {microcycle.rpe != null && (
-                                <span className="text-xs text-app-muted">RPE {microcycle.rpe}</span>
-                              )}
-                            </div>
-                            <span className={`shrink-0 text-xs ${mutedTextClass}`}>
-                              {microcycle.workouts.length} trening{microcycle.workouts.length === 1 ? '' : microcycle.workouts.length < 5 ? 'i' : 'ów'}
-                            </span>
-                          </Button>
-
-                          {isActiveMicrocycle && microcycle.workouts.length > 0 && (
-                            <div className="mt-1 flex flex-wrap gap-1 pl-0.5">
-                              {microcycle.workouts.map((workout) => {
-                                const isActiveWorkout = workout.id === resolvedSelection.workoutId
-
-                                return (
-                                  <Button
-                                    className={[
-                                      'min-h-7 px-2.5 py-1 text-xs',
-                                      isActiveWorkout ? 'border-app-accent bg-app-accent/10 text-app-text' : '',
-                                    ].join(' ')}
-                                    key={workout.id}
-                                    onClick={() =>
-                                      setSelection({
-                                        ...resolvedSelection,
-                                        workoutId: workout.id,
-                                      })
-                                    }
-                                    variant="secondary"
-                                  >
-                                    {workout.title}
-                                  </Button>
-                                )
-                              })}
-                            </div>
-                          )}
-                        </div>
+                        <Button
+                          key={microcycle.id}
+                          size="sm"
+                          variant={isActiveMicrocycle ? 'primary' : 'secondary'}
+                          className="flex-1"
+                          onClick={() => selectMicrocycle(plan, microcycle.id)}
+                        >
+                          M{idx + 1}({microcycle.workouts.length})
+                        </Button>
                       )
                     })}
                   </div>
+
+                  {activeMicrocycle && activeMicrocycle.workouts.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {activeMicrocycle.workouts.map((workout) => (
+                        <Button
+                          key={workout.id}
+                          size="sm"
+                          variant="secondary"
+                          active={workout.id === resolvedSelection.workoutId}
+                          onClick={() => setSelection({ ...resolvedSelection, workoutId: workout.id })}
+                        >
+                          {workout.title}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

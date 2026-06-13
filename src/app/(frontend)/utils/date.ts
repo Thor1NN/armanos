@@ -26,7 +26,7 @@ export const fmtDuration = (start?: string | null, end?: string | null): string 
   const totalMin = Math.round(ms / 60000)
   const h = Math.floor(totalMin / 60)
   const m = totalMin % 60
-  return h ? `${h} h ${m} min` : `${m} min`
+  return h ? `${h}h ${m}min` : `${m}min`
 }
 
 export const fmtSec = (s: number): string => {

@@ -220,10 +220,10 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-6 sm:px-6 sm:py-8">
-      <div className="mb-7 flex items-center justify-between gap-4">
+      <div className="mb-4 flex items-center justify-between gap-3 sm:mb-7 sm:gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-app-text">Cześć, {user.name || user.email} 👋</h1>
-          <span className="mt-1 block text-xs text-app-muted">Twoje plany treningowe</span>
+          <h1 className="text-sm font-semibold text-app-text sm:text-xl">Cześć, {user.name || user.email}</h1>
+          <span className="mt-0.5 block text-xs text-app-muted sm:mt-1">Twoje plany treningowe</span>
         </div>
         <LogoutButton />
       </div>

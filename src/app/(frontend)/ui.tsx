@@ -6,16 +6,16 @@ export const panelClass = 'rounded-xl border border-app-border bg-app-panel'
 export const mutedTextClass = 'text-app-muted'
 export const sectionLabelClass = 'text-xs uppercase tracking-wider text-app-muted'
 export const inputClass =
-  'rounded-lg border border-app-border bg-app-bg px-3 py-2.5 text-sm text-app-text outline-none transition focus-visible:border-app-accent focus-visible:ring-2 focus-visible:ring-app-accent/20'
-export const compactInputClass = joinClasses('w-20 px-2.5 py-2', inputClass)
-export const compactUnitInputClass = joinClasses('w-16 px-2.5 py-2', inputClass)
-export const selectClass = joinClasses('px-2 py-2', inputClass)
+  'rounded-lg border border-app-border bg-app-bg px-3 py-[7px] text-base text-app-text outline-none transition placeholder:opacity-40 focus-visible:border-app-accent focus-visible:ring-2 focus-visible:ring-app-accent/20'
+export const compactInputClass = joinClasses('w-20 px-2.5 py-1.5 sm:py-2', inputClass)
+export const compactUnitInputClass = joinClasses('w-16 px-2.5 py-1.5 sm:py-2', inputClass)
+export const selectClass = joinClasses('px-2 py-1.5 sm:py-2', inputClass)
 export const primaryButtonClass =
-  'inline-flex min-h-9 cursor-pointer items-center justify-center rounded-lg bg-app-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-app-accent-hover disabled:cursor-not-allowed disabled:opacity-60'
+  'appearance-none flex w-fit cursor-pointer items-center justify-center rounded-lg bg-app-accent px-3 text-sm font-semibold text-white transition-colors hover:bg-app-accent-hover disabled:cursor-not-allowed disabled:opacity-60'
 export const secondaryButtonClass =
-  'inline-flex min-h-9 cursor-pointer items-center justify-center rounded-lg border border-app-border px-3 py-2 text-sm font-medium text-app-muted transition hover:border-app-muted hover:text-app-text focus-visible:border-app-accent focus-visible:ring-2 focus-visible:ring-app-accent/20 disabled:cursor-not-allowed disabled:opacity-60'
+  'appearance-none flex w-fit cursor-pointer items-center justify-center rounded-lg border border-app-border px-2.5 text-sm font-medium text-app-muted transition hover:border-app-muted hover:text-app-text focus-visible:border-app-accent focus-visible:ring-2 focus-visible:ring-app-accent/20 disabled:cursor-not-allowed disabled:opacity-60'
 export const dashedButtonClass =
-  'inline-flex min-h-8 cursor-pointer items-center justify-center rounded-lg border border-dashed border-app-border px-3 py-1.5 text-sm text-app-accent transition-colors hover:border-app-accent focus-visible:border-app-accent focus-visible:ring-2 focus-visible:ring-app-accent/20'
+  'appearance-none flex w-fit cursor-pointer items-center justify-center rounded-lg border border-dashed border-app-border px-2.5 text-sm text-app-accent transition-colors hover:border-app-accent focus-visible:border-app-accent focus-visible:ring-2 focus-visible:ring-app-accent/20'
 export const iconButtonClass =
   'cursor-pointer rounded px-1.5 py-0.5 text-sm text-app-muted transition-colors hover:text-app-accent focus-visible:text-app-accent'
 export const dangerIconButtonClass =
@@ -25,7 +25,7 @@ export const errorBannerClass =
 
 export const statusBadgeClass = (status: string) =>
   joinClasses(
-    'inline-flex rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide',
+    'flex rounded-full px-1.5 py-1 text-xs font-semibold uppercase tracking-wide',
     status === 'active' && 'bg-app-accent/15 text-app-accent',
     status === 'paused' && 'bg-app-warn/15 text-app-warn',
     status === 'completed' && 'bg-app-muted/15 text-app-muted',
