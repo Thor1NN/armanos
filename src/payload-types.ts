@@ -463,6 +463,7 @@ export interface SetLog {
   roundLog?: (number | null) | RoundLog;
   setNumber?: number | null;
   weight?: number | null;
+  isBodyweight?: boolean | null;
   distanceM?: number | null;
   durationSec?: number | null;
   reps?: string | null;
@@ -807,6 +808,7 @@ export interface SetLogsSelect<T extends boolean = true> {
   roundLog?: T;
   setNumber?: T;
   weight?: T;
+  isBodyweight?: T;
   distanceM?: T;
   durationSec?: T;
   reps?: T;

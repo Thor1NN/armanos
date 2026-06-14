@@ -109,6 +109,12 @@ export const SetLogs: CollectionConfig = {
       label: 'Ciężar (kg)',
     },
     {
+      name: 'isBodyweight',
+      type: 'checkbox',
+      label: 'Masa własnego ciała',
+      defaultValue: false,
+    },
+    {
       name: 'distanceM',
       type: 'number',
       label: 'Dystans (m)',

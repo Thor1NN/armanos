@@ -29,6 +29,7 @@ export type SetLog = {
   exerciseRow?: number | null
   setNumber?: number | null
   weight?: number | null
+  isBodyweight?: boolean | null
   distanceM?: number | null
   durationSec?: number | null
   reps?: string | null

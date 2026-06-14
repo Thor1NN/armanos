@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import React, { useState, useCallback } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { METRIC_FIELDS, type MetricField } from '../../../../trackingTypes'
 import { errorBannerClass, mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
@@ -81,6 +81,12 @@ export function SeriesForm({
     formState: { errors, isSubmitting },
   } = useForm<Values>({ defaultValues: initial })
 
+  const isBodyweight = useWatch({ control, name: 'weight__bodyweight' }) === 'true'
+  const toggleBodyweight = useCallback(() => {
+    setValue('weight__bodyweight', isBodyweight ? 'false' : 'true')
+    if (!isBodyweight) setValue('weight', '')
+  }, [isBodyweight, setValue])
+
   const validateAtLeastOne = () => {
     const vals = getValues()
     const filled = fields.some((f) => {
@@ -156,6 +162,43 @@ export function SeriesForm({
                     )}
                   />
                 </span>
+              </div>
+            )
+          }
+
+          if (f === 'weight') {
+            return (
+              <div className="flex flex-col gap-1" key={f}>
+                <span className={`text-xs ${mutedTextClass}`}>{meta.label}</span>
+                {isBodyweight ? (
+                  <button
+                    type="button"
+                    onClick={toggleBodyweight}
+                    className={`h-8 rounded-md border border-ui-border-base bg-ui-bg-subtle px-2.5 text-xs ${mutedTextClass} text-left`}
+                  >
+                    masa własna ✕
+                  </button>
+                ) : (
+                  <span className="inline-flex items-stretch gap-1">
+                    <Input
+                      variant="compact"
+                      type="number"
+                      step="0.5"
+                      placeholder={meta.placeholder}
+                      autoFocus={i === 0}
+                      {...register(f, isFirst ? { validate: validateAtLeastOne } : {})}
+                    />
+                    <button
+                      type="button"
+                      onClick={toggleBodyweight}
+                      title="Masa własnego ciała"
+                      className={`rounded-md border border-ui-border-base bg-ui-bg-subtle px-2 text-xs ${mutedTextClass} hover:bg-ui-bg-base-hover`}
+                    >
+                      MC
+                    </button>
+                  </span>
+                )}
+                <input type="hidden" {...register('weight__bodyweight')} />
               </div>
             )
           }

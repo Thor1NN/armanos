@@ -14,6 +14,11 @@ export const metricBody = (fields: MetricField[], v: Values): Record<string, unk
       continue
     }
 
+    if (f === 'weight' && v['weight__bodyweight'] === 'true') {
+      body.weight = null
+      continue
+    }
+
     const raw = (v[f] ?? '').trim()
     if (raw === '') {
       body[f] = null
@@ -26,6 +31,7 @@ export const metricBody = (fields: MetricField[], v: Values): Record<string, unk
     }
   }
 
+  body.isBodyweight = v['weight__bodyweight'] === 'true'
   body.note = v.note?.trim() || null
   return body
 }
@@ -40,7 +46,8 @@ export const toDefaultUnit = (f: MetricField, base: number): { value: string; un
 
 export const setSummary = (s: SetLog): string => {
   const parts: string[] = []
-  if (s.weight != null) parts.push(`${s.weight} kg`)
+  if (s.isBodyweight) parts.push('MC')
+  else if (s.weight != null) parts.push(`${s.weight} kg`)
   if (s.distanceM != null) parts.push(`${s.distanceM} m`)
   if (s.durationSec != null) parts.push(fmtSec(s.durationSec))
   if (s.reps) parts.push(`× ${s.reps}`)
@@ -51,6 +58,8 @@ export const setSummary = (s: SetLog): string => {
 
 export const setLogToFormValues = (set: SetLog, fields: MetricField[]): Values => {
   const initial: Values = { note: set.note ?? '' }
+  if (set.isBodyweight) initial['weight__bodyweight'] = 'true'
+
   for (const f of fields) {
     const v = (set as Record<string, unknown>)[f]
     if (v == null) {
