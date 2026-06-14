@@ -1,5 +1,6 @@
 import { headers as getHeaders } from 'next/headers.js'
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 import React from 'react'
 
@@ -10,6 +11,7 @@ import { WorkoutPlansAccordion, type TPlanAccordionItem } from './components/Wor
 import { STATUS_LABEL } from './types/constants'
 
 export default async function HomePage() {
+  const t = await getTranslations('home')
   const headers = await getHeaders()
   const payload = await getPayload({ config: await config })
   const { user } = await payload.auth({ headers })
@@ -109,11 +111,11 @@ export default async function HomePage() {
     kg?: string | null
   }): string[] => {
     const parts: string[] = []
-    if (ok(ex.rounds)) parts.push(`Serie: ${ex.rounds}`)
-    if (ok(ex.reps)) parts.push(`Powt.: ${ex.reps}`)
+    if (ok(ex.rounds)) parts.push(`${t('seriesPrefix')}: ${ex.rounds}`)
+    if (ok(ex.reps)) parts.push(`${t('repsPrefix')}: ${ex.reps}`)
     const dur = fmtDuration(ex.durationMin, ex.durationSec)
-    if (dur) parts.push(`Czas: ${dur}`)
-    if (ok(ex.rest)) parts.push(`Przerwa: ${ex.rest}`)
+    if (dur) parts.push(`${t('durationPrefix')}: ${dur}`)
+    if (ok(ex.rest)) parts.push(`${t('restPrefix')}: ${ex.rest}`)
     if (ok(ex.tut)) parts.push(`TUT: ${ex.tut}`)
     if (ok(ex.rir)) parts.push(`RIR: ${ex.rir}`)
     if (ok(ex.kg)) parts.push(`${ex.kg} kg`)
@@ -224,8 +226,8 @@ export default async function HomePage() {
         <div className="flex items-center gap-3">
           <img src="/images/logo.svg" alt="Logo" className="h-7 w-auto sm:h-8" />
           <div>
-            <h1 className="text-sm font-semibold text-ui-fg-base sm:text-xl">Cześć, {user.name || user.email}</h1>
-            <span className="mt-0.5 block text-xs text-ui-fg-muted sm:mt-1">Twoje plany treningowe</span>
+            <h1 className="text-sm font-semibold text-ui-fg-base sm:text-xl">{t('greeting', { name: user.name || user.email })}</h1>
+            <span className="mt-0.5 block text-xs text-ui-fg-muted sm:mt-1">{t('yourTrainingPlans')}</span>
           </div>
         </div>
         <LogoutButton />
@@ -233,7 +235,7 @@ export default async function HomePage() {
 
       {plans.docs.length === 0 && (
         <div className="py-10 text-center text-sm text-ui-fg-muted">
-          Nie masz jeszcze przypisanego planu. Skontaktuj się z trenerem.
+          {t('noPlans')}
         </div>
       )}
 

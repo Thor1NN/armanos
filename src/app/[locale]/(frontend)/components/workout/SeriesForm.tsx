@@ -1,8 +1,9 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React, { useState, useCallback } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { METRIC_FIELDS, type MetricField } from '../../../../trackingTypes'
+import { METRIC_FIELDS, type MetricField } from '../../../../../trackingTypes'
 import { errorBannerClass, mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { Input, Select } from '../ui/Input'
@@ -72,6 +73,7 @@ export function SeriesForm({
   onSubmit: (v: Values) => Promise<void>
   onCancel?: () => void
 }) {
+  const t = useTranslations('seriesForm')
   const {
     register,
     control,
@@ -96,7 +98,7 @@ export function SeriesForm({
       }
       return (vals[f] ?? '').trim() !== ''
     })
-    return filled || 'Podaj co najmniej jedną wartość'
+    return filled || t('atLeastOneValue')
   }
 
   const submit = handleSubmit(async (data) => {
@@ -176,7 +178,7 @@ export function SeriesForm({
                     onClick={toggleBodyweight}
                     className={`h-8 rounded-md border border-ui-border-base bg-ui-bg-subtle px-2.5 text-xs ${mutedTextClass} text-left`}
                   >
-                    masa własna ✕
+                    {t('bodyweightActive')}
                   </button>
                 ) : (
                   <span className="inline-flex items-stretch gap-1">
@@ -191,7 +193,7 @@ export function SeriesForm({
                     <button
                       type="button"
                       onClick={toggleBodyweight}
-                      title="Masa własnego ciała"
+                      title={t('bodyweightTitle')}
                       className={`rounded-md border border-ui-border-base bg-ui-bg-subtle px-2 text-xs ${mutedTextClass} hover:bg-ui-bg-base-hover`}
                     >
                       MC
@@ -220,16 +222,16 @@ export function SeriesForm({
       </div>
 
       <div className="flex flex-col gap-1">
-        <span className={`text-xs ${mutedTextClass}`}>Notatka</span>
-        <Input className="w-full" type="text" placeholder="notatka" {...register('note')} />
+        <span className={`text-xs ${mutedTextClass}`}>{t('note')}</span>
+        <Input className="w-full" type="text" placeholder={t('notePlaceholder')} {...register('note')} />
       </div>
 
       <div className="flex items-center gap-1.5">
         <Button size="sm" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? '…' : 'Zapisz'}
+          {isSubmitting ? '…' : t('save')}
         </Button>
         {onCancel && (
-          <Button size="sm" variant="secondary" type="button" onClick={onCancel} aria-label="Anuluj">
+          <Button size="sm" variant="secondary" type="button" onClick={onCancel} aria-label={t('cancel')}>
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>

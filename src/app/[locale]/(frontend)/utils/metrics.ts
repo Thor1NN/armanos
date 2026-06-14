@@ -1,4 +1,4 @@
-import { METRIC_FIELDS, type MetricField } from '../../../trackingTypes'
+import { METRIC_FIELDS, type MetricField } from '../../../../trackingTypes'
 import type { SetLog, Values } from '../types/types'
 import { fmtSec } from './date'
 

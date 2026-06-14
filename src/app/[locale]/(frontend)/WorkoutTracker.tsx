@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import type { MetricField } from '../../trackingTypes'
+import type { MetricField } from '../../../trackingTypes'
 import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from './ui'
 import { ExerciseCard } from './components/workout/ExerciseCard'
 import { SessionTimesBadge, SessionTimesForm } from './components/workout/SessionTimes'

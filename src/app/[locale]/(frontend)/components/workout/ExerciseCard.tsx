@@ -1,8 +1,9 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 import { CopyPlus } from 'lucide-react'
-import { trackingFields, type MetricField } from '../../../../trackingTypes'
+import { trackingFields, type MetricField } from '../../../../../trackingTypes'
 import { mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { SeriesForm } from './SeriesForm'
@@ -23,6 +24,7 @@ export function ExerciseCard({
   onUpdate: (id: number, fields: MetricField[], v: Values) => Promise<void>
   onDelete: (id: number) => Promise<void>
 }) {
+  const t = useTranslations('exercise')
   const [open, setOpen] = useState(false)
   const fields = trackingFields(ex.trackingType)
 
@@ -40,7 +42,7 @@ export function ExerciseCard({
             target="_blank"
             rel="noopener noreferrer"
           >
-            ▶ wideo
+            {t('video')}
           </a>
         )}
       </div>
@@ -77,12 +79,12 @@ export function ExerciseCard({
       ) : (
         <div className="mt-1.5 flex items-center gap-2">
           <Button variant="dashed" onClick={() => setOpen(true)}>
-            + dodaj serię
+            {t('addSet')}
           </Button>
           {sets.length > 0 && (
             <Button
               variant="dashed"
-              aria-label="Duplikuj ostatnią serię"
+              aria-label={t('duplicateSet')}
               onClick={() => onAdd(ex, fields, setLogToFormValues(sets[sets.length - 1], fields))}
             >
               <CopyPlus size={14} />

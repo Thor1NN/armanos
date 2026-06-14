@@ -1,10 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 import { Button } from './components/ui/Button'
 
 export default function LogoutButton() {
+  const t = useTranslations('nav')
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -17,7 +19,7 @@ export default function LogoutButton() {
 
   return (
     <Button variant="secondary" onClick={onClick} disabled={loading}>
-      {loading ? '…' : 'Wyloguj'}
+      {loading ? '…' : t('logout')}
     </Button>
   )
 }

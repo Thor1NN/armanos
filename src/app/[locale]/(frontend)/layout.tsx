@@ -1,3 +1,5 @@
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
 import React from 'react'
 import './styles.css'
 
@@ -35,13 +37,19 @@ export const metadata = {
   manifest: '/favicon/manifest.json',
 }
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
-  const { children } = props
+export default async function RootLayout(props: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await props.params
+  const messages = await getMessages()
 
   return (
-    <html lang="pl" className="dark">
+    <html lang={locale} className="dark">
       <body className="bg-ui-bg-base text-ui-fg-base">
-        <main>{children}</main>
+        <NextIntlClientProvider messages={messages}>
+          <main>{props.children}</main>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

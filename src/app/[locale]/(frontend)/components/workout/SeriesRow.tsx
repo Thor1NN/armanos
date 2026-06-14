@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
-import type { MetricField } from '../../../../trackingTypes'
+import type { MetricField } from '../../../../../trackingTypes'
 import { joinClasses, panelClass } from '../../ui'
 import { Button } from '../ui/Button'
 import { SeriesForm } from './SeriesForm'
