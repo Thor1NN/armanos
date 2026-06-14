@@ -8,6 +8,10 @@ A coach-facing admin and client-facing training tracker built with Payload CMS a
 
 **Client (web app)** — logs in, sees their active plan, works through workouts session by session, and logs each set (reps, weight, RIR, time, etc.).
 
+## Screenshots
+
+![Training App mockup](docs/mockup-1.png)
+
 ## Data model
 
 ```
