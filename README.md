@@ -10,7 +10,9 @@ A coach-facing admin and client-facing training tracker built with Payload CMS a
 
 ## Screenshots
 
-![Training App mockup](docs/mockup-1.png)
+<p align="center">
+  <img src="docs/mockup-1.png" alt="Training App mockup" width="700" />
+</p>
 
 ## Data model
 
