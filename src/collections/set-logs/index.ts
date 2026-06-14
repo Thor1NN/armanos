@@ -7,7 +7,7 @@ export const SetLogs: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     defaultColumns: ['exerciseName', 'setNumber', 'weight', 'reps', 'client'],
-    group: 'Dziennik treningów',
+    group: 'Training log',
   },
   access: {
     create: ({ req: { user } }) => Boolean(user),
@@ -27,7 +27,7 @@ export const SetLogs: CollectionConfig = {
           })
           const owner = typeof session.client === 'object' ? session.client?.id : session.client
           if (owner !== req.user.id) {
-            throw new Error('Nie możesz logować serii do cudzej sesji.')
+            throw new Error('You cannot log sets to someone else\'s session.')
           }
         }
         if (data.exercise) {
@@ -59,70 +59,70 @@ export const SetLogs: CollectionConfig = {
       type: 'relationship',
       relationTo: 'workout-logs',
       required: true,
-      label: 'Sesja',
+      label: 'Session',
     },
     {
       name: 'client',
       type: 'relationship',
       relationTo: 'clients',
-      label: 'Klient',
+      label: 'Client',
       defaultValue: ({ user }) => (user?.collection === 'clients' ? user.id : undefined),
     },
     {
       name: 'exercise',
       type: 'relationship',
       relationTo: 'exercises',
-      label: 'Ćwiczenie (katalog)',
+      label: 'Exercise (catalog)',
     },
     {
       name: 'exerciseName',
       type: 'text',
-      label: 'Ćwiczenie (nazwa, migawka)',
+      label: 'Exercise (name, snapshot)',
     },
     {
       name: 'exerciseRow',
       type: 'relationship',
       relationTo: 'workout-exercise-rows',
-      label: 'Zlecenie w treningu',
+      label: 'Exercise row in workout',
       admin: { readOnly: true },
     },
     {
       name: 'roundLog',
       type: 'relationship',
       relationTo: 'round-logs',
-      label: 'Runda',
+      label: 'Round',
       admin: { readOnly: true },
     },
     {
       name: 'setNumber',
       type: 'number',
-      label: 'Nr serii',
+      label: 'Set number',
     },
     {
       name: 'weight',
       type: 'number',
-      label: 'Ciężar (kg)',
+      label: 'Weight (kg)',
     },
     {
       name: 'isBodyweight',
       type: 'checkbox',
-      label: 'Masa własnego ciała',
+      label: 'Bodyweight',
       defaultValue: false,
     },
     {
       name: 'distanceM',
       type: 'number',
-      label: 'Dystans (m)',
+      label: 'Distance (m)',
     },
     {
       name: 'durationSec',
       type: 'number',
-      label: 'Czas (s)',
+      label: 'Duration (s)',
     },
     {
       name: 'reps',
       type: 'text',
-      label: 'Powtórzenia',
+      label: 'Reps',
     },
     {
       name: 'rir',
@@ -132,12 +132,12 @@ export const SetLogs: CollectionConfig = {
     {
       name: 'note',
       type: 'text',
-      label: 'Notatka',
+      label: 'Note',
     },
     {
       name: 'completedAt',
       type: 'date',
-      label: 'Wykonano',
+      label: 'Completed',
       defaultValue: () => new Date().toISOString(),
       admin: { date: { pickerAppearance: 'dayAndTime' } },
     },

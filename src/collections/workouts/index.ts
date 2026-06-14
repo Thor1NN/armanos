@@ -26,7 +26,7 @@ export const Workouts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'rpe', 'order', 'microcycle'],
-    group: 'Plan treningowy',
+    group: 'Training plan',
     components: {
       views: {
         edit: {
@@ -37,7 +37,7 @@ export const Workouts: CollectionConfig = {
             },
             path: '/structure',
             tab: {
-              label: 'Struktura',
+              label: 'Structure',
               href: '/structure',
             },
           },
@@ -50,7 +50,7 @@ export const Workouts: CollectionConfig = {
       async ({ id, req }) => {
         if (await hasWorkoutLogs(req, id)) {
           throw new APIError(
-            'Nie mozna usunac treningu, ktory ma juz zapisane logi. Najpierw usun logi albo utworz nowa wersje treningu.',
+            'Cannot delete a workout that already has logged sessions. Delete the logs first or create a new version of the workout.',
             400,
           )
         }
@@ -75,14 +75,14 @@ export const Workouts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
-      label: 'Nazwa treningu',
+      label: 'Workout name',
     },
     {
       name: 'microcycle',
       type: 'relationship',
       relationTo: 'microcycles',
       required: true,
-      label: 'Mikrocykl',
+      label: 'Microcycle',
     },
     {
       name: 'rpe',
@@ -92,27 +92,27 @@ export const Workouts: CollectionConfig = {
     {
       name: 'order',
       type: 'number',
-      label: 'Kolejność',
+      label: 'Order',
       defaultValue: 0,
     },
     {
       name: 'sections',
       type: 'array',
-      label: 'Sekcje',
-      labels: { singular: 'Sekcja', plural: 'Sekcje' },
+      label: 'Sections',
+      labels: { singular: 'Section', plural: 'Sections' },
       admin: { initCollapsed: true },
       fields: [
         {
           name: 'title',
           type: 'text',
-          label: 'Tytuł sekcji',
-          admin: { description: 'np. Rozgrzewka, Część główna' },
+          label: 'Section title',
+          admin: { description: 'e.g. Warm-up, Main part' },
         },
         {
           name: 'subtitle',
           type: 'text',
-          label: 'Podtytuł',
-          admin: { description: 'np. Upper Body, EMOM' },
+          label: 'Subtitle',
+          admin: { description: 'e.g. Upper Body, EMOM' },
         },
       ],
     },

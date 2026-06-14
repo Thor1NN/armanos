@@ -5,14 +5,14 @@ export const Microcycles: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'rpe', 'order', 'plan'],
-    group: 'Plan treningowy',
+    group: 'Training plan',
   },
   fields: [
     {
       name: 'title',
       type: 'text',
       required: true,
-      label: 'Nazwa mikrocyklu',
+      label: 'Microcycle name',
     },
     {
       name: 'plan',
@@ -25,12 +25,12 @@ export const Microcycles: CollectionConfig = {
       name: 'rpe',
       type: 'number',
       label: 'RPE',
-      admin: { description: 'Docelowy RPE mikrocyklu (6–9)' },
+      admin: { description: 'Target RPE for the microcycle (6–9)' },
     },
     {
       name: 'order',
       type: 'number',
-      label: 'Kolejność',
+      label: 'Order',
       defaultValue: 0,
     },
   ],

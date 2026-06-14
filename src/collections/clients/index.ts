@@ -7,7 +7,7 @@ export const Clients: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['name', 'email'],
-    group: 'Konta',
+    group: 'Accounts',
   },
   access: {
     create: isAdmin,
@@ -20,19 +20,19 @@ export const Clients: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
-      label: 'Imię i nazwisko',
+      label: 'Full name',
     },
     {
       name: 'plans',
       type: 'join',
       collection: 'plans',
       on: 'client',
-      label: 'Plany klienta',
+      label: "Client's plans",
     },
     {
       name: 'notes',
       type: 'textarea',
-      label: 'Notatki trenera',
+      label: 'Trainer notes',
       access: {
         read: isAdminField,
         update: isAdminField,

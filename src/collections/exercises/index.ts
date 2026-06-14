@@ -7,7 +7,7 @@ export const Exercises: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'muscleGroup', 'equipment'],
-    group: 'Katalog',
+    group: 'Catalog',
   },
   access: {
     create: isAdmin,
@@ -20,36 +20,36 @@ export const Exercises: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
-      label: 'Nazwa',
+      label: 'Name',
     },
     {
       name: 'trackingType',
       type: 'select',
-      label: 'Typ pomiaru',
+      label: 'Tracking type',
       defaultValue: DEFAULT_TRACKING,
       options: trackingOptions,
-      admin: { description: 'Decyduje, które pola pokazuje formularz logowania serii' },
+      admin: { description: 'Determines which fields are shown in the set logging form' },
     },
     {
       name: 'description',
       type: 'textarea',
-      label: 'Opis techniczny',
+      label: 'Technical description',
     },
     {
       name: 'videoUrl',
       type: 'text',
-      label: 'Wideo (link)',
-      admin: { description: 'URL do filmu instruktażowego (np. YouTube)' },
+      label: 'Video (link)',
+      admin: { description: 'URL to instructional video (e.g. YouTube)' },
     },
     {
       name: 'muscleGroup',
       type: 'text',
-      label: 'Partia mięśniowa',
+      label: 'Muscle group',
     },
     {
       name: 'equipment',
       type: 'text',
-      label: 'Sprzęt',
+      label: 'Equipment',
     },
   ],
 }

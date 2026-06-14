@@ -6,7 +6,7 @@ export const Plans: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'client', 'status', 'updatedAt'],
-    group: 'Plan treningowy',
+    group: 'Training plan',
   },
   access: {
     create: isAdmin,
@@ -19,7 +19,7 @@ export const Plans: CollectionConfig = {
       name: 'client',
       type: 'relationship',
       relationTo: 'clients',
-      label: 'Klient (właściciel planu)',
+      label: 'Client (plan owner)',
       admin: { position: 'sidebar' },
     },
     {
@@ -29,9 +29,9 @@ export const Plans: CollectionConfig = {
       defaultValue: 'active',
       admin: { position: 'sidebar' },
       options: [
-        { label: 'Aktywny', value: 'active' },
-        { label: 'Wstrzymany', value: 'paused' },
-        { label: 'Zakończony', value: 'completed' },
+        { label: 'Active', value: 'active' },
+        { label: 'Paused', value: 'paused' },
+        { label: 'Completed', value: 'completed' },
       ],
     },
     {
@@ -40,13 +40,13 @@ export const Plans: CollectionConfig = {
         {
           name: 'startDate',
           type: 'date',
-          label: 'Początek',
+          label: 'Start date',
           admin: { width: '50%', date: { pickerAppearance: 'dayOnly' } },
         },
         {
           name: 'endDate',
           type: 'date',
-          label: 'Koniec',
+          label: 'End date',
           admin: { width: '50%', date: { pickerAppearance: 'dayOnly' } },
         },
       ],
@@ -55,18 +55,18 @@ export const Plans: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
-      label: 'Nazwa planu',
+      label: 'Plan name',
     },
     {
       name: 'description',
       type: 'textarea',
-      label: 'Opis',
+      label: 'Description',
     },
     {
       name: 'source',
       type: 'text',
-      label: 'Źródło (plik)',
-      admin: { description: 'Skąd zaimportowano plan' },
+      label: 'Source (file)',
+      admin: { description: 'Where the plan was imported from' },
     },
   ],
 }

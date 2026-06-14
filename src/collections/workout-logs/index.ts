@@ -6,7 +6,7 @@ export const WorkoutLogs: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'workout', 'startedAt', 'finishedAt', 'client'],
-    group: 'Dziennik treningów',
+    group: 'Training log',
   },
   access: {
     create: ({ req: { user } }) => Boolean(user),
@@ -27,9 +27,9 @@ export const WorkoutLogs: CollectionConfig = {
               id: data.workout,
               depth: 0,
             })
-            data.title = `${w?.title ?? 'Trening'} — ${new Date().toLocaleDateString('pl-PL')}`
+            data.title = `${w?.title ?? 'Workout'} — ${new Date().toLocaleDateString('en-GB')}`
           } catch {
-            /* tytuł zostanie pusty — nie blokujemy zapisu */
+            /* title will remain empty — we do not block the save */
           }
         }
         return data
@@ -40,39 +40,39 @@ export const WorkoutLogs: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
-      label: 'Opis sesji',
-      admin: { readOnly: true, description: 'Generowany automatycznie' },
+      label: 'Session description',
+      admin: { readOnly: true, description: 'Auto-generated' },
     },
     {
       name: 'workout',
       type: 'relationship',
       relationTo: 'workouts',
       required: true,
-      label: 'Trening',
+      label: 'Workout',
     },
     {
       name: 'client',
       type: 'relationship',
       relationTo: 'clients',
-      label: 'Klient',
+      label: 'Client',
       defaultValue: ({ user }) => (user?.collection === 'clients' ? user.id : undefined),
     },
     {
       name: 'startedAt',
       type: 'date',
-      label: 'Rozpoczęto',
+      label: 'Started at',
       admin: { date: { pickerAppearance: 'dayAndTime' } },
     },
     {
       name: 'finishedAt',
       type: 'date',
-      label: 'Zakończono',
+      label: 'Finished at',
       admin: { date: { pickerAppearance: 'dayAndTime' } },
     },
     {
       name: 'notes',
       type: 'textarea',
-      label: 'Notatki ogólne',
+      label: 'General notes',
     },
   ],
 }

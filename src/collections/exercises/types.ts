@@ -1,6 +1,6 @@
 /**
- * Jedno źródło prawdy: typ pomiaru ćwiczenia → które metryki zbieramy.
- * Używane przez: formularz logowania (które inputy) i hook SetLog (czyszczenie pól spoza typu).
+ * Single source of truth: exercise tracking type → which metrics we collect.
+ * Used by: the logging form (which inputs to show) and the SetLog hook (clearing fields outside the type).
  */
 
 export type MetricField = 'weight' | 'reps' | 'rir' | 'distanceM' | 'durationSec'
@@ -11,34 +11,34 @@ export type MetricMeta = {
   label: string
   placeholder: string
   numeric: boolean
-  // Pole złożone: wejście min + sek, w bazie suma sekund
+  // Composite field: input in min + sec, stored in DB as total seconds
   composite?: 'duration'
-  // Jednostki wejścia na froncie; w bazie wartość bazowa (factor = ile jednostek bazowych na 1 wybraną)
+  // Front-end input units; stored in DB as base value (factor = how many base units per 1 selected unit)
   units?: { default: string; options: UnitOption[] }
 }
 
 export const METRIC_FIELDS: Record<MetricField, MetricMeta> = {
-  weight: { label: 'Ciężar (kg)', placeholder: 'ciężar', numeric: true },
-  reps: { label: 'Powtórzenia', placeholder: 'powtórzenia', numeric: false },
-  rir: { label: 'RIR', placeholder: 'RIR (rezerwa)', numeric: false },
-  distanceM: { label: 'Dystans (m)', placeholder: 'dystans', numeric: true },
-  durationSec: { label: 'Czas', placeholder: 'minuty / sekundy', numeric: true, composite: 'duration' },
+  weight: { label: 'Weight (kg)', placeholder: 'weight', numeric: true },
+  reps: { label: 'Reps', placeholder: 'reps', numeric: false },
+  rir: { label: 'RIR', placeholder: 'RIR (reserve)', numeric: false },
+  distanceM: { label: 'Distance (m)', placeholder: 'distance', numeric: true },
+  durationSec: { label: 'Duration', placeholder: 'minutes / seconds', numeric: true, composite: 'duration' },
 }
 
 export const ALL_METRIC_FIELDS = Object.keys(METRIC_FIELDS) as MetricField[]
 
 export const TRACKING: Record<TrackingType, { label: string; fields: MetricField[] }> = {
-  strength: { label: 'Siłowe', fields: ['weight', 'reps', 'rir'] },
+  strength: { label: 'Strength', fields: ['weight', 'reps', 'rir'] },
   cardio: { label: 'Cardio', fields: ['distanceM', 'durationSec'] },
 }
 
 export const DEFAULT_TRACKING: TrackingType = 'strength'
 
-/** Lista pól dla danego typu (z fallbackiem do domyślnego). */
+/** List of fields for the given type (with fallback to the default). */
 export const trackingFields = (t?: string | null): MetricField[] =>
   t && t in TRACKING ? TRACKING[t as TrackingType].fields : TRACKING[DEFAULT_TRACKING].fields
 
-/** Opcje selecta dla Payload. */
+/** Select options for Payload. */
 export const trackingOptions = (Object.keys(TRACKING) as TrackingType[]).map((value) => ({
   label: TRACKING[value].label,
   value,

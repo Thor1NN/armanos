@@ -2,7 +2,7 @@ import { APIError, type CollectionConfig } from 'payload'
 import { isAdmin, isAuthenticated } from '../../access'
 
 const PROTOCOL_OPTIONS = [
-  { label: 'Brak (dziedziczy z grupy)', value: '' },
+  { label: 'None (inherits from group)', value: '' },
   { label: 'Standard', value: 'standard' },
   { label: 'EMOM', value: 'emom' },
   { label: 'AMRAP', value: 'amrap' },
@@ -15,7 +15,7 @@ export const WorkoutExerciseRows: CollectionConfig = {
   admin: {
     useAsTitle: 'numer',
     defaultColumns: ['numer', 'exercise', 'group', 'reps', 'kg'],
-    group: 'Plan treningowy',
+    group: 'Training plan',
   },
   access: {
     create: isAdmin,
@@ -32,7 +32,7 @@ export const WorkoutExerciseRows: CollectionConfig = {
         })
         if (result.totalDocs > 0) {
           throw new APIError(
-            'Nie można usunąć ćwiczenia, które ma już zapisane logi. Utwórz nową wersję treningu zamiast modyfikować istniejącą.',
+            'Cannot delete an exercise that already has logged sets. Create a new version of the workout instead of modifying the existing one.',
             400,
           )
         }
@@ -45,37 +45,37 @@ export const WorkoutExerciseRows: CollectionConfig = {
       type: 'relationship',
       relationTo: 'workout-groups',
       required: true,
-      label: 'Grupa',
+      label: 'Group',
     },
     {
       name: 'order',
       type: 'number',
-      label: 'Kolejność',
+      label: 'Order',
       defaultValue: 0,
     },
     {
       name: 'numer',
       type: 'text',
-      label: 'Numer',
-      admin: { description: 'np. "1a", "2b"' },
+      label: 'Number',
+      admin: { description: 'e.g. "1a", "2b"' },
     },
     {
       name: 'exercise',
       type: 'relationship',
       relationTo: 'exercises',
-      label: 'Ćwiczenie (katalog)',
-      admin: { description: 'Powiązanie z katalogiem — do wideo i progresu' },
+      label: 'Exercise (catalog)',
+      admin: { description: 'Link to the catalog — for video and progress tracking' },
     },
     {
       name: 'note',
       type: 'text',
-      label: 'Uwaga / wariant',
+      label: 'Note / variant',
     },
     {
       type: 'row',
       fields: [
-        { name: 'rounds', type: 'text', label: 'Serie', admin: { width: '25%', description: 'np. 4, 3-4' } },
-        { name: 'reps', type: 'text', label: 'Powtórzenia', admin: { width: '25%' } },
+        { name: 'rounds', type: 'text', label: 'Sets', admin: { width: '25%', description: 'e.g. 4, 3-4' } },
+        { name: 'reps', type: 'text', label: 'Reps', admin: { width: '25%' } },
         { name: 'kg', type: 'text', label: 'KG', admin: { width: '50%' } },
       ],
     },
@@ -84,7 +84,7 @@ export const WorkoutExerciseRows: CollectionConfig = {
       fields: [
         { name: 'tut', type: 'text', label: 'TUT', admin: { width: '33%' } },
         { name: 'rir', type: 'text', label: 'RIR', admin: { width: '33%' } },
-        { name: 'rest', type: 'text', label: 'Przerwa', admin: { width: '34%' } },
+        { name: 'rest', type: 'text', label: 'Rest', admin: { width: '34%' } },
       ],
     },
     {
@@ -93,14 +93,14 @@ export const WorkoutExerciseRows: CollectionConfig = {
         {
           name: 'durationMin',
           type: 'number',
-          label: 'Czas — minuty',
+          label: 'Duration — minutes',
           min: 0,
           admin: { width: '50%' },
         },
         {
           name: 'durationSec',
           type: 'number',
-          label: 'Czas — sekundy',
+          label: 'Duration — seconds',
           min: 0,
           max: 59,
           admin: { width: '50%' },
@@ -110,35 +110,35 @@ export const WorkoutExerciseRows: CollectionConfig = {
     {
       name: 'setParameters',
       type: 'array',
-      label: 'Parametry per seria',
-      labels: { singular: 'Seria', plural: 'Serie' },
+      label: 'Per-set parameters',
+      labels: { singular: 'Set', plural: 'Sets' },
       admin: {
-        description: 'Wypełnij tylko dla drop setów / piramidy. Puste = wszystkie serie identyczne.',
+        description: 'Fill in only for drop sets / pyramids. Empty = all sets identical.',
         initCollapsed: true,
       },
       fields: [
-        { name: 'setNumber', type: 'number', label: 'Nr serii', required: true },
-        { name: 'reps', type: 'text', label: 'Powtórzenia' },
+        { name: 'setNumber', type: 'number', label: 'Set number', required: true },
+        { name: 'reps', type: 'text', label: 'Reps' },
         { name: 'kg', type: 'text', label: 'KG' },
       ],
     },
     {
       name: 'override',
       type: 'group',
-      label: 'Override protokołu grupy',
-      admin: { description: 'Zostaw puste jeśli ćwiczenie dziedziczy protokół z grupy.' },
+      label: 'Group protocol override',
+      admin: { description: 'Leave empty if the exercise inherits the protocol from the group.' },
       fields: [
         {
           name: 'protocol',
           type: 'select',
-          label: 'Protokół',
+          label: 'Protocol',
           options: PROTOCOL_OPTIONS,
         },
-        { name: 'rounds', type: 'text', label: 'Serie / rundy' },
-        { name: 'durationMinutes', type: 'number', label: 'Czas (minuty)', min: 0 },
-        { name: 'intervalSeconds', type: 'number', label: 'Interwał (s)', min: 1 },
-        { name: 'workSeconds', type: 'number', label: 'Czas pracy (s)', min: 1 },
-        { name: 'restSeconds', type: 'number', label: 'Odpoczynek (s)', min: 0 },
+        { name: 'rounds', type: 'text', label: 'Sets / rounds' },
+        { name: 'durationMinutes', type: 'number', label: 'Duration (minutes)', min: 0 },
+        { name: 'intervalSeconds', type: 'number', label: 'Interval (s)', min: 1 },
+        { name: 'workSeconds', type: 'number', label: 'Work time (s)', min: 1 },
+        { name: 'restSeconds', type: 'number', label: 'Rest (s)', min: 0 },
       ],
     },
   ],
