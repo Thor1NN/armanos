@@ -17,7 +17,7 @@ export default async function HomePage() {
           <img src="/images/logo.svg" alt="Logo" className="h-7 w-auto sm:h-8" />
           <div>
             <h1 className="text-sm font-semibold text-ui-fg-base sm:text-xl">
-              {t('greeting', { name: result.user.name || result.user.email })}
+              {t('greeting', { name: result.user.name || result.user.email || '' })}
             </h1>
             <span className="mt-0.5 block text-xs text-ui-fg-muted sm:mt-1">{t('yourTrainingPlans')}</span>
           </div>
