@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Copy } from 'lucide-react'
 import { trackingFields, type MetricField } from '../../../../trackingTypes'
 import { mutedTextClass } from '../../ui'
 import { Button } from '../ui/Button'
@@ -80,11 +81,11 @@ export function ExerciseCard({
           </Button>
           {sets.length > 0 && (
             <Button
-              variant="danger"
+              variant="dashed"
               aria-label="Duplikuj ostatnią serię"
               onClick={() => onAdd(ex, fields, setLogToFormValues(sets[sets.length - 1], fields))}
             >
-              ⧉
+              <Copy size={14} />
             </Button>
           )}
         </div>

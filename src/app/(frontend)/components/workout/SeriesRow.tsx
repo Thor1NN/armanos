@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Pencil, X } from 'lucide-react'
 import type { MetricField } from '../../../../trackingTypes'
 import { joinClasses, panelClass } from '../../ui'
 import { Button } from '../ui/Button'
@@ -44,10 +45,10 @@ export function SeriesRow({
       </span>
       <span className="flex shrink-0 gap-0.5">
         <Button variant="icon" onClick={() => setEditing(true)} aria-label="Edytuj">
-          ✎
+          <Pencil size={14} />
         </Button>
         <Button variant="danger" onClick={onDelete} aria-label="Usuń">
-          ✕
+          <X size={14} />
         </Button>
       </span>
     </li>
