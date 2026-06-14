@@ -1,11 +1,12 @@
 'use client'
 
 import { Button, Form, RelationshipField, TextField, toast, useFormProcessing } from '@payloadcms/ui'
-import type { FormState, SingleRelationshipFieldClient, TextFieldClient, ValueWithRelation } from 'payload'
-import type { ExerciseRow } from '../types'
-import { s } from '../styles'
+import type { FormState, SingleRelationshipFieldClient, ValueWithRelation } from 'payload'
+import type { ExerciseRow } from '../../types'
+import { s } from '../../styles'
 import { sdk } from '@/lib/sdk'
-import { validateKgOrReps, validateRepsOrKg, validateRounds } from '../utils'
+import { textField } from '@/app/(payload)/admin/utils/fields'
+import { validateKgOrReps, validateRepsOrKg, validateRounds } from '../../utils'
 
 type Props = {
   groupId: number
@@ -14,9 +15,6 @@ type Props = {
   onSaved: (row: ExerciseRow) => void
   onCancel: () => void
 }
-
-const textField = (name: string, label: string, placeholder?: string): TextFieldClient =>
-  ({ name, label, type: 'text', admin: { placeholder } }) as TextFieldClient
 
 const exerciseRelField: SingleRelationshipFieldClient = {
   name: 'exercise',

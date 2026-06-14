@@ -1,14 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button, toast } from '@payloadcms/ui'
-import { sdk } from '@/lib/sdk'
-import type { ExerciseRow, Group, Section } from './types'
-import { PROTOCOL_LABEL } from './constants'
-import { exerciseLabel, exerciseMeta, groupLabel } from './utils'
-import { s } from './styles'
-import { GroupForm } from './components/group-form'
-import { ExerciseForm } from './components/exercise-form'
+import { Button } from '@payloadcms/ui'
+import type { ExerciseRow, Group, Section } from '../../types'
+import { PROTOCOL_LABEL } from '../../constants'
+import { exerciseLabel, exerciseMeta, groupLabel } from '../../utils'
+import { s } from '../../styles'
+import { GroupForm } from '../group-form'
+import { ExerciseForm } from '../exercise-form'
+import { useWorkoutMutations } from './hooks/use-workout-mutations'
 
 type Props = {
   sections: Section[]
@@ -33,8 +33,9 @@ export function WorkoutStructureEditor({
   const [editingGroup, setEditingGroup] = useState<number | null>(null)
   const [addingExerciseFor, setAddingExerciseFor] = useState<number | null>(null)
   const [editingExercise, setEditingExercise] = useState<number | null>(null)
-  const [deletingGroup, setDeletingGroup] = useState<number | null>(null)
-  const [deletingExercise, setDeletingExercise] = useState<number | null>(null)
+
+  const { deleteGroup, deleteExercise, deletingGroup, deletingExercise } =
+    useWorkoutMutations(setGroups, setExerciseRows)
 
   const sectionsWithFallback: Section[] =
     sections.length > 0 ? sections : [{ id: undefined, title: null, subtitle: null }]
@@ -44,33 +45,6 @@ export function WorkoutStructureEditor({
 
   const rowsForGroup = (groupId: number) =>
     exerciseRows.filter((r) => r.group === groupId).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-
-  const handleDeleteGroup = async (groupId: number) => {
-    setDeletingGroup(groupId)
-    try {
-      await sdk.delete({ collection: 'workout-groups', id: groupId })
-      setGroups((prev) => prev.filter((g) => g.id !== groupId))
-      setExerciseRows((prev) => prev.filter((r) => r.group !== groupId))
-      toast.success('Grupa usunięta')
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Nie można usunąć grupy')
-    } finally {
-      setDeletingGroup(null)
-    }
-  }
-
-  const handleDeleteExercise = async (rowId: number) => {
-    setDeletingExercise(rowId)
-    try {
-      await sdk.delete({ collection: 'workout-exercise-rows', id: rowId })
-      setExerciseRows((prev) => prev.filter((r) => r.id !== rowId))
-      toast.success('Ćwiczenie usunięte')
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Nie można usunąć ćwiczenia')
-    } finally {
-      setDeletingExercise(null)
-    }
-  }
 
   return (
     <div style={s.container}>
@@ -139,7 +113,7 @@ export function WorkoutStructureEditor({
                             disabled={deletingGroup === group.id}
                             onClick={() => {
                               if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
-                                handleDeleteGroup(group.id)
+                                deleteGroup(group.id)
                               }
                             }}
                           >
@@ -192,7 +166,7 @@ export function WorkoutStructureEditor({
                               disabled={deletingExercise === row.id}
                               onClick={() => {
                                 if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
-                                  handleDeleteExercise(row.id)
+                                  deleteExercise(row.id)
                                 }
                               }}
                             >

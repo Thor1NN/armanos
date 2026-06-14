@@ -1,22 +1,20 @@
 'use client'
 
 import { Button, Form, SelectField, TextField, toast, useDocumentInfo, useFormFields, useFormProcessing } from '@payloadcms/ui'
-import type { FormState, SelectFieldClient, TextFieldClient } from 'payload'
-import type { Group } from '../types'
-import { PROTOCOLS } from '../constants'
-import { s } from '../styles'
+import type { FormState, SelectFieldClient } from 'payload'
+import type { Group } from '../../types'
+import { PROTOCOLS } from '../../constants'
+import { s } from '../../styles'
 import type { WorkoutGroup } from '@/payload-types'
 import { sdk } from '@/lib/sdk'
+import { textField } from '@/app/(payload)/admin/utils/fields'
 import {
   validateDurationMinutes,
   validateIntervalSeconds,
   validateRestSeconds,
   validateRounds,
   validateWorkSeconds,
-} from '../utils'
-
-const textField = (name: string, label: string, placeholder?: string): TextFieldClient =>
-  ({ name, label, type: 'text', admin: { placeholder } }) as TextFieldClient
+} from '../../utils'
 
 const protocolField: SelectFieldClient = {
   name: 'protocol',
