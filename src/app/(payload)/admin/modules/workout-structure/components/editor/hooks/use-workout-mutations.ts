@@ -18,9 +18,9 @@ export function useWorkoutMutations(
       await sdk.delete({ collection: 'workout-groups', id: groupId })
       setGroups((prev) => prev.filter((g) => g.id !== groupId))
       setExerciseRows((prev) => prev.filter((r) => r.group !== groupId))
-      toast.success('Grupa usunięta')
+      toast.success('Group deleted')
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Nie można usunąć grupy')
+      toast.error(e instanceof Error ? e.message : 'Failed to delete group')
     } finally {
       setDeletingGroup(null)
     }
@@ -31,9 +31,9 @@ export function useWorkoutMutations(
     try {
       await sdk.delete({ collection: 'workout-exercise-rows', id: rowId })
       setExerciseRows((prev) => prev.filter((r) => r.id !== rowId))
-      toast.success('Ćwiczenie usunięte')
+      toast.success('Exercise deleted')
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Nie można usunąć ćwiczenia')
+      toast.error(e instanceof Error ? e.message : 'Failed to delete exercise')
     } finally {
       setDeletingExercise(null)
     }

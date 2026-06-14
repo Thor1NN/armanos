@@ -51,7 +51,7 @@ export function WorkoutStructureEditor({
 
       {exerciseRowsWithLogs.size === 0 && (
         <div style={s.infoMsg}>
-          Brak zapisanych serii dla tego treningu. Dodanie pierwszej serii utworzy sesję automatycznie.
+          No recorded sets for this workout. Adding the first set will create a session automatically.
         </div>
       )}
 
@@ -59,16 +59,16 @@ export function WorkoutStructureEditor({
         const sectionGroups = groupsForSection(section.id)
         const sectionKey = section.id ?? `no-section-${si}`
         const sectionLabel =
-          [section.title, section.subtitle].filter(Boolean).join(' · ') || 'Sekcja bez tytułu'
+          [section.title, section.subtitle].filter(Boolean).join(' · ') || 'Untitled section'
 
         return (
           <div key={sectionKey} style={s.sectionBlock}>
             <div style={s.sectionHeader}>
-              {sections.length > 0 ? sectionLabel : 'Grupy treningu'}
+              {sections.length > 0 ? sectionLabel : 'Workout groups'}
             </div>
 
             {sectionGroups.length === 0 && (
-              <div style={s.empty}>Brak grup w tej sekcji.</div>
+              <div style={s.empty}>No groups in this section.</div>
             )}
 
             {sectionGroups.map((group) => {
@@ -104,7 +104,7 @@ export function WorkoutStructureEditor({
                             setEditingGroup(group.id)
                           }}
                         >
-                          Edytuj grupę
+                          Edit group
                         </Button>
                         {!groupsWithLogs.has(group.id) && (
                           <Button
@@ -112,19 +112,19 @@ export function WorkoutStructureEditor({
                             margin={false}
                             disabled={deletingGroup === group.id}
                             onClick={() => {
-                              if (confirm('Usunąć grupę i wszystkie jej ćwiczenia?')) {
+                              if (confirm('Delete group and all its exercises?')) {
                                 deleteGroup(group.id)
                               }
                             }}
                           >
-                            {deletingGroup === group.id ? '…' : 'Usuń grupę'}
+                            {deletingGroup === group.id ? '…' : 'Delete group'}
                           </Button>
                         )}
                       </div>
                     </div>
                   )}
 
-                  {rows.length === 0 && editingGroup !== group.id && <div style={s.empty}>Brak ćwiczeń.</div>}
+                  {rows.length === 0 && editingGroup !== group.id && <div style={s.empty}>No exercises.</div>}
 
                   {rows.map((row) => (
                     <div key={row.id}>
@@ -165,12 +165,12 @@ export function WorkoutStructureEditor({
                               margin={false}
                               disabled={deletingExercise === row.id}
                               onClick={() => {
-                                if (confirm(`Usunąć ćwiczenie "${exerciseLabel(row)}"?`)) {
+                                if (confirm(`Delete exercise "${exerciseLabel(row)}"?`)) {
                                   deleteExercise(row.id)
                                 }
                               }}
                             >
-                              {deletingExercise === row.id ? '…' : 'Usuń'}
+                              {deletingExercise === row.id ? '…' : 'Delete'}
                             </Button>
                           )}
                         </div>
@@ -199,7 +199,7 @@ export function WorkoutStructureEditor({
                         }}
                         extraButtonProps={{ style: { width: '100%', textAlign: 'left' } }}
                       >
-                        + Dodaj ćwiczenie
+                        + Add exercise
                       </Button>
                     )}
                   </div>
@@ -225,7 +225,7 @@ export function WorkoutStructureEditor({
                   onClick={() => setAddingGroupFor(sectionKey)}
                   extraButtonProps={{ style: { width: '100%', textAlign: 'left' } }}
                 >
-                  + Dodaj grupę do tej sekcji
+                  + Add group to this section
                 </Button>
               )}
             </div>

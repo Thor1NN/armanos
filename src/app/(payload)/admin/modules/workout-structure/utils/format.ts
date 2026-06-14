@@ -6,9 +6,9 @@ export const groupLabel = (g: Group): string => {
   const d = g.durationMinutes
   if (p === 'emom') return r ? `EMOM · ${r} min` : 'EMOM'
   if (p === 'amrap') return d ? `AMRAP · ${d} min` : 'AMRAP'
-  if (p === 'for_time') return r ? `For Time · ${r} rund` : 'For Time'
+  if (p === 'for_time') return r ? `For Time · ${r} rounds` : 'For Time'
   if (p === 'tabata') return 'Tabata'
-  return r ? `${r} serie` : 'Standard'
+  return r ? `${r} sets` : 'Standard'
 }
 
 export const exerciseLabel = (row: ExerciseRow): string =>
@@ -16,11 +16,11 @@ export const exerciseLabel = (row: ExerciseRow): string =>
 
 export const exerciseMeta = (row: ExerciseRow): string => {
   const parts: string[] = []
-  if (row.rounds) parts.push(`${row.rounds} serie`)
-  if (row.reps) parts.push(`${row.reps} powt.`)
+  if (row.rounds) parts.push(`${row.rounds} sets`)
+  if (row.reps) parts.push(`${row.reps} reps`)
   if (row.kg) parts.push(`${row.kg} kg`)
   if (row.rir) parts.push(`RIR ${row.rir}`)
   if (row.tut) parts.push(`TUT ${row.tut}`)
-  if (row.rest) parts.push(`przerwa ${row.rest}`)
+  if (row.rest) parts.push(`rest ${row.rest}`)
   return parts.join(' · ')
 }

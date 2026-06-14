@@ -21,7 +21,7 @@ const exerciseRelField: SingleRelationshipFieldClient = {
   type: 'relationship',
   relationTo: 'exercises',
   hasMany: false,
-  label: 'Ćwiczenie (katalog)',
+  label: 'Exercise (catalog)',
 } as SingleRelationshipFieldClient
 
 function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => void }) {
@@ -31,10 +31,10 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
     <>
       <div style={s.formRow}>
         <div style={{ flex: '0 0 64px' }}>
-          <TextField path="numer" field={textField('numer', 'Numer', '1a')} />
+          <TextField path="numer" field={textField('numer', 'No.', '1a')} />
         </div>
         <div style={{ flex: '0 0 80px' }}>
-          <TextField path="rounds" field={textField('rounds', 'Serie', '4')} validate={validateRounds} />
+          <TextField path="rounds" field={textField('rounds', 'Sets', '4')} validate={validateRounds} />
         </div>
         <div style={{ flex: 1 }}>
           <RelationshipField path="exercise" field={exerciseRelField} />
@@ -43,13 +43,13 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
 
       <div style={s.formRow}>
         <div style={{ flex: 1 }}>
-          <TextField path="note" field={textField('note', 'Uwaga / wariant', 'opcjonalnie')} />
+          <TextField path="note" field={textField('note', 'Note / variant', 'optional')} />
         </div>
       </div>
 
       <div style={s.formRow}>
         <div style={{ flex: '1 1 70px' }}>
-          <TextField path="reps" field={textField('reps', 'Powt.', '8')} validate={validateRepsOrKg} />
+          <TextField path="reps" field={textField('reps', 'Reps', '8')} validate={validateRepsOrKg} />
         </div>
         <div style={{ flex: '1 1 70px' }}>
           <TextField path="kg" field={textField('kg', 'KG', '60')} validate={validateKgOrReps} />
@@ -61,7 +61,7 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
           <TextField path="tut" field={textField('tut', 'TUT', '3-0-1')} />
         </div>
         <div style={{ flex: '1 1 90px' }}>
-          <TextField path="rest" field={textField('rest', 'Przerwa', '90 sek')} />
+          <TextField path="rest" field={textField('rest', 'Rest', '90 sec')} />
         </div>
       </div>
 
@@ -70,7 +70,7 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
           Anuluj
         </Button>
         <Button buttonStyle="primary" margin={false} type="submit" disabled={processing}>
-          {processing ? 'Zapisuję…' : isEdit ? 'Zapisz ćwiczenie' : 'Dodaj ćwiczenie'}
+          {processing ? 'Saving…' : isEdit ? 'Save exercise' : 'Add exercise'}
         </Button>
       </div>
     </>
@@ -119,17 +119,17 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
       const normalizedGroup =
         typeof doc.group === 'object' && doc.group !== null ? (doc.group as { id: number }).id : doc.group
 
-      toast.success(isEdit ? 'Ćwiczenie zaktualizowane' : 'Ćwiczenie dodane')
+      toast.success(isEdit ? 'Exercise updated' : 'Exercise added')
       onSaved({ ...doc, group: normalizedGroup, exercise: exerciseObj } as ExerciseRow)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Błąd zapisu')
+      toast.error(e instanceof Error ? e.message : 'Save failed')
     }
   }
 
   return (
     <div style={s.formBox}>
       <div style={{ ...s.label, fontWeight: 700, color: 'var(--theme-text)', marginBottom: 10 }}>
-        {isEdit ? 'Edytuj ćwiczenie' : 'Nowe ćwiczenie'}
+        {isEdit ? 'Edit exercise' : 'New exercise'}
       </div>
 
       <Form initialState={initialState} onSubmit={handleSubmit}>

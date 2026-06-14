@@ -39,11 +39,11 @@ export async function WorkoutLogsNotice({ id, payload }: WorkoutLogsNoticeProps)
       }}
     >
       <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 1 }}>
-        Ten trening ma zapisane logi.
+        This workout has recorded logs.
       </div>
       <div style={{ color: '#9a3412', fontSize: 10, lineHeight: 1 }}>
-        Nie mozna usunac treningu ani cwiczen z zapisanymi seriami. Mozna edytowac opisy,
-        dodawac nowe cwiczenia i grupy.
+        Workouts and exercises with recorded sets cannot be deleted. You can edit descriptions
+        and add new exercises and groups.
       </div>
     </div>
   )

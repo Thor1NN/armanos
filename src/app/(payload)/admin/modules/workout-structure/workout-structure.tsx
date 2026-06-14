@@ -15,7 +15,7 @@ export async function WorkoutStructureView({
   if (!docId || docId === 'create' || !payload) {
     return (
       <div style={{ padding: '24px', color: 'var(--theme-elevation-500)', fontSize: 14 }}>
-        Najpierw zapisz trening, aby zarządzać strukturą.
+        Save the workout first to manage its structure.
       </div>
     )
   }

@@ -19,7 +19,7 @@ import {
 const protocolField: SelectFieldClient = {
   name: 'protocol',
   type: 'select',
-  label: 'Protokół',
+  label: 'Protocol',
   options: PROTOCOLS,
 } as SelectFieldClient
 
@@ -43,7 +43,7 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
     <>
       <div style={s.formRow}>
         <div style={{ flex: '1 1 200px' }}>
-          <TextField path="label" field={textField('label', 'Nazwa grupy (opcjonalna)', 'np. Superset górny, Część A')} />
+          <TextField path="label" field={textField('label', 'Group name (optional)', 'e.g. Upper superset, Part A')} />
         </div>
       </div>
 
@@ -54,29 +54,29 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
 
         {protocol !== 'amrap' && protocol !== 'tabata' && (
           <div style={{ flex: '1 1 80px' }}>
-            <TextField path="rounds" field={textField('rounds', 'Serie / rundy', 'np. 4, 1-3')} validate={validateRounds} />
+            <TextField path="rounds" field={textField('rounds', 'Sets / rounds', 'e.g. 4, 1-3')} validate={validateRounds} />
           </div>
         )}
 
         {protocol === 'amrap' && (
           <div style={{ flex: '1 1 80px' }}>
-            <TextField path="durationMinutes" field={textField('durationMinutes', 'Czas (min)', '10')} validate={validateDurationMinutes} />
+            <TextField path="durationMinutes" field={textField('durationMinutes', 'Duration (min)', '10')} validate={validateDurationMinutes} />
           </div>
         )}
 
         {protocol === 'emom' && (
           <div style={{ flex: '1 1 80px' }}>
-            <TextField path="intervalSeconds" field={textField('intervalSeconds', 'Interwał (s)')} validate={validateIntervalSeconds} />
+            <TextField path="intervalSeconds" field={textField('intervalSeconds', 'Interval (s)')} validate={validateIntervalSeconds} />
           </div>
         )}
 
         {protocol === 'tabata' && (
           <>
             <div style={{ flex: '1 1 70px' }}>
-              <TextField path="workSeconds" field={textField('workSeconds', 'Praca (s)')} validate={validateWorkSeconds} />
+              <TextField path="workSeconds" field={textField('workSeconds', 'Work (s)')} validate={validateWorkSeconds} />
             </div>
             <div style={{ flex: '1 1 70px' }}>
-              <TextField path="restSeconds" field={textField('restSeconds', 'Odpoczynek (s)')} validate={validateRestSeconds} />
+              <TextField path="restSeconds" field={textField('restSeconds', 'Rest (s)')} validate={validateRestSeconds} />
             </div>
           </>
         )}
@@ -84,7 +84,7 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
 
       <div style={s.formRow}>
         <div style={{ flex: '1 1 160px' }}>
-          <TextField path="restBetweenRounds" field={textField('restBetweenRounds', 'Przerwa między rundami', 'np. 90 sek')} />
+          <TextField path="restBetweenRounds" field={textField('restBetweenRounds', 'Rest between rounds', 'e.g. 90 sec')} />
         </div>
       </div>
 
@@ -93,7 +93,7 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
           Anuluj
         </Button>
         <Button buttonStyle="primary" margin={false} type="submit" disabled={processing}>
-          {processing ? 'Zapisuję…' : 'Zapisz grupę'}
+          {processing ? 'Saving…' : 'Save group'}
         </Button>
       </div>
     </>
@@ -133,17 +133,17 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
       const doc = isEdit
         ? await sdk.update({ collection: 'workout-groups', id: initial!.id, data: body as unknown as WorkoutGroup })
         : await sdk.create({ collection: 'workout-groups', data: body as unknown as WorkoutGroup })
-      toast.success(isEdit ? 'Grupa zaktualizowana' : 'Grupa dodana')
+      toast.success(isEdit ? 'Group updated' : 'Group added')
       onSaved(doc as unknown as Group)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Błąd zapisu')
+      toast.error(e instanceof Error ? e.message : 'Save failed')
     }
   }
 
   return (
     <div style={s.formBox}>
       <div style={{ ...s.label, fontWeight: 700, color: 'var(--theme-text)', marginBottom: 10 }}>
-        {isEdit ? 'Edytuj grupę' : 'Nowa grupa'}
+        {isEdit ? 'Edit group' : 'New group'}
       </div>
 
       <Form initialState={initialState} onSubmit={handleSubmit}>
