@@ -21,7 +21,7 @@ A client-facing training app built with [Payload CMS](https://payloadcms.com) an
 
 ### Requirements
 
-- Node.js 22+
+- Node.js 24+
 - PostgreSQL database
 
 ### Setup
