@@ -8,11 +8,14 @@ A coach-facing admin and client-facing training tracker built with Payload CMS a
 
 **Client (web app)** — logs in, sees their active plan, works through workouts session by session, and logs each set (reps, weight, RIR, time, etc.).
 
-## Screenshots
-
-<p align="center">
-  <img src="docs/mockup-1.png" alt="Training App mockup" width="420" />
-</p>
+## Navigation
+- [Data model](#data-model)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+- [Project structure](#project-structure)
+- [Key scripts](#key-scripts)
+- [Development](#development)
+- [Screenshots](#screenshots)
 
 ## Data model
 
@@ -170,3 +173,9 @@ yarn install-skills
 ```
 
 Skills live in `.ai/skills/` and cover: Payload patterns, collection scaffolding, admin module structure, UI copy, and spec writing.
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/mockup-1.png" alt="Training App mockup" width="420" />
+</p>
