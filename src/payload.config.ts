@@ -54,7 +54,7 @@ export default buildConfig({
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,
     },
-    logger: true,
+    logger: false,
   }),
   sharp,
 })
