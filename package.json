@@ -18,7 +18,8 @@
     "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/seed.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation tsx node_modules/payload/bin.js --disable-transpile",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "install-skills": "sh scripts/install-skills.sh"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.1",
