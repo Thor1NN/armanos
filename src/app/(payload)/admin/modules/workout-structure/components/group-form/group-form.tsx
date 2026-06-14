@@ -90,7 +90,7 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
 
       <div style={s.formActions}>
         <Button buttonStyle="secondary" margin={false} type="button" onClick={onCancel} disabled={processing}>
-          Anuluj
+          Cancel
         </Button>
         <Button buttonStyle="primary" margin={false} type="submit" disabled={processing}>
           {processing ? 'Saving…' : 'Save group'}

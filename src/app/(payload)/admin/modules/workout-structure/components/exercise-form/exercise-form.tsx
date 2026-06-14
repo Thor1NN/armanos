@@ -67,7 +67,7 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
 
       <div style={s.formActions}>
         <Button buttonStyle="secondary" margin={false} type="button" onClick={onCancel}>
-          Anuluj
+          Cancel
         </Button>
         <Button buttonStyle="primary" margin={false} type="submit" disabled={processing}>
           {processing ? 'Saving…' : isEdit ? 'Save exercise' : 'Add exercise'}
