@@ -1,6 +1,6 @@
 {
   "name": "training-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aplikacja treningowa na Payload 3",
   "license": "MIT",
   "type": "module",
@@ -15,7 +15,13 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation tsx node_modules/payload/bin.js --disable-transpile",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "install-skills": "sh scripts/install-skills.sh"
+    "install-skills": "sh scripts/install-skills.sh",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "prepare-release": "bash scripts/prepare-release.sh",
+    "pr:create": "bash scripts/create-pr.sh"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.1",
@@ -36,6 +42,7 @@
     "sharp": "0.34.2"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "24.12.3",
     "@types/react": "19.2.14",
