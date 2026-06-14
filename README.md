@@ -131,7 +131,7 @@ src/
 | `yarn generate:types` | Regenerate `payload-types.ts` from collection configs |
 | `yarn generate:importmap` | Regenerate Payload admin import map (run after adding custom views) |
 | `yarn seed` | Seed database with demo data |
-| `yarn import:plan` | Import a training plan from JSON |
+| `yarn seed:export` | Export current database state to seed file |
 | `yarn lint` | Run ESLint |
 | `yarn install-skills` | Link `.ai/skills/` into `.claude/` and `.codex/` |
 
