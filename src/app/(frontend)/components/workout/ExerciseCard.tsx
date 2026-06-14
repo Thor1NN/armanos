@@ -80,7 +80,7 @@ export function ExerciseCard({
           </Button>
           {sets.length > 0 && (
             <Button
-              variant="icon"
+              variant="danger"
               aria-label="Duplikuj ostatnią serię"
               onClick={() => onAdd(ex, fields, setLogToFormValues(sets[sets.length - 1], fields))}
             >
