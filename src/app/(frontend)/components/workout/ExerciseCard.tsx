@@ -7,6 +7,7 @@ import { Button } from '../ui/Button'
 import { SeriesForm } from './SeriesForm'
 import { SeriesRow } from './SeriesRow'
 import type { SetLog, TExercise, Values } from '../../types/types'
+import { setLogToFormValues } from '../../utils/metrics'
 
 export function ExerciseCard({
   ex,
@@ -73,9 +74,20 @@ export function ExerciseCard({
           onCancel={() => setOpen(false)}
         />
       ) : (
-        <Button className="mt-1.5" variant="dashed" onClick={() => setOpen(true)}>
-          + dodaj serię
-        </Button>
+        <div className="mt-1.5 flex items-center gap-2">
+          <Button variant="dashed" onClick={() => setOpen(true)}>
+            + dodaj serię
+          </Button>
+          {sets.length > 0 && (
+            <Button
+              variant="icon"
+              aria-label="Duplikuj ostatnią serię"
+              onClick={() => onAdd(ex, fields, setLogToFormValues(sets[sets.length - 1], fields))}
+            >
+              ⧉
+            </Button>
+          )}
+        </div>
       )}
     </div>
   )
