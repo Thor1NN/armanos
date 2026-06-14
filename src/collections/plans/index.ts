@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, adminOrOwnByClient } from '../access'
+import { isAdmin, adminOrOwnByClient } from '../../access'
 
 export const Plans: CollectionConfig = {
   slug: 'plans',
@@ -10,7 +10,7 @@ export const Plans: CollectionConfig = {
   },
   access: {
     create: isAdmin,
-    read: adminOrOwnByClient, // admin wszystko; klient tylko swoje plany
+    read: adminOrOwnByClient,
     update: isAdmin,
     delete: isAdmin,
   },

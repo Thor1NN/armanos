@@ -5,18 +5,20 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-import { Users } from './collections/Users'
-import { Clients } from './collections/Clients'
-import { Media } from './collections/Media'
-import { Plans } from './collections/Plans'
-import { Microcycles } from './collections/Microcycles'
-import { Workouts } from './collections/Workouts'
-import { WorkoutGroups } from './collections/WorkoutGroups'
-import { WorkoutExerciseRows } from './collections/WorkoutExerciseRows'
-import { WorkoutLogs } from './collections/WorkoutLogs'
-import { RoundLogs } from './collections/RoundLogs'
-import { SetLogs } from './collections/SetLogs'
-import { Exercises } from './collections/Exercises'
+import {
+  Users,
+  Clients,
+  Media,
+  Plans,
+  Microcycles,
+  Workouts,
+  WorkoutGroups,
+  WorkoutExerciseRows,
+  WorkoutLogs,
+  RoundLogs,
+  SetLogs,
+  Exercises,
+} from './collections'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

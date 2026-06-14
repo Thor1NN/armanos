@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, adminOrSelf, isAdminField } from '../access'
+import { isAdmin, adminOrSelf, isAdminField } from '../../access'
 
 export const Clients: CollectionConfig = {
   slug: 'clients',
@@ -10,13 +10,10 @@ export const Clients: CollectionConfig = {
     group: 'Konta',
   },
   access: {
-    // Konta zakłada wyłącznie trener/admin (brak publicznej rejestracji)
     create: isAdmin,
-    // Admin czyta wszystkich; klient tylko siebie
     read: adminOrSelf,
     update: adminOrSelf,
     delete: isAdmin,
-    // Klienci nie mają dostępu do panelu Payload (logują się przez tracker)
     admin: () => false,
   },
   fields: [
@@ -26,7 +23,6 @@ export const Clients: CollectionConfig = {
       label: 'Imię i nazwisko',
     },
     {
-      // Wszystkie plany tego klienta (klient ma wiele customowych planów)
       name: 'plans',
       type: 'join',
       collection: 'plans',

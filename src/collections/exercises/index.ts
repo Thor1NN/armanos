@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
-import { isAdmin, isAuthenticated } from '../access'
-import { trackingOptions, DEFAULT_TRACKING } from '../trackingTypes'
+import { isAdmin, isAuthenticated } from '../../access'
+import { trackingOptions, DEFAULT_TRACKING } from './types'
 
 export const Exercises: CollectionConfig = {
   slug: 'exercises',
@@ -10,7 +10,6 @@ export const Exercises: CollectionConfig = {
     group: 'Katalog',
   },
   access: {
-    // Katalog czytają wszyscy zalogowani (klient widzi wideo/opis); edytuje admin
     create: isAdmin,
     read: isAuthenticated,
     update: isAdmin,

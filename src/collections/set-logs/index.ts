@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
-import { adminOrOwnByClient } from '../access'
-import { trackingFields, ALL_METRIC_FIELDS } from '../trackingTypes'
+import { adminOrOwnByClient } from '../../access'
+import { trackingFields, ALL_METRIC_FIELDS } from '../exercises/types'
 
 export const SetLogs: CollectionConfig = {
   slug: 'set-logs',
@@ -19,7 +19,6 @@ export const SetLogs: CollectionConfig = {
     beforeValidate: [
       async ({ data, req }) => {
         if (!data) return data
-        // Klient nie może logować do cudzej sesji
         if (req.user?.collection === 'clients' && data.session) {
           const session = await req.payload.findByID({
             collection: 'workout-logs',
@@ -31,7 +30,6 @@ export const SetLogs: CollectionConfig = {
             throw new Error('Nie możesz logować serii do cudzej sesji.')
           }
         }
-        // Wyzeruj metryki spoza typu pomiaru ćwiczenia (czyste dane pod wykresy)
         if (data.exercise) {
           const ex = await req.payload.findByID({
             collection: 'exercises',
@@ -48,7 +46,6 @@ export const SetLogs: CollectionConfig = {
     ],
     beforeChange: [
       ({ data, req }) => {
-        // Klient zawsze loguje na siebie (ignoruj client z frontu)
         if (req.user?.collection === 'clients') {
           data.client = req.user.id
         }
@@ -72,14 +69,12 @@ export const SetLogs: CollectionConfig = {
       defaultValue: ({ user }) => (user?.collection === 'clients' ? user.id : undefined),
     },
     {
-      // Snapshot — relacja do katalogu (progres między treningami)
       name: 'exercise',
       type: 'relationship',
       relationTo: 'exercises',
       label: 'Ćwiczenie (katalog)',
     },
     {
-      // Snapshot tekstowy — trwałość historii nawet po usunięciu z katalogu
       name: 'exerciseName',
       type: 'text',
       label: 'Ćwiczenie (nazwa, migawka)',

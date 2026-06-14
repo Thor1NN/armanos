@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { adminOrOwnByClient } from '../access'
+import { adminOrOwnByClient } from '../../access'
 
 export const WorkoutLogs: CollectionConfig = {
   slug: 'workout-logs',
@@ -17,11 +17,9 @@ export const WorkoutLogs: CollectionConfig = {
   hooks: {
     beforeChange: [
       async ({ data, req, operation }) => {
-        // Klient zawsze loguje sesję na siebie (ignoruj to, co przyszło z frontu)
         if (req.user?.collection === 'clients') {
           data.client = req.user.id
         }
-        // Auto-tytuł: "Trening — data"
         if (operation === 'create' && !data.title && data.workout) {
           try {
             const w = await req.payload.findByID({

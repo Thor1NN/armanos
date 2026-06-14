@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { adminOrOwnByClient, isAdmin } from '../access'
+import { adminOrOwnByClient, isAdmin } from '../../access'
 
 export const RoundLogs: CollectionConfig = {
   slug: 'round-logs',

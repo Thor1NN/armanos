@@ -1,5 +1,5 @@
 import { APIError, type CollectionConfig } from 'payload'
-import { isAdmin, isAuthenticated } from '../access'
+import { isAdmin, isAuthenticated } from '../../access'
 
 const PROTOCOL_OPTIONS = [
   { label: 'Standard', value: 'standard' },
