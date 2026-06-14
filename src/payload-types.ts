@@ -230,7 +230,7 @@ export interface Plan {
   title: string;
   description?: string | null;
   /**
-   * Skąd zaimportowano plan
+   * Where the plan was imported from
    */
   source?: string | null;
   updatedAt: string;
@@ -264,7 +264,7 @@ export interface Microcycle {
   title: string;
   plan: number | Plan;
   /**
-   * Docelowy RPE mikrocyklu (6–9)
+   * Target RPE for the microcycle (6–9)
    */
   rpe?: number | null;
   order?: number | null;
@@ -284,11 +284,11 @@ export interface Workout {
   sections?:
     | {
         /**
-         * np. Rozgrzewka, Część główna
+         * e.g. Warm-up, Main part
          */
         title?: string | null;
         /**
-         * np. Upper Body, EMOM
+         * e.g. Upper Body, EMOM
          */
         subtitle?: string | null;
         id?: string | null;
@@ -305,37 +305,37 @@ export interface WorkoutGroup {
   id: number;
   workout: number | Workout;
   /**
-   * Row ID sekcji z workout.sections
+   * Row ID of the section from workout.sections
    */
   sectionRowId?: string | null;
   /**
-   * np. "Superset górny", "Część główna A" (opcjonalne)
+   * e.g. "Upper superset", "Main part A" (optional)
    */
   label?: string | null;
   order?: number | null;
   protocol?: ('standard' | 'emom' | 'amrap' | 'for_time' | 'tabata') | null;
   /**
-   * np. "4", "1-3"
+   * e.g. "4", "1-3"
    */
   rounds?: string | null;
   /**
-   * Używane dla AMRAP
+   * Used for AMRAP
    */
   durationMinutes?: number | null;
   /**
-   * Używane dla EMOM — domyślnie 60
+   * Used for EMOM — default 60
    */
   intervalSeconds?: number | null;
   /**
-   * Używane dla Tabata — domyślnie 20
+   * Used for Tabata — default 20
    */
   workSeconds?: number | null;
   /**
-   * Używane dla Tabata — domyślnie 10
+   * Used for Tabata — default 10
    */
   restSeconds?: number | null;
   /**
-   * Przerwa po ukończeniu pełnej rundy/obwodu
+   * Rest after completing a full round/circuit
    */
   restBetweenRounds?: string | null;
   updatedAt: string;
@@ -350,16 +350,16 @@ export interface WorkoutExerciseRow {
   group: number | WorkoutGroup;
   order?: number | null;
   /**
-   * np. "1a", "2b"
+   * e.g. "1a", "2b"
    */
   numer?: string | null;
   /**
-   * Powiązanie z katalogiem — do wideo i progresu
+   * Link to the catalog — for video and progress tracking
    */
   exercise?: (number | null) | Exercise;
   note?: string | null;
   /**
-   * np. 4, 3-4
+   * e.g. 4, 3-4
    */
   rounds?: string | null;
   reps?: string | null;
@@ -370,7 +370,7 @@ export interface WorkoutExerciseRow {
   durationMin?: number | null;
   durationSec?: number | null;
   /**
-   * Wypełnij tylko dla drop setów / piramidy. Puste = wszystkie serie identyczne.
+   * Fill in only for drop sets / pyramids. Empty = all sets identical.
    */
   setParameters?:
     | {
@@ -381,7 +381,7 @@ export interface WorkoutExerciseRow {
       }[]
     | null;
   /**
-   * Zostaw puste jeśli ćwiczenie dziedziczy protokół z grupy.
+   * Leave empty if the exercise inherits the protocol from the group.
    */
   override?: {
     protocol?: ('' | 'standard' | 'emom' | 'amrap' | 'for_time' | 'tabata') | null;
@@ -402,12 +402,12 @@ export interface Exercise {
   id: number;
   name: string;
   /**
-   * Decyduje, które pola pokazuje formularz logowania serii
+   * Determines which fields are shown in the set logging form
    */
   trackingType?: ('strength' | 'cardio') | null;
   description?: string | null;
   /**
-   * URL do filmu instruktażowego (np. YouTube)
+   * URL to instructional video (e.g. YouTube)
    */
   videoUrl?: string | null;
   muscleGroup?: string | null;
@@ -422,7 +422,7 @@ export interface Exercise {
 export interface WorkoutLog {
   id: number;
   /**
-   * Generowany automatycznie
+   * Auto-generated
    */
   title?: string | null;
   workout: number | Workout;
