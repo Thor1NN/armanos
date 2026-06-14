@@ -7,7 +7,7 @@ import {
   inputClass,
   joinClasses,
   selectClass,
-} from '../../ui'
+} from '@/lib/class-names'
 
 type InputVariant = 'default' | 'compact' | 'compact-unit'
 

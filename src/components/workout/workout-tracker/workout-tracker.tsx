@@ -1,17 +1,15 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import type { MetricField } from '../../../trackingTypes'
-import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from './ui'
-import { ExerciseCard } from './components/workout/ExerciseCard'
-import { SessionTimesBadge, SessionTimesForm } from './components/workout/SessionTimes'
-import type { Session, SetLog, TExercise, TWorkout, Values } from './types/types'
-import { metricBody } from './utils/metrics'
+import type { MetricField } from '@/collections/exercises/types'
+import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from '@/lib/class-names'
+import { ExerciseCard } from '@/components/workout/exercise-card'
+import { SessionTimesBadge, SessionTimesForm } from '@/components/workout/session-times'
+import type { Session, SetLog, TExercise, TWorkout, Values } from '@/types/workout'
+import { metricBody } from '@/lib/metrics'
 import { sdk } from '@/lib/sdk'
 
-export type { TWorkout } from './types/types'
-
-export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
+export function WorkoutTracker({ workout }: { workout: TWorkout }) {
   const [session, setSession] = useState<Session | null>(null)
   const [sets, setSets] = useState<SetLog[]>([])
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
@@ -205,7 +203,6 @@ export default function WorkoutTracker({ workout }: { workout: TWorkout }) {
           ))}
         </div>
       ))}
-
     </div>
   )
 }

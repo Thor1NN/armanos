@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useState } from 'react'
-import { joinClasses, mutedTextClass } from '../../ui'
-import { Button } from '../ui/Button'
-import { Input } from '../ui/Input'
-import type { Session } from '../../types/types'
-import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from '../../utils/date'
+import { joinClasses, mutedTextClass } from '@/lib/class-names'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import type { Session } from '@/types/workout'
+import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from '@/lib/date'
 
 export function SessionTimesBadge({
   session,

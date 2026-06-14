@@ -2,37 +2,23 @@
 
 import { useTranslations } from 'next-intl'
 import React, { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
-import WorkoutTracker, { type TWorkout } from '../WorkoutTracker'
-import { Button } from './ui/Button'
-import { StatusBadge } from './ui/StatusBadge'
-import { Surface } from './ui/Surface'
-import { mutedTextClass, sectionLabelClass } from '../ui'
-import { STORAGE_KEY, SSR_SNAPSHOT } from '../types/constants'
-
-const subscribeToSelection = (onStoreChange: () => void) => {
-  window.addEventListener('storage', onStoreChange)
-  return () => window.removeEventListener('storage', onStoreChange)
-}
-
-export type TPlanAccordionItem = {
-  id: number | string
-  title: string
-  status: string
-  statusLabel: string
-  dateRange?: string | null
-  description?: string | null
-  microcycles: Array<{
-    id: number | string
-    title: string
-    rpe?: number | null
-    workouts: TWorkout[]
-  }>
-}
+import { WorkoutTracker } from '@/components/workout/workout-tracker'
+import { Button } from '@/components/ui/button'
+import { StatusBadge } from '@/components/ui/status-badge'
+import { Surface } from '@/components/ui/surface'
+import { mutedTextClass, sectionLabelClass } from '@/lib/class-names'
+import { STORAGE_KEY, SSR_SNAPSHOT } from '@/types/constants'
+import type { TPlanAccordionItem } from '@/types/plan'
 
 type Selection = {
   planId: number | string | null
   microcycleId: number | string | null
   workoutId: number | string | null
+}
+
+const subscribeToSelection = (onStoreChange: () => void) => {
+  window.addEventListener('storage', onStoreChange)
+  return () => window.removeEventListener('storage', onStoreChange)
 }
 
 const firstAvailableSelection = (plans: TPlanAccordionItem[]) => {
@@ -47,10 +33,7 @@ const firstAvailableSelection = (plans: TPlanAccordionItem[]) => {
   }
 }
 
-const isValidSelection = (
-  plans: TPlanAccordionItem[],
-  selection: Selection,
-) => {
+const isValidSelection = (plans: TPlanAccordionItem[], selection: Selection) => {
   const plan = plans.find((item) => item.id === selection.planId)
   if (!plan) return false
 

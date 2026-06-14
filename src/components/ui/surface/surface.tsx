@@ -1,5 +1,5 @@
 import React from 'react'
-import { joinClasses, panelClass, surfaceClass } from '../../ui'
+import { joinClasses, panelClass, surfaceClass } from '@/lib/class-names'
 
 type Variant = 'card' | 'panel'
 

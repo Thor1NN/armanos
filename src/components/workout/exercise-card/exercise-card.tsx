@@ -3,13 +3,13 @@
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 import { CopyPlus } from 'lucide-react'
-import { trackingFields, type MetricField } from '../../../../../trackingTypes'
-import { mutedTextClass } from '../../ui'
-import { Button } from '../ui/Button'
-import { SeriesForm } from './SeriesForm'
-import { SeriesRow } from './SeriesRow'
-import type { SetLog, TExercise, Values } from '../../types/types'
-import { setLogToFormValues } from '../../utils/metrics'
+import { trackingFields, type MetricField } from '@/collections/exercises/types'
+import { mutedTextClass } from '@/lib/class-names'
+import { Button } from '@/components/ui/button'
+import { SeriesForm } from '@/components/workout/series-form'
+import { SeriesRow } from '@/components/workout/series-row'
+import type { SetLog, TExercise, Values } from '@/types/workout'
+import { setLogToFormValues } from '@/lib/metrics'
 
 export function ExerciseCard({
   ex,

@@ -3,11 +3,11 @@
 import { useTranslations } from 'next-intl'
 import React, { useState, useCallback } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
-import { METRIC_FIELDS, type MetricField } from '../../../../../trackingTypes'
-import { errorBannerClass, mutedTextClass } from '../../ui'
-import { Button } from '../ui/Button'
-import { Input, Select } from '../ui/Input'
-import type { Values } from '../../types/types'
+import { METRIC_FIELDS, type MetricField } from '@/collections/exercises/types'
+import { errorBannerClass, mutedTextClass } from '@/lib/class-names'
+import { Button } from '@/components/ui/button'
+import { Input, Select } from '@/components/ui/input'
+import type { Values } from '@/types/workout'
 
 function parseMmSs(raw: string): { min: string; sec: string } {
   const clean = raw.replace(/[^\d:]/g, '')
@@ -16,7 +16,6 @@ function parseMmSs(raw: string): { min: string; sec: string } {
     return { min: m ?? '', sec: s ?? '' }
   }
   if (clean.length <= 2) return { min: clean, sec: '' }
-  // e.g. "530" → 5min 30sec
   return { min: clean.slice(0, -2), sec: clean.slice(-2) }
 }
 
@@ -120,7 +119,6 @@ export function SeriesForm({
             return (
               <div className="flex flex-col gap-1" key={f}>
                 <span className={`text-xs ${mutedTextClass}`}>{meta.label}</span>
-                {/* hidden inputs keep RHF validation wired */}
                 <input type="hidden" {...register(minKey, isFirst ? { validate: validateAtLeastOne } : {})} />
                 <input type="hidden" {...register(secKey)} />
                 <DurationInput

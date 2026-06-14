@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
-import type { MetricField } from '../../../../../trackingTypes'
-import { joinClasses, panelClass } from '../../ui'
-import { Button } from '../ui/Button'
-import { SeriesForm } from './SeriesForm'
-import type { SetLog, Values } from '../../types/types'
-import { setLogToFormValues, setSummary } from '../../utils/metrics'
+import type { MetricField } from '@/collections/exercises/types'
+import { joinClasses, panelClass } from '@/lib/class-names'
+import { Button } from '@/components/ui/button'
+import { SeriesForm } from '@/components/workout/series-form'
+import type { SetLog, Values } from '@/types/workout'
+import { setLogToFormValues, setSummary } from '@/lib/metrics'
 
 export function SeriesRow({
   set,

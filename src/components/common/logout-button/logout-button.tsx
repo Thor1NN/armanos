@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
-import { Button } from './components/ui/Button'
+import { Button } from '@/components/ui/button'
 
-export default function LogoutButton() {
+export function LogoutButton() {
   const t = useTranslations('nav')
   const router = useRouter()
   const [loading, setLoading] = useState(false)

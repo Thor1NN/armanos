@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
-import { errorBannerClass } from '../ui'
-import { Button } from '../components/ui/Button'
-import { Input } from '../components/ui/Input'
-import { Surface } from '../components/ui/Surface'
+import { errorBannerClass } from '@/lib/class-names'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Surface } from '@/components/ui/surface'
 
 export default function LoginPage() {
   const t = useTranslations('login')

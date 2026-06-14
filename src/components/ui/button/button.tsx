@@ -8,7 +8,7 @@ import {
   joinClasses,
   primaryButtonClass,
   secondaryButtonClass,
-} from '../../ui'
+} from '@/lib/class-names'
 
 type Variant = 'primary' | 'secondary' | 'dashed' | 'icon' | 'danger' | 'ghost'
 type Size = 'md' | 'sm'
