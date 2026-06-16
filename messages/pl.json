@@ -41,6 +41,7 @@
   "share": {
     "expiredOrInvalid": "Ten link wygasł lub jest nieprawidłowy.",
     "expiresOn": "Ważny do: {date}",
+    "noPlan": "Brak planu do wyświetlenia.",
     "planSection": "Plan treningowy",
     "resultsSection": "Wyniki",
     "session": "Sesja",

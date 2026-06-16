@@ -41,6 +41,7 @@
   "share": {
     "expiredOrInvalid": "This link has expired or is invalid.",
     "expiresOn": "Valid until: {date}",
+    "noPlan": "No plan to display.",
     "planSection": "Training plan",
     "resultsSection": "Results",
     "session": "Session",

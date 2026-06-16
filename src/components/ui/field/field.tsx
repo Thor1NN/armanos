@@ -6,12 +6,21 @@ type FieldProps = {
   children: React.ReactNode
   className?: string
   labelClassName?: string
+  /** When set, the label renders as a real `<label htmlFor>` instead of a `<span>`. */
+  htmlFor?: string
 }
 
-export function Field({ label, children, className, labelClassName }: FieldProps) {
+export function Field({ label, children, className, labelClassName, htmlFor }: FieldProps) {
+  const labelClasses = joinClasses('text-xs', mutedTextClass, labelClassName)
   return (
     <div className={joinClasses('flex flex-col gap-1', className)}>
-      <span className={joinClasses('text-xs', mutedTextClass, labelClassName)}>{label}</span>
+      {htmlFor ? (
+        <label htmlFor={htmlFor} className={labelClasses}>
+          {label}
+        </label>
+      ) : (
+        <span className={labelClasses}>{label}</span>
+      )}
       {children}
     </div>
   )

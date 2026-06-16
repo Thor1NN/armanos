@@ -11,7 +11,7 @@ import { ActiveContextBanner } from './active-context-banner'
 import { useWorkoutSelection } from './hooks/use-workout-selection'
 import { MicrocyclePicker, WorkoutPicker } from './workout-pickers'
 
-export function WorkoutPlansAccordion({
+export function WorkoutPlans({
   plans,
   readOnly,
   showResults,
