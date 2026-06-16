@@ -134,6 +134,18 @@ workflowName
 
 ---
 
+## Spec Checklist
+
+See [spec-checklist.md](../references/spec-checklist.md). Paste results here before marking status as `review`.
+
+---
+
+## Compliance Review
+
+{Load [compliance-review.md](../references/compliance-review.md) to determine which stack-specific file to use, then paste the filled matrix here.}
+
+---
+
 ## Open Questions
 
 - [ ] {Unresolved decision — remove when answered}
