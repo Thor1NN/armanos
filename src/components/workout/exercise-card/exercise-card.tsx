@@ -17,12 +17,14 @@ export function ExerciseCard({
   onAdd,
   onUpdate,
   onDelete,
+  readOnly,
 }: {
   ex: TExercise
   sets: SetLog[]
-  onAdd: (ex: TExercise, fields: MetricField[], v: Values) => Promise<void>
-  onUpdate: (id: number, fields: MetricField[], v: Values) => Promise<void>
-  onDelete: (id: number) => Promise<void>
+  onAdd?: (ex: TExercise, fields: MetricField[], v: Values) => Promise<void>
+  onUpdate?: (id: number, fields: MetricField[], v: Values) => Promise<void>
+  onDelete?: (id: number) => Promise<void>
+  readOnly?: boolean
 }) {
   const t = useTranslations('exercise')
   const [open, setOpen] = useState(false)
@@ -59,19 +61,20 @@ export function ExerciseCard({
               key={s.id}
               set={s}
               fields={fields}
-              onUpdate={(values) => onUpdate(s.id, fields, values)}
-              onDelete={() => onDelete(s.id)}
+              onUpdate={async (values) => { await onUpdate?.(s.id, fields, values) }}
+              onDelete={async () => { await onDelete?.(s.id) }}
+              readOnly={readOnly}
             />
           ))}
         </ul>
       )}
 
-      {open ? (
+      {!readOnly && (open ? (
         <SeriesForm
           fields={fields}
           initial={{ reps: ex.prefill.reps ?? '', rir: ex.prefill.rir ?? '', note: '' }}
           onSubmit={async (v) => {
-            await onAdd(ex, fields, v)
+            await onAdd?.(ex, fields, v)
             setOpen(false)
           }}
           onCancel={() => setOpen(false)}
@@ -85,13 +88,13 @@ export function ExerciseCard({
             <Button
               variant="dashed"
               aria-label={t('duplicateSet')}
-              onClick={() => onAdd(ex, fields, setLogToFormValues(sets[sets.length - 1], fields))}
+              onClick={() => onAdd?.(ex, fields, setLogToFormValues(sets[sets.length - 1], fields))}
             >
               <CopyPlus size={14} />
             </Button>
           )}
         </div>
-      )}
+      ))}
     </div>
   )
 }

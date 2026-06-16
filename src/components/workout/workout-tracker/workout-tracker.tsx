@@ -9,7 +9,7 @@ import type { Session, SetLog, TExercise, TWorkout, Values } from '@/types/worko
 import { metricBody } from '@/lib/metrics'
 import { sdk } from '@/lib/sdk'
 
-export function WorkoutTracker({ workout }: { workout: TWorkout }) {
+export function WorkoutTracker({ workout, readOnly }: { workout: TWorkout; readOnly?: boolean }) {
   const [session, setSession] = useState<Session | null>(null)
   const [sets, setSets] = useState<SetLog[]>([])
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
@@ -21,6 +21,7 @@ export function WorkoutTracker({ workout }: { workout: TWorkout }) {
   const displayedSets = hasLoadedWorkout ? sets : []
 
   useEffect(() => {
+    if (readOnly) return
     let active = true
 
     sdk.find({ collection: 'workout-logs', where: { workout: { equals: workout.id } }, limit: 1, depth: 0, sort: '-updatedAt' })
@@ -51,7 +52,7 @@ export function WorkoutTracker({ workout }: { workout: TWorkout }) {
     return () => {
       active = false
     }
-  }, [workout.id])
+  }, [workout.id, readOnly])
 
   const creating = useRef<Promise<Session> | null>(null)
   const ensureSession = async (): Promise<Session> => {
@@ -144,14 +145,16 @@ export function WorkoutTracker({ workout }: { workout: TWorkout }) {
           <span className="break-words">{workout.title}</span>
           {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
         </span>
-        <SessionTimesBadge
-          session={displayedSession}
-          open={timeEditorOpen}
-          onOpen={() => setTimeEditorOpen((p) => !p)}
-        />
+        {!readOnly && (
+          <SessionTimesBadge
+            session={displayedSession}
+            open={timeEditorOpen}
+            onOpen={() => setTimeEditorOpen((p) => !p)}
+          />
+        )}
       </div>
 
-      {timeEditorOpen && (
+      {!readOnly && timeEditorOpen && (
         <SessionTimesForm
           session={displayedSession}
           onSet={setTime}
@@ -197,6 +200,7 @@ export function WorkoutTracker({ workout }: { workout: TWorkout }) {
                   onAdd={onAdd}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
+                  readOnly={readOnly}
                 />
               ))}
             </div>

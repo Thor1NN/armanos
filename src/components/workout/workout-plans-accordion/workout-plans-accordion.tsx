@@ -43,13 +43,13 @@ const isValidSelection = (plans: TPlanAccordionItem[], selection: Selection) => 
   return microcycle.workouts.some((item) => item.id === selection.workoutId)
 }
 
-export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }) {
+export function WorkoutPlansAccordion({ plans, readOnly }: { plans: TPlanAccordionItem[]; readOnly?: boolean }) {
   const t = useTranslations('workout')
   const initialSelection = useMemo(() => firstAvailableSelection(plans), [plans])
   const [selection, setSelection] = useState<Selection | null>(null)
   const storedSelectionRaw = useSyncExternalStore(
     subscribeToSelection,
-    () => window.localStorage.getItem(STORAGE_KEY),
+    () => readOnly ? SSR_SNAPSHOT : window.localStorage.getItem(STORAGE_KEY),
     () => SSR_SNAPSHOT,
   )
   const storedSelection = useMemo(() => {
@@ -67,10 +67,11 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
   const resolvedSelection = isValidSelection(plans, preferredSelection) ? preferredSelection : initialSelection
 
   useEffect(() => {
+    if (readOnly) return
     if (storedSelectionRaw === SSR_SNAPSHOT) return
     if (!isValidSelection(plans, resolvedSelection)) return
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(resolvedSelection))
-  }, [plans, resolvedSelection, storedSelectionRaw])
+  }, [plans, readOnly, resolvedSelection, storedSelectionRaw])
 
   const selectPlan = (plan: TPlanAccordionItem) => {
     const nextMicrocycle = plan.microcycles[0] ?? null
@@ -168,18 +169,20 @@ export function WorkoutPlansAccordion({ plans }: { plans: TPlanAccordionItem[] }
 
       {activePlan && activeMicrocycle && activeWorkout && (
         <div className="space-y-2.5">
-          <div className="rounded-lg border border-ui-border-base bg-ui-bg-subtle/60 px-4 py-2">
-            <div className={sectionLabelClass}>{t('activeContext')}</div>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ui-fg-base">
-              <span>{activePlan.title}</span>
-              <span className={mutedTextClass}>/</span>
-              <span>{activeMicrocycle.title}</span>
-              <span className={mutedTextClass}>/</span>
-              <span className="font-semibold">{activeWorkout.title}</span>
+          {!readOnly && (
+            <div className="rounded-lg border border-ui-border-base bg-ui-bg-subtle/60 px-4 py-2">
+              <div className={sectionLabelClass}>{t('activeContext')}</div>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ui-fg-base">
+                <span>{activePlan.title}</span>
+                <span className={mutedTextClass}>/</span>
+                <span>{activeMicrocycle.title}</span>
+                <span className={mutedTextClass}>/</span>
+                <span className="font-semibold">{activeWorkout.title}</span>
+              </div>
             </div>
-          </div>
+          )}
 
-          <WorkoutTracker key={activeWorkout.id} workout={activeWorkout} />
+          <WorkoutTracker key={activeWorkout.id} workout={activeWorkout} readOnly={readOnly} />
         </div>
       )}
     </div>

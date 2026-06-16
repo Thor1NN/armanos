@@ -1,7 +1,15 @@
 import type { CollectionConfig } from 'payload'
 
+import { isAdmin, isAuthenticated } from '../../access'
+
 export const Microcycles: CollectionConfig = {
   slug: 'microcycles',
+  access: {
+    create: isAdmin,
+    read: isAuthenticated,
+    update: isAdmin,
+    delete: isAdmin,
+  },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'rpe', 'order', 'plan'],

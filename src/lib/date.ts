@@ -29,6 +29,16 @@ export const fmtDuration = (start?: string | null, end?: string | null): string 
   return h ? `${h}h ${m}min` : `${m}min`
 }
 
+export const fmtMinSec = (min?: number | null, sec?: number | null): string | null => {
+  const m = min ?? 0
+  const s = sec ?? 0
+  if (!m && !s) return null
+  const p: string[] = []
+  if (m) p.push(`${m} min`)
+  if (s) p.push(`${s} sek`)
+  return p.join(' ')
+}
+
 export const fmtSec = (s: number): string => {
   if (s < 60) return `${s} s`
   const m = Math.floor(s / 60)

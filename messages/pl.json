@@ -37,5 +37,22 @@
   },
   "workout": {
     "activeContext": "Aktywny kontekst"
+  },
+  "share": {
+    "expiredOrInvalid": "Ten link wygasł lub jest nieprawidłowy.",
+    "expiresOn": "Ważny do: {date}",
+    "planSection": "Plan treningowy",
+    "resultsSection": "Wyniki",
+    "session": "Sesja",
+    "noResults": "Brak zapisanych wyników.",
+    "set": "Seria",
+    "kg": "kg",
+    "reps": "Powt.",
+    "rir": "RIR",
+    "duration": "Czas",
+    "seriesPrefix": "Serie",
+    "repsPrefix": "Powt.",
+    "durationPrefix": "Czas",
+    "restPrefix": "Przerwa"
   }
 }
