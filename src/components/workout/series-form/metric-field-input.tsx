@@ -1,61 +1,15 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import React, { useState } from 'react'
+import React from 'react'
 import type { Control, RegisterOptions, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { Controller } from 'react-hook-form'
 import { METRIC_FIELDS, type MetricField } from '@/collections/exercises/types'
-import { mutedTextClass } from '@/lib/class-names'
-import { formatMmSs, parseMmSs } from '@/lib/date'
 import { minKey, secKey, unitKey } from '@/lib/metric-keys'
+import { Field } from '@/components/ui/field'
 import { Input, Select } from '@/components/ui/input'
 import type { Values } from '@/types/workout'
-
-function DurationInput({
-  initialMin,
-  initialSec,
-  autoFocus,
-  onCommit,
-  className,
-}: {
-  initialMin: string
-  initialSec: string
-  autoFocus?: boolean
-  onCommit: (min: string, sec: string) => void
-  className?: string
-}) {
-  const [display, setDisplay] = useState(() => formatMmSs(initialMin, initialSec))
-
-  const handleBlur = () => {
-    const { min, sec } = parseMmSs(display)
-    const formatted = formatMmSs(min, sec)
-    setDisplay(formatted)
-    onCommit(min, sec)
-  }
-
-  return (
-    <Input
-      variant="compact"
-      type="text"
-      inputMode="numeric"
-      placeholder="00:00"
-      autoFocus={autoFocus}
-      value={display}
-      className={className}
-      onChange={(event) => setDisplay(event.target.value)}
-      onBlur={handleBlur}
-    />
-  )
-}
-
-function FieldWrapper({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className={`text-xs ${mutedTextClass}`}>{label}</span>
-      {children}
-    </div>
-  )
-}
+import { BodyweightField } from './bodyweight-field'
+import { DurationInput } from './duration-input'
 
 export function MetricFieldInput({
   field,
@@ -80,7 +34,6 @@ export function MetricFieldInput({
   isBodyweight: boolean
   onToggleBodyweight: () => void
 }) {
-  const t = useTranslations('seriesForm')
   const meta = METRIC_FIELDS[field]
   const firstFieldOptions: RegisterOptions<Values> = isFirst ? { validate } : {}
 
@@ -88,7 +41,7 @@ export function MetricFieldInput({
     const minName = minKey(field) as keyof Values
     const secName = secKey(field) as keyof Values
     return (
-      <FieldWrapper label={meta.label}>
+      <Field label={meta.label}>
         <input type="hidden" {...register(minName, firstFieldOptions)} />
         <input type="hidden" {...register(secName)} />
         <DurationInput
@@ -100,13 +53,13 @@ export function MetricFieldInput({
             setValue(secName, sec)
           }}
         />
-      </FieldWrapper>
+      </Field>
     )
   }
 
   if (meta.units) {
     return (
-      <FieldWrapper label={meta.label}>
+      <Field label={meta.label}>
         <span className="inline-flex items-stretch gap-1">
           <Input
             variant="compact-unit"
@@ -131,48 +84,26 @@ export function MetricFieldInput({
             )}
           />
         </span>
-      </FieldWrapper>
+      </Field>
     )
   }
 
   if (field === 'weight') {
     return (
-      <FieldWrapper label={meta.label}>
-        {isBodyweight ? (
-          <button
-            type="button"
-            onClick={onToggleBodyweight}
-            className={`h-8 rounded-md border border-ui-border-base bg-ui-bg-subtle px-2.5 text-xs ${mutedTextClass} text-left`}
-          >
-            {t('bodyweightActive')}
-          </button>
-        ) : (
-          <span className="inline-flex items-stretch gap-1">
-            <Input
-              variant="compact"
-              type="number"
-              step="0.5"
-              placeholder={meta.placeholder}
-              autoFocus={autoFocus}
-              {...register(field, firstFieldOptions)}
-            />
-            <button
-              type="button"
-              onClick={onToggleBodyweight}
-              title={t('bodyweightTitle')}
-              className={`rounded-md border border-ui-border-base bg-ui-bg-subtle px-2 text-xs ${mutedTextClass} hover:bg-ui-bg-base-hover`}
-            >
-              MC
-            </button>
-          </span>
-        )}
-        <input type="hidden" {...register('weight__bodyweight')} />
-      </FieldWrapper>
+      <BodyweightField
+        label={meta.label}
+        placeholder={meta.placeholder}
+        autoFocus={autoFocus}
+        register={register}
+        registerOptions={firstFieldOptions}
+        isBodyweight={isBodyweight}
+        onToggleBodyweight={onToggleBodyweight}
+      />
     )
   }
 
   return (
-    <FieldWrapper label={meta.label}>
+    <Field label={meta.label}>
       <Input
         variant="compact"
         type={meta.numeric ? 'number' : 'text'}
@@ -181,6 +112,6 @@ export function MetricFieldInput({
         autoFocus={autoFocus}
         {...register(field, firstFieldOptions)}
       />
-    </FieldWrapper>
+    </Field>
   )
 }

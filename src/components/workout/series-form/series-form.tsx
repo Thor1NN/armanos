@@ -5,9 +5,10 @@ import React, { useCallback } from 'react'
 import { X } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { METRIC_FIELDS, type MetricField } from '@/collections/exercises/types'
-import { errorBannerClass, mutedTextClass } from '@/lib/class-names'
 import { BODYWEIGHT_KEY, minKey, secKey } from '@/lib/metric-keys'
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import type { Values } from '@/types/workout'
 import { MetricFieldInput } from './metric-field-input'
@@ -77,10 +78,9 @@ export function SeriesForm({
         ))}
       </div>
 
-      <div className="flex flex-col gap-1">
-        <span className={`text-xs ${mutedTextClass}`}>{t('note')}</span>
+      <Field label={t('note')}>
         <Input className="w-full" type="text" placeholder={t('notePlaceholder')} {...register('note')} />
-      </div>
+      </Field>
 
       <div className="flex items-center gap-1.5">
         <Button size="sm" type="submit" disabled={isSubmitting}>
@@ -94,9 +94,7 @@ export function SeriesForm({
       </div>
 
       {errors[firstField]?.message && (
-        <div className={`w-full ${errorBannerClass}`} role="alert">
-          {errors[firstField]!.message as string}
-        </div>
+        <Alert className="w-full">{errors[firstField]!.message as string}</Alert>
       )}
     </form>
   )

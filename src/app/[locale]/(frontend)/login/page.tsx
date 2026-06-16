@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
-import { errorBannerClass } from '@/lib/class-names'
+import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Surface } from '@/components/ui/surface'
@@ -50,7 +50,7 @@ export default function LoginPage() {
         <h1 className="text-xl font-semibold text-ui-fg-base">{t('title')}</h1>
         <p className="mt-1 mb-6 text-sm text-ui-fg-muted">{t('subtitle')}</p>
 
-        {error && <div className={`mb-4 ${errorBannerClass}`}>{error}</div>}
+        {error && <Alert className="mb-4">{error}</Alert>}
 
         <div className="mb-4">
           <label className="mb-1.5 block text-xs text-ui-fg-muted" htmlFor="email">

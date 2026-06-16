@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Clock, X } from 'lucide-react'
 import { joinClasses, mutedTextClass } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import type { Session } from '@/types/workout'
 import { combineDateTime, formatDuration, isoToDateInput, isoToTimeInput } from '@/lib/date'
@@ -95,8 +96,7 @@ export function SessionTimesForm({
   return (
     <div className="mt-2 font-normal">
       <div className="flex flex-col gap-2.5">
-        <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
-          <span className={`text-xs ${mutedTextClass}`}>Rozpoczęto</span>
+        <Field label="Rozpoczęto" className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
           <div className="flex items-center gap-1.5">
             <Input
               type="date"
@@ -116,10 +116,9 @@ export function SessionTimesForm({
               teraz
             </Button>
           </div>
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
-          <span className={`text-xs ${mutedTextClass}`}>Zakończono</span>
+        <Field label="Zakończono" className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
           <div className="flex flex-wrap items-center gap-1.5">
             <Input
               type="time"
@@ -133,7 +132,7 @@ export function SessionTimesForm({
               </Button>
             ))}
           </div>
-        </div>
+        </Field>
 
         <div className="flex flex-wrap items-center gap-1.5">
           <Button size="sm" onClick={save} disabled={saving}>

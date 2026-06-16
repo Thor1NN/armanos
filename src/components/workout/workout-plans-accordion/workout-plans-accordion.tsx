@@ -1,14 +1,15 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import React from 'react'
 import { WorkoutTracker } from '@/components/workout/workout-tracker'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { Surface } from '@/components/ui/surface'
-import { mutedTextClass, sectionLabelClass } from '@/lib/class-names'
+import { mutedTextClass } from '@/lib/class-names'
 import type { TPlanAccordionItem } from '@/types/plan'
+import { ActiveContextBanner } from './active-context-banner'
 import { useWorkoutSelection } from './hooks/use-workout-selection'
+import { MicrocyclePicker, WorkoutPicker } from './workout-pickers'
 
 export function WorkoutPlansAccordion({
   plans,
@@ -19,7 +20,6 @@ export function WorkoutPlansAccordion({
   readOnly?: boolean
   showResults?: boolean
 }) {
-  const t = useTranslations('workout')
   const {
     resolvedSelection,
     activePlan,
@@ -59,37 +59,18 @@ export function WorkoutPlansAccordion({
                     <div className="text-sm text-ui-fg-muted">{plan.description}</div>
                   )}
 
-                  <div className="flex gap-1.5">
-                    {plan.microcycles.map((microcycle, index) => {
-                      const isActiveMicrocycle = microcycle.id === resolvedSelection.microcycleId
-                      return (
-                        <Button
-                          key={microcycle.id}
-                          size="sm"
-                          variant={isActiveMicrocycle ? 'primary' : 'secondary'}
-                          className="flex-1"
-                          onClick={() => selectMicrocycle(plan, microcycle.id)}
-                        >
-                          M{index + 1}({microcycle.workouts.length})
-                        </Button>
-                      )
-                    })}
-                  </div>
+                  <MicrocyclePicker
+                    microcycles={plan.microcycles}
+                    activeMicrocycleId={resolvedSelection.microcycleId}
+                    onSelect={(microcycleId) => selectMicrocycle(plan, microcycleId)}
+                  />
 
                   {activeMicrocycle && activeMicrocycle.workouts.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {activeMicrocycle.workouts.map((workout) => (
-                        <Button
-                          key={workout.id}
-                          size="sm"
-                          variant="secondary"
-                          active={workout.id === resolvedSelection.workoutId}
-                          onClick={() => selectWorkout(workout.id)}
-                        >
-                          {workout.title}
-                        </Button>
-                      ))}
-                    </div>
+                    <WorkoutPicker
+                      workouts={activeMicrocycle.workouts}
+                      activeWorkoutId={resolvedSelection.workoutId}
+                      onSelect={selectWorkout}
+                    />
                   )}
                 </div>
               )}
@@ -101,16 +82,11 @@ export function WorkoutPlansAccordion({
       {activePlan && activeMicrocycle && activeWorkout && (
         <div className="space-y-2.5">
           {!readOnly && (
-            <div className="rounded-lg border border-ui-border-base bg-ui-bg-subtle/60 px-4 py-2">
-              <div className={sectionLabelClass}>{t('activeContext')}</div>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ui-fg-base">
-                <span>{activePlan.title}</span>
-                <span className={mutedTextClass}>/</span>
-                <span>{activeMicrocycle.title}</span>
-                <span className={mutedTextClass}>/</span>
-                <span className="font-semibold">{activeWorkout.title}</span>
-              </div>
-            </div>
+            <ActiveContextBanner
+              planTitle={activePlan.title}
+              microcycleTitle={activeMicrocycle.title}
+              workoutTitle={activeWorkout.title}
+            />
           )}
 
           <WorkoutTracker key={activeWorkout.id} workout={activeWorkout} readOnly={readOnly} showResults={showResults} />

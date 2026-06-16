@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X } from 'lucide-react'
-import { errorBannerClass, mutedTextClass, panelClass, sectionLabelClass } from '@/lib/class-names'
+import { mutedTextClass, panelClass, sectionLabelClass } from '@/lib/class-names'
+import { Alert } from '@/components/ui/alert'
 import { ExerciseCard } from '@/components/workout/exercise-card'
 import { SessionTimesBadge, SessionTimesForm } from '@/components/workout/session-times'
 import type { TWorkout } from '@/types/workout'
@@ -48,12 +48,9 @@ export function WorkoutTracker({
       )}
 
       {error && (
-        <div className={`mt-2 ${errorBannerClass}`} role="alert">
+        <Alert className="mt-2" onDismiss={clearError}>
           {error}
-          <button className="ml-3 inline-flex align-middle opacity-70 hover:opacity-100" onClick={clearError} aria-label="Zamknij">
-            <X size={13} strokeWidth={2.5} />
-          </button>
-        </div>
+        </Alert>
       )}
 
       {hasLoaded && !session && (
