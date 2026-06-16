@@ -8,8 +8,8 @@ import { minKey, secKey, unitKey } from '@/lib/metric-keys'
 import { Field } from '@/components/ui/field'
 import { Input, Select } from '@/components/ui/input'
 import type { Values } from '@/types/workout'
-import { BodyweightField } from './bodyweight-field'
-import { DurationInput } from './duration-input'
+import { BodyweightField } from '../bodyweight-field'
+import { DurationInput } from '../duration-input'
 
 export function MetricFieldInput({
   field,

@@ -73,7 +73,7 @@ export function WorkoutTracker({
               {group.exercises.map((exercise) => (
                 <ExerciseCard
                   key={exercise.rowId}
-                  ex={exercise}
+                  exercise={exercise}
                   sets={setsForRow(exercise.rowId)}
                   onAdd={addSet}
                   onUpdate={updateSet}

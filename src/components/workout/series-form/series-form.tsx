@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import type { Values } from '@/types/workout'
-import { MetricFieldInput } from './metric-field-input'
+import { MetricFieldInput } from './components/metric-field-input'
 
 export function SeriesForm({
   fields,

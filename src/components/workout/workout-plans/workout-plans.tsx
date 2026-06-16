@@ -7,9 +7,9 @@ import { StatusBadge } from '@/components/ui/status-badge'
 import { Surface } from '@/components/ui/surface'
 import { mutedTextClass } from '@/lib/class-names'
 import type { TPlanAccordionItem } from '@/types/plan'
-import { ActiveContextBanner } from './active-context-banner'
+import { ActiveContextBanner } from './components/active-context-banner'
+import { MicrocyclePicker, WorkoutPicker } from './components/workout-pickers'
 import { useWorkoutSelection } from './hooks/use-workout-selection'
-import { MicrocyclePicker, WorkoutPicker } from './workout-pickers'
 
 export function WorkoutPlans({
   plans,
