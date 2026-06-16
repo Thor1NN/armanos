@@ -52,6 +52,9 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
+    // Never auto-sync schema from models. Schema changes go through migrations only
+    // (migrate:create + migrate), so `yarn dev` can never push to a remote/prod DB.
+    push: false,
     pool: {
       connectionString: process.env.DATABASE_URL || '',
       max: 10,
