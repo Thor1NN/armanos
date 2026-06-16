@@ -1,6 +1,8 @@
 import { METRIC_FIELDS, type MetricField } from '@/collections/exercises/types'
+import { PROTOCOL_LABEL } from '@/types/constants'
 import type { SetLog, Values } from '@/types/workout'
-import { fmtMinSec, fmtSec } from './date'
+import { formatMinSec, formatSec } from './date'
+import { BODYWEIGHT_KEY, minKey, secKey, unitKey } from './metric-keys'
 
 type ExerciseMetaLabels = {
   seriesPrefix: string
@@ -9,8 +11,17 @@ type ExerciseMetaLabels = {
   restPrefix: string
 }
 
-export const isValidValue = (v?: string | null): boolean =>
-  Boolean(v && v.trim() !== '' && v.trim().toLowerCase() !== 'x')
+type UnitMeta = { options: { value: string; factor: number }[]; default: string }
+
+/** Returns the conversion factor for a unit, defaulting to 1 when not found. */
+const unitFactor = (units: UnitMeta, unit: string): number =>
+  units.options.find((option) => option.value === unit)?.factor ?? 1
+
+/** A value counts as filled when it is non-empty and not the 'x' placeholder used for "no value". */
+export const isValidValue = (value?: string | null): boolean => {
+  const trimmed = value?.trim() ?? ''
+  return trimmed !== '' && trimmed.toLowerCase() !== 'x'
+}
 
 export const buildExerciseMeta = (
   ex: {
@@ -28,7 +39,7 @@ export const buildExerciseMeta = (
   const parts: string[] = []
   if (isValidValue(ex.rounds)) parts.push(`${labels.seriesPrefix}: ${ex.rounds}`)
   if (isValidValue(ex.reps)) parts.push(`${labels.repsPrefix}: ${ex.reps}`)
-  const dur = fmtMinSec(ex.durationMin, ex.durationSec)
+  const dur = formatMinSec(ex.durationMin, ex.durationSec)
   if (dur) parts.push(`${labels.durationPrefix}: ${dur}`)
   if (isValidValue(ex.rest)) parts.push(`${labels.restPrefix}: ${ex.rest}`)
   if (isValidValue(ex.tut)) parts.push(`TUT: ${ex.tut}`)
@@ -37,95 +48,96 @@ export const buildExerciseMeta = (
   return parts
 }
 
-export const metricBody = (fields: MetricField[], v: Values): Record<string, unknown> => {
+export const metricBody = (fields: MetricField[], values: Values): Record<string, unknown> => {
   const body: Record<string, unknown> = {}
+  const isBodyweight = values[BODYWEIGHT_KEY] === 'true'
 
-  for (const f of fields) {
-    const meta = METRIC_FIELDS[f]
+  for (const field of fields) {
+    const meta = METRIC_FIELDS[field]
     if (meta.composite === 'duration') {
-      const mins = (v[`${f}__min`] ?? '').trim()
-      const secs = (v[`${f}__sec`] ?? '').trim()
-      body[f] = mins === '' && secs === '' ? null : (Number(mins) || 0) * 60 + (Number(secs) || 0)
+      const mins = (values[minKey(field)] ?? '').trim()
+      const secs = (values[secKey(field)] ?? '').trim()
+      body[field] = mins === '' && secs === '' ? null : (Number(mins) || 0) * 60 + (Number(secs) || 0)
       continue
     }
 
-    if (f === 'weight' && v['weight__bodyweight'] === 'true') {
+    if (field === 'weight' && isBodyweight) {
       body.weight = null
       continue
     }
 
-    const raw = (v[f] ?? '').trim()
+    const raw = (values[field] ?? '').trim()
     if (raw === '') {
-      body[f] = null
+      body[field] = null
     } else if (meta.units) {
-      const unit = v[`${f}__unit`] || meta.units.default
-      const factor = meta.units.options.find((o) => o.value === unit)?.factor ?? 1
-      body[f] = Number(raw) * factor
+      const unit = values[unitKey(field)] || meta.units.default
+      body[field] = Number(raw) * unitFactor(meta.units, unit)
     } else {
-      body[f] = meta.numeric ? Number(raw) : raw
+      body[field] = meta.numeric ? Number(raw) : raw
     }
   }
 
-  body.isBodyweight = v['weight__bodyweight'] === 'true'
-  body.note = v.note?.trim() || null
+  body.isBodyweight = isBodyweight
+  body.note = values.note?.trim() || null
   return body
 }
 
-export const toDefaultUnit = (f: MetricField, base: number): { value: string; unit: string } => {
-  const meta = METRIC_FIELDS[f]
+export const toDefaultUnit = (field: MetricField, base: number): { value: string; unit: string } => {
+  const meta = METRIC_FIELDS[field]
   if (!meta.units) return { value: String(base), unit: '' }
   const unit = meta.units.default
-  const factor = meta.units.options.find((o) => o.value === unit)?.factor ?? 1
-  return { value: String(base / factor), unit }
+  return { value: String(base / unitFactor(meta.units, unit)), unit }
 }
 
-export const setSummary = (s: SetLog): string => {
+export const setSummary = (set: SetLog): string => {
   const parts: string[] = []
-  if (s.isBodyweight) parts.push('MC')
-  else if (s.weight != null) parts.push(`${s.weight} kg`)
-  if (s.distanceM != null) parts.push(`${s.distanceM} m`)
-  if (s.durationSec != null) parts.push(fmtSec(s.durationSec))
-  if (s.reps) parts.push(`× ${s.reps}`)
-  if (s.rir) parts.push(`RIR ${s.rir}`)
-  if (s.note) parts.push(s.note)
+  if (set.isBodyweight) parts.push('MC')
+  else if (set.weight != null) parts.push(`${set.weight} kg`)
+  if (set.distanceM != null) parts.push(`${set.distanceM} m`)
+  if (set.durationSec != null) parts.push(formatSec(set.durationSec))
+  // reps is free text - empty string means "not filled", so only render a truthy value
+  if (set.reps) parts.push(`× ${set.reps}`)
+  if (set.rir) parts.push(`RIR ${set.rir}`)
+  if (set.note) parts.push(set.note)
   return parts.length ? parts.join(' · ') : '—'
 }
 
-export const workoutGroupLabel = (g: {
+export const workoutGroupLabel = (group: {
   label?: unknown
   protocol?: unknown
   rounds?: unknown
   durationMinutes?: unknown
 }): string => {
-  if (g.label) return g.label as string
-  const protocol = g.protocol as string
-  const rounds = g.rounds as string | null | undefined
-  const durationMinutes = g.durationMinutes as number | null | undefined
-  if (protocol === 'emom') return rounds ? `EMOM · ${rounds} min` : 'EMOM'
-  if (protocol === 'amrap') return durationMinutes ? `AMRAP · ${durationMinutes} min` : 'AMRAP'
-  if (protocol === 'for_time') return rounds ? `For Time · ${rounds} rund` : 'For Time'
-  if (protocol === 'tabata') return 'Tabata'
+  if (group.label) return group.label as string
+  const protocol = group.protocol as string
+  const rounds = group.rounds as string | null | undefined
+  const durationMinutes = group.durationMinutes as number | null | undefined
+  if (protocol === 'emom') return rounds ? `${PROTOCOL_LABEL.emom} · ${rounds} min` : PROTOCOL_LABEL.emom
+  if (protocol === 'amrap')
+    return durationMinutes ? `${PROTOCOL_LABEL.amrap} · ${durationMinutes} min` : PROTOCOL_LABEL.amrap
+  if (protocol === 'for_time') return rounds ? `${PROTOCOL_LABEL.for_time} · ${rounds} rund` : PROTOCOL_LABEL.for_time
+  if (protocol === 'tabata') return PROTOCOL_LABEL.tabata
   return rounds ? `${rounds} serie` : ''
 }
 
 export const setLogToFormValues = (set: SetLog, fields: MetricField[]): Values => {
   const initial: Values = { note: set.note ?? '' }
-  if (set.isBodyweight) initial['weight__bodyweight'] = 'true'
+  if (set.isBodyweight) initial[BODYWEIGHT_KEY] = 'true'
 
-  for (const f of fields) {
-    const v = (set as Record<string, unknown>)[f]
-    if (v == null) {
-      initial[f] = ''
-    } else if (METRIC_FIELDS[f].composite === 'duration') {
-      const base = Number(v)
-      initial[`${f}__min`] = String(Math.floor(base / 60))
-      initial[`${f}__sec`] = String(base % 60)
-    } else if (METRIC_FIELDS[f].units) {
-      const conv = toDefaultUnit(f, Number(v))
-      initial[f] = conv.value
-      initial[`${f}__unit`] = conv.unit
+  for (const field of fields) {
+    const raw = (set as Record<string, unknown>)[field]
+    if (raw == null) {
+      initial[field] = ''
+    } else if (METRIC_FIELDS[field].composite === 'duration') {
+      const base = Number(raw)
+      initial[minKey(field)] = String(Math.floor(base / 60))
+      initial[secKey(field)] = String(base % 60)
+    } else if (METRIC_FIELDS[field].units) {
+      const conv = toDefaultUnit(field, Number(raw))
+      initial[field] = conv.value
+      initial[unitKey(field)] = conv.unit
     } else {
-      initial[f] = String(v)
+      initial[field] = String(raw)
     }
   }
   return initial

@@ -1,103 +1,34 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import React, { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import React from 'react'
 import { WorkoutTracker } from '@/components/workout/workout-tracker'
 import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { Surface } from '@/components/ui/surface'
 import { mutedTextClass, sectionLabelClass } from '@/lib/class-names'
-import { STORAGE_KEY, SSR_SNAPSHOT } from '@/types/constants'
 import type { TPlanAccordionItem } from '@/types/plan'
+import { useWorkoutSelection } from './hooks/use-workout-selection'
 
-type Selection = {
-  planId: number | string | null
-  microcycleId: number | string | null
-  workoutId: number | string | null
-}
-
-const subscribeToSelection = (onStoreChange: () => void) => {
-  window.addEventListener('storage', onStoreChange)
-  return () => window.removeEventListener('storage', onStoreChange)
-}
-
-const firstAvailableSelection = (plans: TPlanAccordionItem[]) => {
-  const plan = plans[0]
-  const microcycle = plan?.microcycles[0]
-  const workout = microcycle?.workouts[0]
-
-  return {
-    microcycleId: microcycle?.id ?? null,
-    planId: plan?.id ?? null,
-    workoutId: workout?.id ?? null,
-  }
-}
-
-const isValidSelection = (plans: TPlanAccordionItem[], selection: Selection) => {
-  const plan = plans.find((item) => item.id === selection.planId)
-  if (!plan) return false
-
-  const microcycle = plan.microcycles.find((item) => item.id === selection.microcycleId)
-  if (!microcycle) return false
-
-  return microcycle.workouts.some((item) => item.id === selection.workoutId)
-}
-
-export function WorkoutPlansAccordion({ plans, readOnly }: { plans: TPlanAccordionItem[]; readOnly?: boolean }) {
+export function WorkoutPlansAccordion({
+  plans,
+  readOnly,
+  showResults,
+}: {
+  plans: TPlanAccordionItem[]
+  readOnly?: boolean
+  showResults?: boolean
+}) {
   const t = useTranslations('workout')
-  const initialSelection = useMemo(() => firstAvailableSelection(plans), [plans])
-  const [selection, setSelection] = useState<Selection | null>(null)
-  const storedSelectionRaw = useSyncExternalStore(
-    subscribeToSelection,
-    () => readOnly ? SSR_SNAPSHOT : window.localStorage.getItem(STORAGE_KEY),
-    () => SSR_SNAPSHOT,
-  )
-  const storedSelection = useMemo(() => {
-    if (storedSelectionRaw === SSR_SNAPSHOT || !storedSelectionRaw) return initialSelection
-
-    try {
-      return JSON.parse(storedSelectionRaw) as Selection
-    } catch {
-      window.localStorage.removeItem(STORAGE_KEY)
-      return initialSelection
-    }
-  }, [initialSelection, storedSelectionRaw])
-
-  const preferredSelection = selection ?? storedSelection
-  const resolvedSelection = isValidSelection(plans, preferredSelection) ? preferredSelection : initialSelection
-
-  useEffect(() => {
-    if (readOnly) return
-    if (storedSelectionRaw === SSR_SNAPSHOT) return
-    if (!isValidSelection(plans, resolvedSelection)) return
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(resolvedSelection))
-  }, [plans, readOnly, resolvedSelection, storedSelectionRaw])
-
-  const selectPlan = (plan: TPlanAccordionItem) => {
-    const nextMicrocycle = plan.microcycles[0] ?? null
-    const nextWorkout = nextMicrocycle?.workouts[0] ?? null
-    setSelection({
-      planId: plan.id,
-      microcycleId: nextMicrocycle?.id ?? null,
-      workoutId: nextWorkout?.id ?? null,
-    })
-  }
-
-  const selectMicrocycle = (plan: TPlanAccordionItem, microcycleId: number | string) => {
-    const microcycle = plan.microcycles.find((item) => item.id === microcycleId) ?? null
-    const nextWorkout = microcycle?.workouts[0] ?? null
-    setSelection({
-      planId: plan.id,
-      microcycleId,
-      workoutId: nextWorkout?.id ?? null,
-    })
-  }
-
-  const activePlan = plans.find((plan) => plan.id === resolvedSelection.planId) ?? null
-  const activeMicrocycle =
-    activePlan?.microcycles.find((microcycle) => microcycle.id === resolvedSelection.microcycleId) ?? null
-  const activeWorkout =
-    activeMicrocycle?.workouts.find((workout) => workout.id === resolvedSelection.workoutId) ?? null
+  const {
+    resolvedSelection,
+    activePlan,
+    activeMicrocycle,
+    activeWorkout,
+    selectPlan,
+    selectMicrocycle,
+    selectWorkout,
+  } = useWorkoutSelection(plans, { readOnly })
 
   return (
     <div className="space-y-2.5">
@@ -129,7 +60,7 @@ export function WorkoutPlansAccordion({ plans, readOnly }: { plans: TPlanAccordi
                   )}
 
                   <div className="flex gap-1.5">
-                    {plan.microcycles.map((microcycle, idx) => {
+                    {plan.microcycles.map((microcycle, index) => {
                       const isActiveMicrocycle = microcycle.id === resolvedSelection.microcycleId
                       return (
                         <Button
@@ -139,7 +70,7 @@ export function WorkoutPlansAccordion({ plans, readOnly }: { plans: TPlanAccordi
                           className="flex-1"
                           onClick={() => selectMicrocycle(plan, microcycle.id)}
                         >
-                          M{idx + 1}({microcycle.workouts.length})
+                          M{index + 1}({microcycle.workouts.length})
                         </Button>
                       )
                     })}
@@ -153,7 +84,7 @@ export function WorkoutPlansAccordion({ plans, readOnly }: { plans: TPlanAccordi
                           size="sm"
                           variant="secondary"
                           active={workout.id === resolvedSelection.workoutId}
-                          onClick={() => setSelection({ ...resolvedSelection, workoutId: workout.id })}
+                          onClick={() => selectWorkout(workout.id)}
                         >
                           {workout.title}
                         </Button>
@@ -182,7 +113,7 @@ export function WorkoutPlansAccordion({ plans, readOnly }: { plans: TPlanAccordi
             </div>
           )}
 
-          <WorkoutTracker key={activeWorkout.id} workout={activeWorkout} readOnly={readOnly} />
+          <WorkoutTracker key={activeWorkout.id} workout={activeWorkout} readOnly={readOnly} showResults={showResults} />
         </div>
       )}
     </div>

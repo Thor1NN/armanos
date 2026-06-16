@@ -56,13 +56,13 @@ export function ExerciseCard({
 
       {sets.length > 0 && (
         <ul className="mt-2 mb-1 list-none p-0">
-          {sets.map((s) => (
+          {sets.map((set) => (
             <SeriesRow
-              key={s.id}
-              set={s}
+              key={set.id}
+              set={set}
               fields={fields}
-              onUpdate={async (values) => { await onUpdate?.(s.id, fields, values) }}
-              onDelete={async () => { await onDelete?.(s.id) }}
+              onUpdate={async (values) => { await onUpdate?.(set.id, fields, values) }}
+              onDelete={async () => { await onDelete?.(set.id) }}
               readOnly={readOnly}
             />
           ))}
@@ -73,8 +73,8 @@ export function ExerciseCard({
         <SeriesForm
           fields={fields}
           initial={{ reps: ex.prefill.reps ?? '', rir: ex.prefill.rir ?? '', note: '' }}
-          onSubmit={async (v) => {
-            await onAdd?.(ex, fields, v)
+          onSubmit={async (values) => {
+            await onAdd?.(ex, fields, values)
             setOpen(false)
           }}
           onCancel={() => setOpen(false)}

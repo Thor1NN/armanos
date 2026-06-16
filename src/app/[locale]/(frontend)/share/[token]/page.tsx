@@ -34,7 +34,13 @@ export default async function SharePage({
         </span>
       </div>
 
-      {data.plan && <WorkoutPlansAccordion plans={data.plan} readOnly={true} />}
+      {data.plan && (
+        <WorkoutPlansAccordion
+          plans={data.plan}
+          readOnly={true}
+          showResults={data.meta.permissions.includes('results')}
+        />
+      )}
     </div>
   )
 }

@@ -30,8 +30,8 @@ export function SeriesRow({
         <SeriesForm
           fields={fields}
           initial={setLogToFormValues(set, fields)}
-          onSubmit={async (v) => {
-            await onUpdate(v)
+          onSubmit={async (values) => {
+            await onUpdate(values)
             setEditing(false)
           }}
           onCancel={() => setEditing(false)}
