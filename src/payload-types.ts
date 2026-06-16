@@ -80,6 +80,7 @@ export interface Config {
     'round-logs': RoundLog;
     'set-logs': SetLog;
     exercises: Exercise;
+    'share-links': ShareLink;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -103,6 +104,7 @@ export interface Config {
     'round-logs': RoundLogsSelect<false> | RoundLogsSelect<true>;
     'set-logs': SetLogsSelect<false> | SetLogsSelect<true>;
     exercises: ExercisesSelect<false> | ExercisesSelect<true>;
+    'share-links': ShareLinksSelect<false> | ShareLinksSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -475,6 +477,30 @@ export interface SetLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "share-links".
+ */
+export interface ShareLink {
+  id: number;
+  /**
+   * Optional name to identify this link
+   */
+  label?: string | null;
+  plan: number | Plan;
+  /**
+   * Auto-generated on first save
+   */
+  token?: string | null;
+  permissions: ('plan' | 'results')[];
+  /**
+   * Link stops working after this date
+   */
+  expiresAt: string;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -544,6 +570,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'exercises';
         value: number | Exercise;
+      } | null)
+    | ({
+        relationTo: 'share-links';
+        value: number | ShareLink;
       } | null);
   globalSlug?: string | null;
   user:
@@ -829,6 +859,20 @@ export interface ExercisesSelect<T extends boolean = true> {
   videoUrl?: T;
   muscleGroup?: T;
   equipment?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "share-links_select".
+ */
+export interface ShareLinksSelect<T extends boolean = true> {
+  label?: T;
+  plan?: T;
+  token?: T;
+  permissions?: T;
+  expiresAt?: T;
+  active?: T;
   updatedAt?: T;
   createdAt?: T;
 }

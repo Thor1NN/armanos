@@ -1,31 +1,36 @@
 # Final Compliance Review
 
-Run this after the spec checklist passes. Validates the spec against the hard rules in `AGENTS.md`.
+Run this after the spec checklist passes. Load the tech-specific compliance file for the project's stack, then fill in the matrix.
 
 ---
 
-## Compliance Matrix
+## Which file to load
 
-| Rule | Source | Status | Notes |
-|------|--------|--------|-------|
-| Module name is camelCase | AGENTS.md | ✅ / ❌ / N/A | |
-| No PUT/PATCH methods | AGENTS.md | ✅ / ❌ / N/A | |
-| All mutations through workflow | AGENTS.md | ✅ / ❌ / N/A | |
-| No module service called from route | AGENTS.md | ✅ / ❌ / N/A | |
-| Prices not multiplied/divided by 100 | AGENTS.md | ✅ / ❌ / N/A | |
-| Static imports only | AGENTS.md | ✅ / ❌ / N/A | |
-| `transform()` used for data manipulation in workflows | AGENTS.md | ✅ / ❌ / N/A | |
-| `external_id` for idempotency | AGENTS.md | ✅ / ❌ / N/A | |
-| Zod validation on all API inputs | AGENTS.md | ✅ / ❌ / N/A | |
-| Built-in Medusa workflows preferred over custom | Medusa docs | ✅ / ❌ / N/A | |
-| `query.graph()` for cross-module reads | AGENTS.md | ✅ / ❌ / N/A | |
-| `query.index()` for cross-module filtering | AGENTS.md | ✅ / ❌ / N/A | |
+| Stack | File |
+|-------|------|
+| Medusa.js | [compliance-review-medusa.md](compliance-review-medusa.md) |
+| Payload CMS / Next.js | [compliance-review-payload.md](compliance-review-payload.md) |
+
+If the project uses a stack not listed above, create a new `compliance-review-[stack].md` in this directory and add it to the table.
+
+---
+
+## Universal checks (all stacks)
+
+These apply regardless of technology:
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| No auth-sensitive values accepted from HTTP request params | ✅ / ❌ / N/A | |
+| All user-facing strings go through i18n, never hardcoded | ✅ / ❌ / N/A | |
+| `yarn build` (or equivalent) verified after each phase | ✅ / ❌ / N/A | |
+| Open Questions section removed or all items resolved | ✅ / ❌ / N/A | |
 
 ---
 
 ## Verdict
 
-- **APPROVED** — All rules pass or are explicitly N/A with justification.
+- **APPROVED** — All rules (universal + stack-specific) pass or are explicitly N/A with justification.
 - **CHANGES REQUIRED** — List violations below.
 
 ### Violations (if any)

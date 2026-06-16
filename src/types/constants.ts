@@ -4,7 +4,9 @@ export const STATUS_LABEL: Record<string, string> = {
   completed: 'Zakończony',
 }
 
-export const PROTOCOL_LABEL: Record<string, string> = {
+export type Protocol = 'emom' | 'amrap' | 'for_time' | 'tabata'
+
+export const PROTOCOL_LABEL: Record<Protocol, string> = {
   emom: 'EMOM',
   amrap: 'AMRAP',
   for_time: 'For Time',

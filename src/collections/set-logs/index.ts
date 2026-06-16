@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { adminOrOwnByClient } from '../../access'
+import { adminOrOwnByClient, canReadViaShareToken } from '../../access'
 import { trackingFields, ALL_METRIC_FIELDS } from '../exercises/types'
 
 export const SetLogs: CollectionConfig = {
@@ -11,7 +11,11 @@ export const SetLogs: CollectionConfig = {
   },
   access: {
     create: ({ req: { user } }) => Boolean(user),
-    read: adminOrOwnByClient,
+    read: async (ctx) => {
+      const own = adminOrOwnByClient(ctx)
+      if (own !== false) return own
+      return canReadViaShareToken(ctx)
+    },
     update: adminOrOwnByClient,
     delete: adminOrOwnByClient,
   },

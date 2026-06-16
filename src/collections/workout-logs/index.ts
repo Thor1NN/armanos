@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { adminOrOwnByClient } from '../../access'
+import { adminOrOwnByClient, canReadViaShareToken } from '../../access'
 
 export const WorkoutLogs: CollectionConfig = {
   slug: 'workout-logs',
@@ -10,7 +10,11 @@ export const WorkoutLogs: CollectionConfig = {
   },
   access: {
     create: ({ req: { user } }) => Boolean(user),
-    read: adminOrOwnByClient,
+    read: async (ctx) => {
+      const own = adminOrOwnByClient(ctx)
+      if (own !== false) return own
+      return canReadViaShareToken(ctx)
+    },
     update: adminOrOwnByClient,
     delete: adminOrOwnByClient,
   },

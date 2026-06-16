@@ -98,7 +98,9 @@ See references/spec-checklist.md
 ## Reference Materials
 
 - [Spec Checklist](references/spec-checklist.md)
-- [Compliance Review](references/compliance-review.md)
+- [Compliance Review — dispatcher](references/compliance-review.md) — load first, then load the stack-specific file below
+- [Compliance Review — Medusa.js](references/compliance-review-medusa.md) — for Medusa.js projects
+- [Compliance Review — Payload CMS](references/compliance-review-payload.md) — for Payload CMS / Next.js projects
 - [Specification Template](references/spec-template.md)
 - [Root AGENTS.md](../../../AGENTS.md)
 - [Medusa Magento Example](https://docs.medusajs.com/resources/integrations/guides/magento)

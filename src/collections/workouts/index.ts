@@ -1,5 +1,7 @@
 import { APIError, type CollectionConfig } from 'payload'
 
+import { isAdmin, isAuthenticated } from '../../access'
+
 const hasWorkoutLogs = async (
   req: {
     payload: {
@@ -23,6 +25,12 @@ const hasWorkoutLogs = async (
 
 export const Workouts: CollectionConfig = {
   slug: 'workouts',
+  access: {
+    create: isAdmin,
+    read: isAuthenticated,
+    update: isAdmin,
+    delete: isAdmin,
+  },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'rpe', 'order', 'microcycle'],

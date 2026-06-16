@@ -1,4 +1,4 @@
-import type { Access, FieldAccess } from 'payload'
+import type { Access, FieldAccess, Where } from 'payload'
 
 /** Whether the logged-in user is a staff member/admin (collection `users`). */
 export const isAdmin: Access = ({ req: { user } }) => user?.collection === 'users'
@@ -31,3 +31,48 @@ export const adminOrOwnByClient: Access = ({ req: { user } }) => {
 
 /** @deprecated alias kept for readability in workout-logs */
 export const adminOrOwnLogs = adminOrOwnByClient
+
+/**
+ * Allows read access when the request carries a valid `share-token` cookie
+ * pointing to a share-link that has the `'results'` permission.
+ * Returns a `{ client: { equals: clientId } }` constraint so Payload scopes
+ * the results to the plan owner's logs only.
+ */
+export const canReadViaShareToken = async ({
+  req,
+}: Parameters<Access>[0]): Promise<boolean | Where> => {
+  const cookieHeader = req.headers.get('cookie') ?? ''
+  const token = cookieHeader
+    .split(';')
+    .map((c) => c.trim().split('='))
+    .find(([k]) => k === 'share-token')?.[1]
+  if (!token) return false
+
+  const result = await req.payload.find({
+    collection: 'share-links',
+    where: {
+      token: { equals: token },
+      active: { equals: true },
+      expiresAt: { greater_than: new Date().toISOString() },
+    },
+    depth: 2,
+    limit: 1,
+    overrideAccess: true,
+  })
+
+  const link = result.docs[0]
+  if (!link) return false
+
+  const permissions = (link.permissions ?? []) as string[]
+  if (!permissions.includes('results')) return false
+
+  const plan = typeof link.plan === 'object' ? link.plan : null
+  const rawClient = plan?.client
+  const clientId =
+    rawClient && typeof rawClient === 'object'
+      ? (rawClient as { id: number | string }).id
+      : (rawClient as number | string | undefined)
+
+  if (!clientId) return false
+  return { client: { equals: clientId } }
+}

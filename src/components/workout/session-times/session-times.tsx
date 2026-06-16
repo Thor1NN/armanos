@@ -1,11 +1,13 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Clock, X } from 'lucide-react'
 import { joinClasses, mutedTextClass } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import type { Session } from '@/types/workout'
-import { combineDateTime, fmtDuration, isoToDateInput, isoToTimeInput } from '@/lib/date'
+import { combineDateTime, formatDuration, isoToDateInput, isoToTimeInput } from '@/lib/date'
 
 export function SessionTimesBadge({
   session,
@@ -18,7 +20,7 @@ export function SessionTimesBadge({
 }) {
   const startIso = session?.startedAt ?? null
   const finishIso = session?.finishedAt ?? null
-  const duration = fmtDuration(startIso, finishIso)
+  const duration = formatDuration(startIso, finishIso)
   const dateLabel = startIso ? isoToDateInput(startIso).slice(5).replace('-', '.') : null
 
   const iconClass = open ? 'text-white' : mutedTextClass
@@ -33,18 +35,14 @@ export function SessionTimesBadge({
       onClick={onOpen}
     >
       {open ? (
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={iconClass}>
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
+        <X size={14} strokeWidth={2.5} className={iconClass} />
       ) : dateLabel || duration ? (
         <span className="flex items-center gap-1.5 whitespace-nowrap">
           {dateLabel && <span>{dateLabel}</span>}
           {duration && <span className="font-bold text-ui-fg-interactive">{duration}</span>}
         </span>
       ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={iconClass}>
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
+        <Clock size={15} className={iconClass} />
       )}
     </Button>
   )
@@ -65,44 +63,30 @@ export function SessionTimesForm({
   const finishIso = session?.finishedAt ?? null
 
   const [saving, setSaving] = useState(false)
-  const [sd, setSd] = useState(() => isoToDateInput(startIso))
-  const [st, setSt] = useState(() => isoToTimeInput(startIso))
-  const [ed, setEd] = useState(() => isoToDateInput(finishIso))
-  const [et, setEt] = useState(() => isoToTimeInput(finishIso))
-
-  const [prevStart, setPrevStart] = useState(startIso)
-  if (startIso !== prevStart) {
-    setPrevStart(startIso)
-    setSd(isoToDateInput(startIso))
-    setSt(isoToTimeInput(startIso))
-  }
-
-  const [prevFinish, setPrevFinish] = useState(finishIso)
-  if (finishIso !== prevFinish) {
-    setPrevFinish(finishIso)
-    setEd(isoToDateInput(finishIso))
-    setEt(isoToTimeInput(finishIso))
-  }
+  const [startDate, setStartDate] = useState(() => isoToDateInput(startIso))
+  const [startTime, setStartTime] = useState(() => isoToTimeInput(startIso))
+  const [endDate, setEndDate] = useState(() => isoToDateInput(finishIso))
+  const [endTime, setEndTime] = useState(() => isoToTimeInput(finishIso))
 
   const setStartNow = () => {
     const iso = new Date().toISOString()
-    setSd(isoToDateInput(iso))
-    setSt(isoToTimeInput(iso))
+    setStartDate(isoToDateInput(iso))
+    setStartTime(isoToTimeInput(iso))
     onSet('startedAt', iso)
   }
 
   const addToStart = (hours: number) => {
-    const base = combineDateTime(sd, st) ?? new Date().toISOString()
+    const base = combineDateTime(startDate, startTime) ?? new Date().toISOString()
     const iso = new Date(new Date(base).getTime() + hours * 3600 * 1000).toISOString()
-    setEd(sd || isoToDateInput(iso))
-    setEt(isoToTimeInput(iso))
-    onSet('finishedAt', combineDateTime(sd || isoToDateInput(iso), isoToTimeInput(iso)))
+    setEndDate(startDate || isoToDateInput(iso))
+    setEndTime(isoToTimeInput(iso))
+    onSet('finishedAt', combineDateTime(startDate || isoToDateInput(iso), isoToTimeInput(iso)))
   }
 
   const save = async () => {
     setSaving(true)
     try {
-      await onSave(combineDateTime(sd, st), combineDateTime(ed || sd, et))
+      await onSave(combineDateTime(startDate, startTime), combineDateTime(endDate || startDate, endTime))
       onClose()
     } finally {
       setSaving(false)
@@ -112,45 +96,43 @@ export function SessionTimesForm({
   return (
     <div className="mt-2 font-normal">
       <div className="flex flex-col gap-2.5">
-        <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
-          <span className={`text-xs ${mutedTextClass}`}>Rozpoczęto</span>
+        <Field label="Rozpoczęto" className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
           <div className="flex items-center gap-1.5">
             <Input
               type="date"
               className="w-31.5 [&::-webkit-calendar-picker-indicator]:hidden"
-              value={sd}
-              onChange={(e) => setSd(e.target.value)}
-              onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
+              value={startDate}
+              onChange={(event) => setStartDate(event.target.value)}
+              onBlur={() => onSet('startedAt', combineDateTime(startDate, startTime))}
             />
             <Input
               type="time"
               className="w-22 [&::-webkit-calendar-picker-indicator]:hidden"
-              value={st}
-              onChange={(e) => setSt(e.target.value)}
-              onBlur={() => onSet('startedAt', combineDateTime(sd, st))}
+              value={startTime}
+              onChange={(event) => setStartTime(event.target.value)}
+              onBlur={() => onSet('startedAt', combineDateTime(startDate, startTime))}
             />
             <Button variant="secondary" onClick={setStartNow}>
               teraz
             </Button>
           </div>
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
-          <span className={`text-xs ${mutedTextClass}`}>Zakończono</span>
+        <Field label="Zakończono" className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
           <div className="flex flex-wrap items-center gap-1.5">
             <Input
               type="time"
-              value={et}
-              onChange={(e) => setEt(e.target.value)}
-              onBlur={() => onSet('finishedAt', combineDateTime(ed || sd, et))}
+              value={endTime}
+              onChange={(event) => setEndTime(event.target.value)}
+              onBlur={() => onSet('finishedAt', combineDateTime(endDate || startDate, endTime))}
             />
-            {([1, 1.5, 2] as const).map((h) => (
-              <Button key={h} variant="secondary" onClick={() => addToStart(h)}>
-                +{h}h
+            {([1, 1.5, 2] as const).map((hours) => (
+              <Button key={hours} variant="secondary" onClick={() => addToStart(hours)}>
+                +{hours}h
               </Button>
             ))}
           </div>
-        </div>
+        </Field>
 
         <div className="flex flex-wrap items-center gap-1.5">
           <Button size="sm" onClick={save} disabled={saving}>

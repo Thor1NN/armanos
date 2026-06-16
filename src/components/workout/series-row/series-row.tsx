@@ -14,11 +14,13 @@ export function SeriesRow({
   fields,
   onUpdate,
   onDelete,
+  readOnly,
 }: {
   set: SetLog
   fields: MetricField[]
   onUpdate: (values: Values) => Promise<void>
   onDelete: () => Promise<void>
+  readOnly?: boolean
 }) {
   const [editing, setEditing] = useState(false)
 
@@ -28,8 +30,8 @@ export function SeriesRow({
         <SeriesForm
           fields={fields}
           initial={setLogToFormValues(set, fields)}
-          onSubmit={async (v) => {
-            await onUpdate(v)
+          onSubmit={async (values) => {
+            await onUpdate(values)
             setEditing(false)
           }}
           onCancel={() => setEditing(false)}
@@ -43,14 +45,16 @@ export function SeriesRow({
       <span>
         Seria {set.setNumber}: {setSummary(set)}
       </span>
-      <span className="flex shrink-0 gap-0.5">
-        <Button variant="icon" onClick={() => setEditing(true)} aria-label="Edytuj">
-          <Pencil size={14} />
-        </Button>
-        <Button variant="danger" onClick={onDelete} aria-label="Usuń">
-          <Trash2 size={14} />
-        </Button>
-      </span>
+      {!readOnly && (
+        <span className="flex shrink-0 gap-0.5">
+          <Button variant="icon" onClick={() => setEditing(true)} aria-label="Edytuj">
+            <Pencil size={14} />
+          </Button>
+          <Button variant="danger" onClick={onDelete} aria-label="Usuń">
+            <Trash2 size={14} />
+          </Button>
+        </span>
+      )}
     </li>
   )
 }
