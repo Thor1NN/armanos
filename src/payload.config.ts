@@ -18,6 +18,7 @@ import {
   RoundLogs,
   SetLogs,
   Exercises,
+  ShareLinks,
 } from './collections'
 
 const filename = fileURLToPath(import.meta.url)
@@ -43,6 +44,7 @@ export default buildConfig({
     RoundLogs,
     SetLogs,
     Exercises,
+    ShareLinks,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
