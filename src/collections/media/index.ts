@@ -11,5 +11,7 @@ export const Media: CollectionConfig = {
       type: 'text',
     },
   ],
-  upload: true,
+  upload: {
+    mimeTypes: ['image/*'], // only allow image uploads
+  },
 }

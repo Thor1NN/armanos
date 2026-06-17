@@ -24,7 +24,24 @@ import {
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const serverURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+
 export default buildConfig({
+  serverURL,
+  // Restrict cross-origin requests and CSRF-trusted origins to our own domain.
+  cors: [serverURL],
+  csrf: [serverURL],
+  // GraphQL is not used by the app; disable it to shrink the public API surface.
+  graphQL: {
+    disable: true,
+  },
+  // Cap upload size at the multipart parser to reject oversized files early.
+  upload: {
+    limits: {
+      fileSize: 5_000_000, // 5 MB
+    },
+    abortOnLimit: true,
+  },
   admin: {
     user: Users.slug,
     importMap: {
