@@ -54,3 +54,4 @@ node_modules/
 .claude/
 .codex
 .agents
+.ai/things
