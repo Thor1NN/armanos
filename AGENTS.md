@@ -8,6 +8,7 @@ Operational guide for AI agents working in this repository.
 
 - Write everything in English: code, comments, variable names, documentation.
 - Check `.ai/specs/` before coding any non-trivial feature.
+- Skills are installed in `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex) — do not edit them directly.
 - Prefer minimal, focused changes. Do not refactor code outside the task scope.
 - Run `yarn build` after every implementation to catch type errors.
 - Comment and naming conventions are defined in the `code-style` skill. Load it before writing or reviewing TypeScript.
@@ -34,21 +35,21 @@ Match the task to the table before starting. A single task often maps to multipl
 
 Skills extend the agent with task-specific guidance, checklists, and reference material.
 
-**Structure:** Each skill lives in its own folder under `.ai/skills/` with a `SKILL.md` entry point and optional `reference/` files loaded on demand.
+**Structure:** Each skill lives in its own folder under `.claude/skills/` and `.agents/skills/` with a `SKILL.md` entry point and optional `reference/` files loaded on demand.
 
 **Automatic triggering:** If the task matches a skill's description, load the skill before starting — without waiting to be asked.
 
 **Reference files:** `SKILL.md` specifies which references to load for a given subtask. Do not load all references blindly.
 
-### Source of truth: `.ai/skills/`
+### Installing skills
 
-`.ai/skills/` is the canonical location. Skills are symlinked from there into `.claude/skills/` and `.codex/skills/` via:
+Skills are managed with [npx skills](https://github.com/vercel-labs/skills). To install from the source repository:
 
 ```bash
-yarn install-skills
+npx skills add <source-path-or-url> -a claude-code -a codex --copy
 ```
 
-**Always create or edit skills in `.ai/skills/`.** Never edit files directly in `.claude/skills/` or `.codex/skills/`.
+This installs into `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex). A `skills-lock.json` file tracks the source and version of each installed skill.
 
 ### Available skills
 
@@ -95,8 +96,9 @@ src/
 ├── types/
 ├── payload-types.ts           # Auto-generated — do not edit
 └── payload.config.ts
+.claude/skills/                # Skills for Claude Code
+.agents/skills/                # Skills for Codex
 .ai/
-├── skills/                    # Skill definitions (source of truth)
 └── specs/                     # Feature specs
 ```
 
@@ -112,5 +114,5 @@ yarn generate:types         # regenerate payload-types.ts
 yarn generate:importmap     # regenerate admin import map (after adding custom views)
 yarn seed                   # seed demo data
 yarn lint                   # ESLint
-yarn install-skills         # sync .ai/skills/ into .claude/ and .codex/
+npx skills add <src> -a claude-code -a codex --copy  # install skills
 ```

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "skills": {
+    "code-style": {
+      "source": "/Applications/XAMPP/xamppfiles/htdocs/codee/agents-skills-company",
+      "sourceType": "local",
+      "computedHash": "4582177950886b0dda32d582ce4aced886bbbe78cec282c1d9e932c05f60c84a"
+    },
+    "payload": {
+      "source": "/Applications/XAMPP/xamppfiles/htdocs/codee/agents-skills-company",
+      "sourceType": "local",
+      "computedHash": "17966845955a5acbf945f0a0927c3d0a65e99605a710d0a8146a04a8ea55ad20"
+    },
+    "payload-build-collections": {
+      "source": "/Applications/XAMPP/xamppfiles/htdocs/codee/agents-skills-company",
+      "sourceType": "local",
+      "computedHash": "d98a041e92655bf7567cd702b750f558e9638c57211faa9615326cc3f66ed216"
+    },
+    "payload-build-modules": {
+      "source": "/Applications/XAMPP/xamppfiles/htdocs/codee/agents-skills-company",
+      "sourceType": "local",
+      "computedHash": "0dc7011f53e2d265f9379ac98c224e1ac05f1f56f5dcc2b38b2dce9897f67fd2"
+    },
+    "payload-frontend-build-components": {
+      "source": "/Applications/XAMPP/xamppfiles/htdocs/codee/agents-skills-company",
+      "sourceType": "local",
+      "computedHash": "ecd5702d4fca5f44ec3d7cd2da24734ab718481fadd9e4c82191762c93d6026f"
+    },
+    "spec-writing": {
+      "source": "/Applications/XAMPP/xamppfiles/htdocs/codee/agents-skills-company",
+      "sourceType": "local",
+      "computedHash": "ba3f763cb6c8f90f4768fcdff29c92032aea37ece7abeb0db36290691b61dedb"
+    },
+    "writing-questions": {
+      "source": "/Applications/XAMPP/xamppfiles/htdocs/codee/agents-skills-company",
+      "sourceType": "local",
+      "computedHash": "1a0a0f0e36968a320f1fe69bc1f349954742eda9c9e90bdb68da050db2da2dfe"
+    }
+  }
+}
