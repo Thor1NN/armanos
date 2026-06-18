@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, adminOrSelf, isAdminField } from '../../access'
+import { validatePassword } from '../../lib/validate-password'
 
 export const Clients: CollectionConfig = {
   slug: 'clients',
@@ -24,6 +25,11 @@ export const Clients: CollectionConfig = {
     delete: isAdmin,
     admin: () => false,
   },
+  hooks: {
+    beforeValidate: [validatePassword],
+  },
+  // Audit trail for client account and trainer-note changes.
+  versions: true,
   fields: [
     {
       name: 'name',

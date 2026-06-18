@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { validatePassword } from '../../lib/validate-password'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -13,6 +14,9 @@ export const Users: CollectionConfig = {
       secure: process.env.NODE_ENV === 'production', // HTTPS-only cookie in prod
       sameSite: 'Lax',
     },
+  },
+  hooks: {
+    beforeValidate: [validatePassword],
   },
   fields: [],
   versions: false,

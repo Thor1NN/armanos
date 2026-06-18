@@ -8,7 +8,7 @@ Operational guide for AI agents working in this repository.
 
 - Write everything in English: code, comments, variable names, documentation.
 - Check `.ai/specs/` before coding any non-trivial feature.
-- Skills are installed in `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex) — do not edit them directly.
+- Skills are installed in `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex). `.agents/skills/` is the local source of truth — edit a skill **only** there, then run `ags push-skill` to propagate it to the source repo (it also syncs the `.claude/skills/` copy). See Installing skills.
 - Prefer minimal, focused changes. Do not refactor code outside the task scope.
 - Run `yarn build` after every implementation to catch type errors.
 - Comment and naming conventions are defined in the `code-style` skill. Load it before writing or reviewing TypeScript.
@@ -51,6 +51,16 @@ npx skills add <source-path-or-url> -a claude-code -a codex --copy
 ```
 
 This installs into `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex). A `skills-lock.json` file tracks the source and version of each installed skill.
+
+### Editing skills
+
+`.agents/skills/` is the local source of truth. Edit a skill **only** there, then push it upstream:
+
+```bash
+ags push-skill   # reads .agents/skills, pushes to the source repo, then syncs .claude/skills
+```
+
+Do not edit `.claude/skills/` by hand — it is a derived copy that `ags push-skill` overwrites from `.agents/skills/`. Likewise do not hand-edit the source repo; let `ags push-skill` write it.
 
 ### Available skills
 
