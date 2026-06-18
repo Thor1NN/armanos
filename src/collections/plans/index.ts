@@ -14,6 +14,8 @@ export const Plans: CollectionConfig = {
     update: isAdmin,
     delete: isAdmin,
   },
+  // Keep an audit trail of every change (no drafts — publish workflow unchanged).
+  versions: true,
   fields: [
     {
       name: 'client',

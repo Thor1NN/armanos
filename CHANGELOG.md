@@ -1,5 +1,30 @@
 # training-app
 
+## 1.2.0
+
+### Minor Changes
+
+- 0b33cdd: Harden security across configuration, auth, and HTTP headers.
+
+  **Requires running DB migrations on deploy** (two migrations included).
+
+  Configuration & API surface:
+
+  - Explicit `auth` config on `users` and `clients` (2h token expiration, 5 max login attempts, 10 min lockout, `secure` cookies in production, `sameSite: Lax`)
+  - Add `serverURL`, CORS and CSRF whitelists scoped to `NEXT_PUBLIC_BASE_URL`
+  - Disable the unused GraphQL API and remove its routes to shrink the public API surface
+  - Restrict Media uploads to images and cap file size at 5 MB
+
+  Auth & data:
+
+  - Enforce a minimum password length of 15 characters (NIST) on `users` and `clients`
+  - Enable versioning/audit history on `plans` and `clients` (migration `20260618_162028_security_versioning`)
+  - Drop the `share-links` version tables and type to avoid retaining live tokens in history (migration `20260618_172305_drop_share_links_versions`)
+
+  HTTP security headers (`next.config.ts`):
+
+  - HSTS (with preload), `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and a `frame-ancestors 'self'` CSP
+
 ## 1.1.1
 
 ### Patch Changes

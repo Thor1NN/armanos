@@ -1,6 +1,6 @@
 {
   "name": "training-app",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Aplikacja treningowa na Payload 3",
   "license": "MIT",
   "type": "module",

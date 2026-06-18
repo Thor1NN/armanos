@@ -125,8 +125,9 @@ src/
 ├── middleware.ts
 ├── payload-types.ts           # Auto-generated — do not edit manually
 └── payload.config.ts
-.ai/
-└── skills/                    # AI assistant skill definitions
+.claude/skills/                # AI skills for Claude Code
+.agents/skills/                # AI skills for Codex
+.ai/specs/                     # Feature specifications
 ```
 
 ## Key scripts
@@ -142,7 +143,7 @@ src/
 | `yarn seed` | Seed database with demo data |
 | `yarn seed:export` | Export current database state to seed file |
 | `yarn lint` | Run ESLint |
-| `yarn install-skills` | Link `.ai/skills/` into `.claude/` and `.codex/` |
+| `npx skills add <source>` | Install AI skills into `.claude/skills/` and `.agents/skills/` |
 
 ## Development
 
@@ -166,13 +167,15 @@ yarn generate:importmap
 
 ### AI skills
 
-This project uses skill files for AI-assisted development. To install them into Claude Code and Codex:
+This project uses skill files for AI-assisted development. Skills are managed with [npx skills](https://github.com/vercel-labs/skills) and installed into `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex).
+
+To install skills from the source repository:
 
 ```bash
-yarn install-skills
+npx skills add <source-path-or-url> -a claude-code -a codex --copy
 ```
 
-Skills live in `.ai/skills/` and cover: Payload patterns, collection scaffolding, admin module structure, UI copy, and spec writing.
+Skills cover: Payload patterns, collection scaffolding, admin module structure, UI copy, and spec writing.
 
 ## Screenshots
 

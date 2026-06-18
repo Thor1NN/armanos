@@ -1,32 +1,40 @@
 name: Create Tag and Release on Merge
 
 # This workflow creates a tag and GitHub Release when a release PR is merged to main
-# Triggered when PR with title starting with "release:" is merged to main
+# It can also be triggered manually after a merge if the PR title was incorrect.
 
 on:
   pull_request:
     types: [closed]
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   create-tag-and-release:
-    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'release:')
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'release:'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: read
     steps:
-      - name: Checkout
+      - name: Checkout main
+        if: github.event_name != 'workflow_dispatch'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: main
 
+      - name: Checkout selected ref
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Enable Corepack
         run: corepack enable

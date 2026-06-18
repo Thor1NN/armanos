@@ -53,3 +53,7 @@ node_modules/
 
 .claude/
 .codex
+.agents
+.ai/things
+.ai/audits
+skills-lock.json
