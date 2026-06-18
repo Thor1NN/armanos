@@ -25,7 +25,7 @@ Match the task to the table before starting. A single task often maps to multipl
 | Adding a custom admin view, tab, or field UI | Load skill `payload-build-modules` |
 | Building a front-end component or page (`src/components`, `(frontend)`) | Load skill `payload-frontend-build-components` |
 | Debugging hooks, queries, access control, transactions | Load skill `payload` |
-| Security review, or adding/modifying auth, access control, uploads, CORS/CSRF, headers | Load skill `payload-security` |
+| Security review, or adding/modifying auth, access control, uploads, CORS/CSRF, headers | Load skill `payload-security`; keep `.ai/audits/security-audit.md` current |
 | Writing questions for a client or stakeholder | Load skill `writing-questions` |
 | Starting a new spec or reviewing one | Load skill `spec-writing` |
 | Any TypeScript code | Load skill `code-style` |
@@ -112,7 +112,8 @@ src/
 .claude/skills/                # Skills for Claude Code
 .agents/skills/                # Skills for Codex
 .ai/
-└── specs/                     # Feature specs
+├── specs/                     # Feature specs (tracked)
+└── audits/                    # Security audit status (gitignored — lists unpatched gaps)
 ```
 
 ---
