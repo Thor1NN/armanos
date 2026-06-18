@@ -23,8 +23,9 @@ Match the task to the table before starting. A single task often maps to multipl
 |---|---|
 | Creating a new collection or extending the schema | Load skill `payload-build-collections` |
 | Adding a custom admin view, tab, or field UI | Load skill `payload-build-modules` |
+| Building a front-end component or page (`src/components`, `(frontend)`) | Load skill `payload-frontend-build-components` |
 | Debugging hooks, queries, access control, transactions | Load skill `payload` |
-| Writing or reviewing any user-facing string | Load skill `ui-copy` |
+| Security review, or adding/modifying auth, access control, uploads, CORS/CSRF, headers | Load skill `payload-security` |
 | Writing questions for a client or stakeholder | Load skill `writing-questions` |
 | Starting a new spec or reviewing one | Load skill `spec-writing` |
 | Any TypeScript code | Load skill `code-style` |
@@ -59,7 +60,8 @@ This installs into `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex)
 | `payload` | Debugging Payload: hooks, queries, access control, transactions, security |
 | `payload-build-collections` | Creating a new collection or extending the schema |
 | `payload-build-modules` | Adding a custom admin view, tab, or field component |
-| `ui-copy` | Any user-facing string (labels, descriptions, toasts, errors) |
+| `payload-frontend-build-components` | Building a front-end React component or page (Next.js + Tailwind) |
+| `payload-security` | Security review, or auth/access control/uploads/CORS/CSRF/headers/logging changes |
 | `writing-questions` | Writing questions for a client or stakeholder |
 | `spec-writing` | Writing or reviewing a feature spec |
 
@@ -70,7 +72,8 @@ This installs into `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex)
 | Any TypeScript code | `code-style` |
 | New collection | `payload-build-collections` + `code-style` |
 | New admin view | `payload-build-modules` + `code-style` |
-| Any user-facing string | `ui-copy` |
+| Front-end component or page | `payload-frontend-build-components` + `code-style` |
+| Collection security / access control | `payload-security` + `payload` |
 
 ---
 
