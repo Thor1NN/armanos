@@ -55,4 +55,5 @@ node_modules/
 .codex
 .agents
 .ai/things
+.ai/audits
 skills-lock.json
