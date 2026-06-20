@@ -26,6 +26,17 @@ const dirname = path.dirname(filename)
 
 const serverURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
+// Fail fast on a misconfigured deploy: a missing secret or DB URL should crash at
+// startup with a clear message, not boot with an empty secret / no database.
+function requiredEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) throw new Error(`Missing required env var: ${name}`)
+  return value
+}
+
+const payloadSecret = requiredEnv('PAYLOAD_SECRET')
+const databaseURL = requiredEnv('DATABASE_URL')
+
 export default buildConfig({
   serverURL,
   // Restrict cross-origin requests and CSRF-trusted origins to our own domain.
@@ -64,7 +75,7 @@ export default buildConfig({
     ShareLinks,
   ],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: payloadSecret,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -73,7 +84,7 @@ export default buildConfig({
     // (migrate:create + migrate), so `yarn dev` can never push to a remote/prod DB.
     push: false,
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: databaseURL,
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,
