@@ -11,7 +11,11 @@
   "exercise": {
     "video": "▶ video",
     "addSet": "+ add set",
-    "duplicateSet": "Duplicate last set"
+    "duplicateSet": "Duplicate last set",
+    "addNote": "+ exercise note",
+    "notePlaceholder": "note for the whole exercise",
+    "saveNote": "Save",
+    "cancelNote": "Cancel"
   },
   "seriesForm": {
     "note": "Note",

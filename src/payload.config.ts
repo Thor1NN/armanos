@@ -17,6 +17,7 @@ import {
   WorkoutLogs,
   RoundLogs,
   SetLogs,
+  ExerciseLogs,
   Exercises,
   ShareLinks,
 } from './collections'
@@ -71,6 +72,7 @@ export default buildConfig({
     WorkoutLogs,
     RoundLogs,
     SetLogs,
+    ExerciseLogs,
     Exercises,
     ShareLinks,
   ],

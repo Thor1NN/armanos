@@ -7,22 +7,27 @@ import type { SetLog, TExercise, Values } from '@/types/workout'
 import { setLogToFormValues } from '@/lib/metrics'
 import { AddSetActions } from './components/add-set-actions'
 import { ExerciseHeader } from './components/exercise-header'
+import { ExerciseNote } from './components/exercise-note'
 import { MetaLine } from './components/meta-line'
 import { SeriesList } from './components/series-list'
 
 export function ExerciseCard({
   exercise,
   sets,
+  clientNote = '',
   onAdd,
   onUpdate,
   onDelete,
+  onSaveNote,
   readOnly,
 }: {
   exercise: TExercise
   sets: SetLog[]
+  clientNote?: string
   onAdd?: (exercise: TExercise, fields: MetricField[], values: Values) => Promise<void>
   onUpdate?: (id: number, fields: MetricField[], values: Values) => Promise<void>
   onDelete?: (id: number) => Promise<void>
+  onSaveNote?: (exercise: TExercise, note: string) => Promise<void>
   readOnly?: boolean
 }) {
   const [open, setOpen] = useState(false)
@@ -35,6 +40,12 @@ export function ExerciseCard({
 
       {exercise.meta.length > 0 && <MetaLine>{exercise.meta.join(' · ')}</MetaLine>}
       {exercise.note && <MetaLine>{exercise.note}</MetaLine>}
+
+      <ExerciseNote
+        note={clientNote}
+        readOnly={readOnly}
+        onSave={(note) => onSaveNote!(exercise, note)}
+      />
 
       <SeriesList sets={sets} fields={fields} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly} />
 

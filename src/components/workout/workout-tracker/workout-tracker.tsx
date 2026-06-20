@@ -17,7 +17,7 @@ export function WorkoutTracker({
   readOnly?: boolean
   showResults?: boolean
 }) {
-  const { session, hasLoaded, error, clearError, setsForRow, setTime, saveTimes, addSet, updateSet, deleteSet } =
+  const { session, hasLoaded, error, clearError, setsForRow, noteForRow, setTime, saveTimes, addSet, updateSet, deleteSet, saveExerciseNote } =
     useWorkoutSession(workout, { readOnly, showResults })
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
 
@@ -75,9 +75,11 @@ export function WorkoutTracker({
                   key={exercise.rowId}
                   exercise={exercise}
                   sets={setsForRow(exercise.rowId)}
+                  clientNote={noteForRow(exercise.rowId)}
                   onAdd={addSet}
                   onUpdate={updateSet}
                   onDelete={deleteSet}
+                  onSaveNote={saveExerciseNote}
                   readOnly={readOnly}
                 />
               ))}

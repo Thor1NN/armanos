@@ -1,6 +1,6 @@
 /**
  * Eksportuje dane z bazy do pliku seed-data.json.
- * Pomija: Users, Clients, WorkoutLogs, RoundLogs, SetLogs.
+ * Pomija: Users, Clients, WorkoutLogs, RoundLogs, SetLogs, ExerciseLogs.
  */
 import 'dotenv/config'
 import fs from 'fs'
