@@ -7,22 +7,27 @@ import type { SetLog, TExercise, Values } from '@/types/workout'
 import { setLogToFormValues } from '@/lib/metrics'
 import { AddSetActions } from './components/add-set-actions'
 import { ExerciseHeader } from './components/exercise-header'
+import { ExerciseNote } from './components/exercise-note'
 import { MetaLine } from './components/meta-line'
 import { SeriesList } from './components/series-list'
 
 export function ExerciseCard({
   exercise,
   sets,
+  clientNote = '',
   onAdd,
   onUpdate,
   onDelete,
+  onSaveNote,
   readOnly,
 }: {
   exercise: TExercise
   sets: SetLog[]
+  clientNote?: string
   onAdd?: (exercise: TExercise, fields: MetricField[], values: Values) => Promise<void>
   onUpdate?: (id: number, fields: MetricField[], values: Values) => Promise<void>
   onDelete?: (id: number) => Promise<void>
+  onSaveNote?: (exercise: TExercise, note: string) => Promise<void>
   readOnly?: boolean
 }) {
   const [open, setOpen] = useState(false)
@@ -30,7 +35,7 @@ export function ExerciseCard({
   const prefillValues: Values = { reps: exercise.prefill.reps ?? '', rir: exercise.prefill.rir ?? '', note: '' }
 
   return (
-    <div className="border-t border-ui-border-base py-2 first:border-t-0">
+    <div className="border-t border-ui-border-base py-2.5 first:border-t-0 first:pt-0 last:pb-0">
       <ExerciseHeader numer={exercise.numer} name={exercise.name} videoUrl={exercise.videoUrl} />
 
       {exercise.meta.length > 0 && <MetaLine>{exercise.meta.join(' · ')}</MetaLine>}
@@ -57,6 +62,12 @@ export function ExerciseCard({
             }
           />
         ))}
+
+      <ExerciseNote
+        note={clientNote}
+        readOnly={readOnly}
+        onSave={(note) => onSaveNote!(exercise, note)}
+      />
     </div>
   )
 }

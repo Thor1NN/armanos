@@ -79,6 +79,7 @@ export interface Config {
     'workout-logs': WorkoutLog;
     'round-logs': RoundLog;
     'set-logs': SetLog;
+    'exercise-logs': ExerciseLog;
     exercises: Exercise;
     'share-links': ShareLink;
     'payload-kv': PayloadKv;
@@ -103,6 +104,7 @@ export interface Config {
     'workout-logs': WorkoutLogsSelect<false> | WorkoutLogsSelect<true>;
     'round-logs': RoundLogsSelect<false> | RoundLogsSelect<true>;
     'set-logs': SetLogsSelect<false> | SetLogsSelect<true>;
+    'exercise-logs': ExerciseLogsSelect<false> | ExerciseLogsSelect<true>;
     exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     'share-links': ShareLinksSelect<false> | ShareLinksSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -315,6 +317,10 @@ export interface WorkoutGroup {
    */
   label?: string | null;
   order?: number | null;
+  /**
+   * Render this group in the same colored block as the group above it
+   */
+  bundleWithPrevious?: boolean | null;
   protocol?: ('standard' | 'emom' | 'amrap' | 'for_time' | 'tabata') | null;
   /**
    * e.g. "4", "1-3"
@@ -477,6 +483,22 @@ export interface SetLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exercise-logs".
+ */
+export interface ExerciseLog {
+  id: number;
+  session: number | WorkoutLog;
+  client?: (number | null) | Client;
+  exercise?: (number | null) | Exercise;
+  exerciseName?: string | null;
+  exerciseRow: number | WorkoutExerciseRow;
+  roundLog?: (number | null) | RoundLog;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "share-links".
  */
 export interface ShareLink {
@@ -566,6 +588,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'set-logs';
         value: number | SetLog;
+      } | null)
+    | ({
+        relationTo: 'exercise-logs';
+        value: number | ExerciseLog;
       } | null)
     | ({
         relationTo: 'exercises';
@@ -747,6 +773,7 @@ export interface WorkoutGroupsSelect<T extends boolean = true> {
   sectionRowId?: T;
   label?: T;
   order?: T;
+  bundleWithPrevious?: T;
   protocol?: T;
   rounds?: T;
   durationMinutes?: T;
@@ -845,6 +872,21 @@ export interface SetLogsSelect<T extends boolean = true> {
   rir?: T;
   note?: T;
   completedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exercise-logs_select".
+ */
+export interface ExerciseLogsSelect<T extends boolean = true> {
+  session?: T;
+  client?: T;
+  exercise?: T;
+  exerciseName?: T;
+  exerciseRow?: T;
+  roundLog?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }

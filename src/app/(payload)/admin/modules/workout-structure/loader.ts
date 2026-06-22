@@ -61,6 +61,7 @@ export async function loadWorkoutStructure(
     sectionRowId: g.sectionRowId ?? null,
     order: g.order ?? 0,
     label: g.label ?? null,
+    bundleWithPrevious: g.bundleWithPrevious ?? false,
     protocol: g.protocol ?? 'standard',
     rounds: g.rounds ?? null,
     durationMinutes: g.durationMinutes ?? null,

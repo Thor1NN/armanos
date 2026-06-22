@@ -74,6 +74,13 @@ export const WorkoutGroups: CollectionConfig = {
       defaultValue: 0,
     },
     {
+      name: 'bundleWithPrevious',
+      type: 'checkbox',
+      label: 'Merge into the previous block',
+      defaultValue: false,
+      admin: { description: 'Render this group in the same colored block as the group above it' },
+    },
+    {
       name: 'protocol',
       type: 'select',
       label: 'Protocol',

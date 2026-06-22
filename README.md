@@ -9,7 +9,7 @@ A coach-facing admin and client-facing training tracker built with Payload CMS a
 **Client (web app)** — logs in, sees their active plan, works through workouts session by session, and logs each set (reps, weight, RIR, time, etc.).
 
 ## Navigation
-- [Data model](#data-model)
+- [Data model & flow](#data-model--flow)
 - [Tech stack](#tech-stack)
 - [Getting started](#getting-started)
 - [Project structure](#project-structure)
@@ -17,19 +17,143 @@ A coach-facing admin and client-facing training tracker built with Payload CMS a
 - [Development](#development)
 - [Screenshots](#screenshots)
 
-## Data model
+## Data model & flow
+
+The data splits into two layers. The **plan layer** is the template a coach authors (read-only for clients). The **log layer** is what a client records while training. The two never mix: logging never writes to the plan, so the same template can be reused and audited.
 
 ```
-Plan
-└── Microcycle
-    └── Workout
-        └── WorkoutGroup            (e.g. "A1/A2 superset")
-            └── WorkoutExerciseRow  (exercise + tracking config)
-                ├── SetLog          (per-set: reps, weight, RIR…)
-                └── RoundLog        (per-round: time, distance…)
+PLAN LAYER (authored by coach)              LOG LAYER (recorded by client)
+─────────────────────────────              ──────────────────────────────
+Plan                                        WorkoutLog ............ one training session
+└─ Microcycle                               ├─ SetLog ............. one logged set       (N per exercise)
+   └─ Workout                               ├─ ExerciseLog ........ one note per exercise (1 per exercise)
+      ├─ sections[]   "Warm-up", "Main"     └─ RoundLog ........... one round of a group  (reserved)
+      └─ WorkoutGroup    → in a section
+         └─ WorkoutExerciseRow              Catalog:  Exercise, Media
+            └─ Exercise  (catalog, opt.)    Accounts: User (coach), Client (athlete)
+                                            Sharing:  ShareLink
 ```
 
-Logging is tracked per session via `WorkoutLog`, which links a client to a specific workout on a given date.
+> `sections[]` is **not a collection** — it's an array of named headings (`title`/`subtitle`) stored on the `Workout`. A `WorkoutGroup` attaches to one section via its `sectionRowId`. So the visible nesting in the app is **Workout → Section → Group → Exercise row**, while in the database a group points back to its section by id.
+
+### How a log row points back to the plan
+
+A `WorkoutLog` references the `Workout` it belongs to and the `Client` who owns it. Each `SetLog` / `ExerciseLog` references its `session` (the `WorkoutLog`) **and** the `exerciseRow` (`WorkoutExerciseRow`) it logs against — that `exerciseRow` link is the key that ties execution back to the exact line in the plan.
+
+```mermaid
+erDiagram
+    CLIENT ||--o{ PLAN : owns
+    PLAN ||--o{ MICROCYCLE : has
+    MICROCYCLE ||--o{ WORKOUT : has
+    WORKOUT ||--o{ WORKOUT_GROUP : has
+    WORKOUT_GROUP ||--o{ WORKOUT_EXERCISE_ROW : has
+    EXERCISE ||--o{ WORKOUT_EXERCISE_ROW : "referenced by"
+
+    CLIENT ||--o{ WORKOUT_LOG : logs
+    WORKOUT ||--o{ WORKOUT_LOG : "session of"
+    WORKOUT_LOG ||--o{ SET_LOG : has
+    WORKOUT_LOG ||--o{ EXERCISE_LOG : has
+    WORKOUT_LOG ||--o{ ROUND_LOG : has
+    WORKOUT_EXERCISE_ROW ||--o{ SET_LOG : "logged as (N per session)"
+    WORKOUT_EXERCISE_ROW ||--o{ EXERCISE_LOG : "noted as (1 per session)"
+    WORKOUT_GROUP ||--o{ ROUND_LOG : "round of"
+
+    PLAN ||--o{ SHARE_LINK : "shared via"
+
+    PLAN {
+        relationship client
+        select status
+    }
+    WORKOUT {
+        relationship microcycle
+        array sections "named headings — Group.sectionRowId points here"
+    }
+    WORKOUT_GROUP {
+        relationship workout
+        text sectionRowId "which section it belongs to"
+        select protocol "standard / emom / amrap / for_time / tabata"
+    }
+    WORKOUT_EXERCISE_ROW {
+        relationship group
+        relationship exercise "catalog link (optional)"
+        text targets "reps, kg, rir, tut, rest…"
+    }
+    WORKOUT_LOG {
+        relationship client
+        relationship workout
+    }
+    SET_LOG {
+        relationship session
+        relationship exerciseRow
+        number setNumber
+    }
+    EXERCISE_LOG {
+        relationship session
+        relationship exerciseRow
+        textarea note
+    }
+    ROUND_LOG {
+        relationship session
+        relationship group
+        number roundNumber "reserved — not yet written"
+    }
+    SHARE_LINK {
+        relationship plan
+        select permissions "plan / results"
+        date expiresAt
+    }
+```
+
+### Collections
+
+#### Accounts
+
+| Collection | Auth | Purpose |
+|---|---|---|
+| `users` | ✅ | Coaches / staff. The only accounts allowed into `/admin`. |
+| `clients` | ✅ | Athletes. Log in to the client web app (never the admin). Holds `name`, a join to their `plans`, and admin-only `notes` (trainer notes, hidden from the client). 2h sessions, lockout after 5 failed logins. |
+
+#### Catalog
+
+| Collection | Purpose |
+|---|---|
+| `exercises` | Reusable exercise catalog (name, muscle group, equipment, video, description). `trackingType` decides **which metric fields** the client sees in the logging form (e.g. weight+reps vs distance+time). Readable by any authenticated user; only coaches edit. |
+| `media` | Image uploads (public read). |
+
+#### Training plan (template — coach writes, client reads)
+
+| Collection | Belongs to | Purpose |
+|---|---|---|
+| `plans` | a `client` | Top-level program. Status (active/paused/completed), date range, title, description. Versioned (audit trail). Client can read only their own. |
+| `microcycles` | `plan` | A block/week within the plan. Target `rpe`, `order`. |
+| `workouts` | `microcycle` | A single training day. Has an `order`, optional `rpe`, and `sections[]` (named blocks like "Warm-up", "Main part"). Edited via a custom **Structure** admin tab. Cannot be deleted once it has logged sessions. |
+| `workout-groups` | `workout` | A group of exercises sharing a `protocol` (Standard / EMOM / AMRAP / For Time / Tabata) and its parameters (rounds, durations, rest). Links to a workout section via `sectionRowId`. E.g. an "A1/A2 superset". Cannot be deleted if its rows have logged sets. |
+| `workout-exercise-rows` | `workout-group` | One prescribed exercise line. Optional link to a catalog `exercise`, plus targets (`reps`, `kg`, `tut`, `rir`, `rest`, duration), a plan `note`, optional per-set `setParameters[]` (drop sets/pyramids), and an `override` of the group protocol. Cannot be deleted if it has logged sets. |
+
+#### Training log (execution — client writes)
+
+| Collection | Keyed by | Cardinality | Purpose |
+|---|---|---|---|
+| `workout-logs` | `client` + `workout` | one per session | A training session. Auto-titled, holds `startedAt` / `finishedAt` and general session `notes`. Creating the first set auto-creates the session. |
+| `set-logs` | `session` + `exerciseRow` (+ `setNumber`) | **N per exercise** | One logged set: weight, reps, RIR, distance, duration, bodyweight flag, per-set `note`. A `beforeValidate` hook strips any metric not allowed by the exercise's `trackingType`. |
+| `exercise-logs` | `session` + `exerciseRow` | **1 per exercise** | A single client note for the whole exercise in that session (vs. `set-logs`, which is per set). Same relations as `set-logs` so it can grow beyond a note later. Upserted from the tracker. |
+| `round-logs` | `session` + `group` | one per round | Per-round execution of a group (round number, status, timing). **Reserved** — defined in the schema but not yet written by the app. |
+
+For every log collection: a client may only create/read/update/delete **their own** rows (`adminOrOwnByClient`), and the owning `client` is always set server-side from the session — never trusted from the request.
+
+#### Sharing
+
+| Collection | Purpose |
+|---|---|
+| `share-links` | A tokenized, read-only link to a `plan`. `permissions` choose what is exposed (`plan` preview and/or `results` logs); `expiresAt` + `active` gate it. Only coaches manage links; the public access happens via the `share-token` cookie, which `canReadViaShareToken` validates to scope reads to that plan owner's data. |
+
+### End-to-end flow
+
+1. **Author** — coach creates a `Client`, then a `Plan` → `Microcycle` → `Workout`, and builds structure (`WorkoutGroup` → `WorkoutExerciseRow`) on the workout's **Structure** tab, linking each row to a catalog `Exercise`.
+2. **Assign** — the plan is owned by the client; they log in and see only their own active plan.
+3. **Train** — opening a workout creates a `WorkoutLog` on first save. The client logs each set as a `SetLog` (fields driven by the exercise's `trackingType`) and can attach one `ExerciseLog` note per exercise.
+4. **Review** — coach reads the client's logs in the admin; deleting plan structure that already has logs is blocked to protect history.
+5. **Share** (optional) — a `ShareLink` exposes a read-only plan and/or results to anyone with the link until it expires.
 
 ## Tech stack
 
@@ -108,7 +232,9 @@ src/
 │   ├── workout-exercise-rows/
 │   ├── workout-logs/
 │   ├── set-logs/
+│   ├── exercise-logs/
 │   ├── round-logs/
+│   ├── share-links/
 │   ├── media/
 │   └── users/
 ├── components/

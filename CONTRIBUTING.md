@@ -10,6 +10,8 @@ This guide explains how we organize releases, structure branches, and prepare pu
 
 ## Working on Features
 
+> **External contributors:** your flow ends at a PR to `develop` — branch from `develop`, add a changeset, open the PR. You do **not** create releases; maintainers handle the [Release Process](#release-process) below.
+
 1. **Branch from `develop`**:
    ```bash
    git checkout develop
@@ -33,6 +35,8 @@ This guide explains how we organize releases, structure branches, and prepare pu
    - Reference related issues or discussions
 
 ## Release Process
+
+> **Maintainers only.** Steps 1–3 are automated by `yarn prepare-release` (runs `changeset version`, commits, pushes `develop`, creates the `release/vX.Y.Z` branch, and opens the release PR). The steps below document what the script does.
 
 ### Normal Release Flow
 

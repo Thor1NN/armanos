@@ -1,7 +1,7 @@
 'use client'
 
-import { Button, Form, SelectField, TextField, toast, useDocumentInfo, useFormFields, useFormProcessing } from '@payloadcms/ui'
-import type { FormState, SelectFieldClient } from 'payload'
+import { Button, CheckboxField, Form, SelectField, TextField, toast, useDocumentInfo, useFormFields, useFormProcessing } from '@payloadcms/ui'
+import type { CheckboxFieldClient, FormState, SelectFieldClient } from 'payload'
 import type { Group } from '../../types'
 import { PROTOCOLS } from '../../constants'
 import { s } from '../../styles'
@@ -22,6 +22,12 @@ const protocolField: SelectFieldClient = {
   label: 'Protocol',
   options: PROTOCOLS,
 } as SelectFieldClient
+
+const bundleField: CheckboxFieldClient = {
+  name: 'bundleWithPrevious',
+  type: 'checkbox',
+  label: 'Merge into the previous block',
+} as CheckboxFieldClient
 
 type Props = {
   sectionRowId: string | undefined
@@ -44,6 +50,12 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
       <div style={s.formRow}>
         <div style={{ flex: '1 1 200px' }}>
           <TextField path="label" field={textField('label', 'Group name (optional)', 'e.g. Upper superset, Part A')} />
+        </div>
+      </div>
+
+      <div style={s.formRow}>
+        <div style={{ flex: '1 1 200px' }}>
+          <CheckboxField path="bundleWithPrevious" field={bundleField} />
         </div>
       </div>
 
@@ -106,6 +118,7 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
 
   const initialState: FormState = {
     label:             { value: initial?.label             ?? '' },
+    bundleWithPrevious:{ value: initial?.bundleWithPrevious ?? false },
     protocol:          { value: initial?.protocol          ?? 'standard' },
     rounds:            { value: initial?.rounds            ?? '' },
     durationMinutes:   { value: String(initial?.durationMinutes  ?? '') },
@@ -119,6 +132,7 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
     const protocol = data.protocol as string
     const body: Record<string, unknown> = {
       label:             (data.label             as string) || null,
+      bundleWithPrevious: Boolean(data.bundleWithPrevious),
       protocol,
       rounds:            (data.rounds            as string) || null,
       durationMinutes:   data.durationMinutes    ? Number(data.durationMinutes)  : null,

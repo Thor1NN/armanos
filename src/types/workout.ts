@@ -19,10 +19,13 @@ export type TGroup = {
   exercises: TExercise[]
 }
 
-export type TSection = { title?: string | null; subtitle?: string | null; groups: TGroup[] }
+// A block bundles consecutive groups that share one colored band in the tracker.
+export type TBlock = { index: number; groups: TGroup[] }
+
+export type TSection = { title?: string | null; subtitle?: string | null; blocks: TBlock[] }
 export type TWorkout = { id: number; title: string; rpe?: number | null; sections: TSection[] }
 
-export type Session = { id: number; startedAt?: string | null; finishedAt?: string | null }
+export type Session = { id: number; startedAt?: string | null; finishedAt?: string | null; notes?: string | null }
 
 export type SetLog = {
   id: number

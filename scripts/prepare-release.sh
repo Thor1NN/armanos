@@ -46,14 +46,31 @@ echo "Creating branch: ${RELEASE_BRANCH}"
 git checkout -b "${RELEASE_BRANCH}"
 git push origin "${RELEASE_BRANCH}"
 
+# Step 3: Open the release PR with the title the workflow expects ("release: vX.Y.Z")
+echo ""
+echo "🔀 Step 3: Opening release PR..."
+
+PR_TITLE="release: v${VERSION}"
+
+# Extract this version's section from CHANGELOG.md for the PR body.
+ESCAPED_VERSION="${VERSION//./\\.}"
+PR_BODY=$(awk "/^## ${ESCAPED_VERSION}/{f=1;next} /^## /{f=0} f" CHANGELOG.md)
+if [ -z "${PR_BODY}" ]; then
+  PR_BODY="Release v${VERSION}. See CHANGELOG.md for details."
+fi
+
+gh pr create \
+  --base main \
+  --head "${RELEASE_BRANCH}" \
+  --title "${PR_TITLE}" \
+  --body "${PR_BODY}"
+
 echo ""
 echo "✅ Release preparation complete!"
 echo ""
 echo "📋 Next steps:"
-echo "1. Go to GitHub and create PR: ${RELEASE_BRANCH} → main"
-echo "2. Title: release: v${VERSION}"
-echo "3. Description: Copy relevant section from CHANGELOG.md"
-echo "4. Merge PR to main"
+echo "1. Review the PR opened above (${RELEASE_BRANCH} → main, title: \"${PR_TITLE}\")"
+echo "2. Merge PR to main"
 echo ""
 echo "✨ After merge, workflow will automatically:"
 echo "   - Create tag v${VERSION}"

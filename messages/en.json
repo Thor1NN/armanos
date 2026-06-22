@@ -10,8 +10,22 @@
   },
   "exercise": {
     "video": "▶ video",
-    "addSet": "+ add set",
-    "duplicateSet": "Duplicate last set"
+    "addSet": "add set",
+    "duplicateSet": "Duplicate last set",
+    "addNote": "note",
+    "noteLabel": "Note:",
+    "editNote": "Edit note",
+    "notePlaceholder": "note for the whole exercise",
+    "saveNote": "Save",
+    "cancelNote": "Cancel"
+  },
+  "session": {
+    "noteLabel": "Workout note:",
+    "addNote": "workout note",
+    "editNote": "Edit note",
+    "notePlaceholder": "note for the whole workout",
+    "saveNote": "Save",
+    "cancelNote": "Cancel"
   },
   "seriesForm": {
     "note": "Note",
