@@ -41,12 +41,6 @@ export function ExerciseCard({
       {exercise.meta.length > 0 && <MetaLine>{exercise.meta.join(' · ')}</MetaLine>}
       {exercise.note && <MetaLine>{exercise.note}</MetaLine>}
 
-      <ExerciseNote
-        note={clientNote}
-        readOnly={readOnly}
-        onSave={(note) => onSaveNote!(exercise, note)}
-      />
-
       <SeriesList sets={sets} fields={fields} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly} />
 
       {!readOnly &&
@@ -68,6 +62,12 @@ export function ExerciseCard({
             }
           />
         ))}
+
+      <ExerciseNote
+        note={clientNote}
+        readOnly={readOnly}
+        onSave={(note) => onSaveNote!(exercise, note)}
+      />
     </div>
   )
 }

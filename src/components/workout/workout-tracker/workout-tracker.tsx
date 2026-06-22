@@ -1,9 +1,11 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 import { mutedTextClass, panelClass, sectionLabelClass } from '@/lib/class-names'
 import { Alert } from '@/components/ui/alert'
 import { ExerciseCard } from '@/components/workout/exercise-card'
+import { NoteField } from '@/components/workout/note-field'
 import { SessionTimesBadge, SessionTimesForm } from '@/components/workout/session-times'
 import type { TWorkout } from '@/types/workout'
 import { useWorkoutSession } from './hooks/use-workout-session'
@@ -17,9 +19,11 @@ export function WorkoutTracker({
   readOnly?: boolean
   showResults?: boolean
 }) {
-  const { session, hasLoaded, error, clearError, setsForRow, noteForRow, setTime, saveTimes, addSet, updateSet, deleteSet, saveExerciseNote } =
+  const { session, hasLoaded, error, clearError, setsForRow, noteForRow, setTime, saveTimes, addSet, updateSet, deleteSet, saveExerciseNote, saveSessionNote } =
     useWorkoutSession(workout, { readOnly, showResults })
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
+  const t = useTranslations('session')
+  const sessionNote = session?.notes ?? ''
 
   return (
     <div className={`mb-3 px-4 py-3 ${panelClass}`}>
@@ -87,6 +91,24 @@ export function WorkoutTracker({
           ))}
         </div>
       ))}
+
+      {(!readOnly || sessionNote) && (
+        <div className="mt-3 border-t border-ui-border-base pt-2.5">
+          <NoteField
+            note={sessionNote}
+            readOnly={readOnly}
+            onSave={saveSessionNote}
+            labels={{
+              label: t('noteLabel'),
+              add: t('addNote'),
+              edit: t('editNote'),
+              placeholder: t('notePlaceholder'),
+              save: t('saveNote'),
+              cancel: t('cancelNote'),
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }

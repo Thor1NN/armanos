@@ -1,7 +1,7 @@
 # Client note for the whole exercise (`exercise-logs`)
 
 **Date:** 2026-06-20
-**Status:** draft
+**Status:** implemented
 **Area:** backend + admin/frontend (Payload CMS / Next.js)
 
 ---
@@ -40,7 +40,7 @@ Disambiguating the existing "notes" (the source of confusion):
 
 ## Proposed Solution
 
-A new `exercise-logs` collection in the log layer, modeled on [set-logs](../../src/collections/set-logs/index.ts): a `session` + `exerciseRow` + `client` + `note` relationship. One note per exercise per session (enforced via an **upsert** pattern in the UI). The tracker loads the notes together with sets, and `ExerciseCard` displays and edits the note in the exercise header (not in the set form).
+A new `exercise-logs` collection in the log layer, with the **same relations as `set-logs`** (`session`, `client`, `exercise`, `exerciseName`, `exerciseRow`, `roundLog`) plus a `note` — so it can grow beyond a note later without another schema change. It is keyed by `(session, exerciseRow)`: one note per exercise per session, enforced via an **upsert** pattern in the UI. The tracker loads the notes together with sets, and `ExerciseCard` displays and edits the note in the exercise header (not in the set form).
 
 ### Diagram — data model (plan layer vs log layer)
 
@@ -65,8 +65,11 @@ erDiagram
     }
     EXERCISE_LOGS {
         relationship session
-        relationship exerciseRow
         relationship client
+        relationship exercise
+        text exerciseName
+        relationship exerciseRow
+        relationship roundLog
         textarea note "LOG note per exercise (client) — NEW"
     }
 ```
@@ -114,11 +117,12 @@ src/
 │   │   └── hooks/
 │   │       └── use-workout-session.ts # load + noteForRow + saveExerciseNote
 │   └── exercise-card/
-│       └── exercise-card.tsx         # render + edit the exercise note
-├── types/workout.ts                  # log-note type (optional)
-├── scripts/export-seed.ts            # + ExerciseLogs to the skip list
+│       ├── exercise-card.tsx         # wires in the note (header) + onSaveNote
+│       └── components/exercise-note/ # NEW: display + inline edit subcomponent
+├── scripts/export-seed.ts            # comment note (logs already skipped via allow-list)
 └── migrations/
-    └── YYYYMMDD_*.ts                 # new exercise_logs table
+    ├── 20260620_195052_exercise_logs.ts            # create exercise_logs table
+    └── 20260620_200543_exercise_logs_relations.ts  # + exercise_name, round_log_id
 messages/
 ├── pl.json                           # UI strings
 └── en.json
@@ -130,12 +134,16 @@ messages/
 
 ### `exercise-logs` collection
 
+Full relational parity with `set-logs` (so the collection can grow beyond a note later):
+
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `session` | relationship → `workout-logs` | yes | training session |
 | `client` | relationship → `clients` | no | `defaultValue` from user (as in set-logs) |
-| `exerciseRow` | relationship → `workout-exercise-rows` | yes | exercise key |
 | `exercise` | relationship → `exercises` | no | catalog snapshot (reporting) |
+| `exerciseName` | text | no | name snapshot (as in set-logs) |
+| `exerciseRow` | relationship → `workout-exercise-rows` | yes | exercise key |
+| `roundLog` | relationship → `round-logs` | no | `admin.readOnly`; reserved (round-logs not yet written) |
 | `note` | textarea | no | note body |
 
 **Uniqueness `(session, exerciseRow)`** — one note per exercise per session. Enforced via the upsert pattern in the UI (find → update / create); optionally hardened with a `beforeValidate` hook that rejects duplicates.
@@ -163,7 +171,7 @@ No custom routes. Operations go through the Payload SDK (`@/lib/sdk`) on the `ex
 
 ```
 sdk.find({ collection: 'exercise-logs', where: { session: { equals: sessionId } } })
-sdk.create({ collection: 'exercise-logs', data: { session, exerciseRow, exercise?, note } })
+sdk.create({ collection: 'exercise-logs', data: { session, exercise?, exerciseName, exerciseRow, note } })
 sdk.update({ collection: 'exercise-logs', id, data: { note } })
 ```
 
@@ -176,8 +184,7 @@ Access control and the `client` assignment are enforced by the collection's acce
 ```
 useWorkoutSession (hook)
 ├── [load]   sdk.find workout-logs (session)       — exists
-├── [load]   sdk.find set-logs by session          — exists
-├── [load]   sdk.find exercise-logs by session     — NEW → exerciseNotes state
+├── [load]   sdk.find set-logs + exercise-logs      — Promise.all; exercise-logs → exerciseNotes state (NEW)
 ├── [select] noteForRow(rowId)                      — NEW (analogous to setsForRow)
 └── [mutate] saveExerciseNote(ex, note)             — NEW
             ├── ensureSession()
@@ -191,8 +198,8 @@ UI: [workout-tracker.tsx](../../src/components/workout/workout-tracker/workout-t
 
 ## Phasing
 
-### Phase 1 — Backend (collection + migration)
-The `exercise-logs` collection, registration, access/hooks, migration, types. **Deliverable:** the exercise note can be created/edited via the admin and the SDK; `yarn build` passes.
+### Phase 1 — Backend (collection + migrations)
+The `exercise-logs` collection, registration, access/hooks, two migrations (table + relations), types. **Deliverable:** the exercise note can be created/edited via the admin and the SDK; typecheck/lint pass.
 
 ### Phase 2 — Runtime (session hook)
 Loading `exercise-logs`, `noteForRow`, `saveExerciseNote` (upsert). **Deliverable:** note data is available in the tracker (logic ready, no UI yet).
@@ -205,24 +212,24 @@ Render and edit the note in `ExerciseCard`, strings in `pl.json`/`en.json`, visi
 ## Implementation Plan
 
 ### Phase 1 — Backend
-- [ ] Create `src/collections/exercise-logs/index.ts` (fields, access, hooks per the Data Models section).
-- [ ] Re-export in [src/collections/index.ts](../../src/collections/index.ts).
-- [ ] Register in `collections[]` in [src/payload.config.ts](../../src/payload.config.ts).
-- [ ] `yarn payload migrate:create` → `exercise_logs` table; then `yarn payload migrate`.
-- [ ] `yarn generate:types` → `ExerciseLog` type.
-- [ ] `yarn build`.
+- [x] Create `src/collections/exercise-logs/index.ts` (fields, access, hooks per the Data Models section).
+- [x] Re-export in [src/collections/index.ts](../../src/collections/index.ts).
+- [x] Register in `collections[]` in [src/payload.config.ts](../../src/payload.config.ts).
+- [x] `yarn generate:types` → `ExerciseLog` type.
+- [x] `yarn payload migrate:create` → two migrations (`..._exercise_logs` table; `..._exercise_logs_relations` adds `exercise_name` + `round_log_id`).
+- [x] `yarn payload migrate` — run by the user (DB-mutating step).
 
 ### Phase 2 — Runtime
-- [ ] [use-workout-session.ts](../../src/components/workout/workout-tracker/hooks/use-workout-session.ts): load `exercise-logs` by `session`, add `exerciseNotes` state.
-- [ ] Add the `noteForRow(rowId)` selector and the `saveExerciseNote(ex, note)` mutation (upsert).
-- [ ] Expose both in the hook's returned API.
+- [x] [use-workout-session.ts](../../src/components/workout/workout-tracker/hooks/use-workout-session.ts): load `exercise-logs` by `session` (parallel with set-logs), add `exerciseNotes` state.
+- [x] Add the `noteForRow(rowId)` selector and the `saveExerciseNote(ex, note)` mutation (upsert).
+- [x] Expose both in the hook's returned API.
 
 ### Phase 3 — UI + i18n
-- [ ] [workout-tracker.tsx](../../src/components/workout/workout-tracker/workout-tracker.tsx): pass `note` + `onSaveNote` to `ExerciseCard`.
-- [ ] [exercise-card.tsx](../../src/components/workout/exercise-card/exercise-card.tsx): render the client note in the header + allow editing when `!readOnly`.
-- [ ] Strings (label, placeholder, save) in `messages/pl.json` + `messages/en.json`.
-- [ ] [export-seed.ts](../../src/scripts/export-seed.ts): add `ExerciseLogs` to the skip list.
-- [ ] `yarn build` + verify in share (read-only) mode.
+- [x] [workout-tracker.tsx](../../src/components/workout/workout-tracker/workout-tracker.tsx): pass `clientNote` + `onSaveNote` to `ExerciseCard`.
+- [x] [exercise-card.tsx](../../src/components/workout/exercise-card/exercise-card.tsx): render the client note in the header (new `exercise-note` subcomponent) + allow editing when `!readOnly`.
+- [x] Strings (`addNote`, `notePlaceholder`, `saveNote`, `cancelNote`) in `messages/pl.json` + `messages/en.json`.
+- [x] [export-seed.ts](../../src/scripts/export-seed.ts): comment updated (logs already excluded via the allow-list).
+- [x] Typecheck (`tsc --noEmit`) + lint pass.
 
 ---
 
@@ -242,7 +249,7 @@ Render and edit the note in `ExerciseCard`, strings in `pl.json`/`en.json`, visi
 | Rule | Status | Notes |
 |------|--------|-------|
 | New collection registered in `payload.config.ts` and exported from `collections/index.ts` | ✅ | Phase 1 |
-| Migration generated (`migrate:create`) and applied (`migrate`) | ✅ | Phase 1 |
+| Migration generated (`migrate:create`) and applied (`migrate`) | ✅ | Two migrations generated; `migrate` run by the user |
 | `yarn generate:types` after schema change | ✅ | Phase 1 |
 | `overrideAccess: true` only in server-side loaders, never in client handlers | ✅ | Tracker uses `sdk` with the logged-in client's permissions — no `overrideAccess` |
 | Sensitive IDs (client) sourced from the DB doc, not the request | ✅ | `client` set in `beforeChange` from `req.user.id` |
@@ -260,3 +267,4 @@ Render and edit the note in `ExerciseCard`, strings in `pl.json`/`en.json`, visi
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-06-20 | Krzysztof Polak | Initial draft (Option B — `exercise-logs` collection) |
+| 2026-06-22 | Krzysztof Polak | Implemented. Collection given full relational parity with `set-logs` (added `exercise`, `exerciseName`, `roundLog`); split into two migrations (table + relations); `migrate` left to the user. Status → implemented. |

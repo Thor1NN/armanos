@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import React from 'react'
-import { CopyPlus } from 'lucide-react'
+import { CopyPlus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function AddSetActions({ onAdd, onDuplicate }: { onAdd: () => void; onDuplicate?: () => void }) {
@@ -10,7 +10,8 @@ export function AddSetActions({ onAdd, onDuplicate }: { onAdd: () => void; onDup
 
   return (
     <div className="mt-1.5 flex items-center gap-2">
-      <Button variant="dashed" onClick={onAdd}>
+      <Button variant="dashed" className="gap-1" onClick={onAdd}>
+        <Plus size={14} />
         {t('addSet')}
       </Button>
       {onDuplicate && (

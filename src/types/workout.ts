@@ -22,7 +22,7 @@ export type TGroup = {
 export type TSection = { title?: string | null; subtitle?: string | null; groups: TGroup[] }
 export type TWorkout = { id: number; title: string; rpe?: number | null; sections: TSection[] }
 
-export type Session = { id: number; startedAt?: string | null; finishedAt?: string | null }
+export type Session = { id: number; startedAt?: string | null; finishedAt?: string | null; notes?: string | null }
 
 export type SetLog = {
   id: number

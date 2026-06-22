@@ -10,10 +10,20 @@
   },
   "exercise": {
     "video": "▶ video",
-    "addSet": "+ add set",
+    "addSet": "add set",
     "duplicateSet": "Duplicate last set",
-    "addNote": "+ exercise note",
+    "addNote": "note",
+    "noteLabel": "Note:",
+    "editNote": "Edit note",
     "notePlaceholder": "note for the whole exercise",
+    "saveNote": "Save",
+    "cancelNote": "Cancel"
+  },
+  "session": {
+    "noteLabel": "Session note:",
+    "addNote": "session note",
+    "editNote": "Edit note",
+    "notePlaceholder": "note for the whole session",
     "saveNote": "Save",
     "cancelNote": "Cancel"
   },

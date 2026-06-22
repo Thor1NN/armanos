@@ -158,6 +158,13 @@ export function useWorkoutSession(
       setSets((prev) => prev.filter((set) => set.id !== id))
     }, 'Błąd usunięcia serii')
 
+  const saveSessionNote = (note: string) =>
+    runMutation(async () => {
+      const s = await ensureSession()
+      const doc = await sdk.update({ collection: 'workout-logs', id: s.id, depth: 0, data: { notes: note.trim() } as never })
+      setSession(toSession(doc))
+    }, 'Błąd zapisu notatki')
+
   const saveExerciseNote = (ex: TExercise, note: string) =>
     runMutation(async () => {
       const s = await ensureSession()
@@ -198,5 +205,6 @@ export function useWorkoutSession(
     updateSet,
     deleteSet,
     saveExerciseNote,
+    saveSessionNote,
   }
 }

@@ -10,10 +10,20 @@
   },
   "exercise": {
     "video": "▶ wideo",
-    "addSet": "+ dodaj serię",
+    "addSet": "dodaj serię",
     "duplicateSet": "Duplikuj ostatnią serię",
-    "addNote": "+ notatka do ćwiczenia",
+    "addNote": "notatka",
+    "noteLabel": "Notatka:",
+    "editNote": "Edytuj notatkę",
     "notePlaceholder": "notatka do całego ćwiczenia",
+    "saveNote": "Zapisz",
+    "cancelNote": "Anuluj"
+  },
+  "session": {
+    "noteLabel": "Notatka do sesji:",
+    "addNote": "notatka do sesji",
+    "editNote": "Edytuj notatkę",
+    "notePlaceholder": "notatka do całego treningu",
     "saveNote": "Zapisz",
     "cancelNote": "Anuluj"
   },
