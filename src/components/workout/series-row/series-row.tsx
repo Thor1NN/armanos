@@ -26,7 +26,7 @@ export function SeriesRow({
 
   if (editing) {
     return (
-      <li className={`px-2.5 py-2 ${joinClasses(panelClass, 'rounded-lg bg-ui-bg-base')}`}>
+      <li className={`mb-1 px-2.5 py-2 ${joinClasses(panelClass, 'rounded-lg bg-ui-bg-base')}`}>
         <SeriesForm
           fields={fields}
           initial={setLogToFormValues(set, fields)}

@@ -19,7 +19,7 @@ export function WorkoutTracker({
   readOnly?: boolean
   showResults?: boolean
 }) {
-  const { session, hasLoaded, error, clearError, setsForRow, noteForRow, setTime, saveTimes, addSet, updateSet, deleteSet, saveExerciseNote, saveSessionNote } =
+  const { session, error, clearError, setsForRow, noteForRow, setTime, saveTimes, addSet, updateSet, deleteSet, saveExerciseNote, saveSessionNote } =
     useWorkoutSession(workout, { readOnly, showResults })
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
   const t = useTranslations('session')
