@@ -51,7 +51,7 @@ export function NoteField({
           {labels.label}
           {note ? ` ${note}` : ''}
         </span>
-        <Button variant="icon" aria-label={note ? labels.edit : labels.add} onClick={open}>
+        <Button variant="dashed" aria-label={note ? labels.edit : labels.add} onClick={open}>
           {note ? <Pencil size={14} /> : <Plus size={14} />}
         </Button>
       </div>

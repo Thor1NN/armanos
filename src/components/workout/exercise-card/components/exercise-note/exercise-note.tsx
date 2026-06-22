@@ -15,7 +15,7 @@ export function ExerciseNote({
   const t = useTranslations('exercise')
 
   return (
-    <div className="mt-0.5">
+    <div className="mt-2.5">
       <NoteField
         note={note}
         readOnly={readOnly}

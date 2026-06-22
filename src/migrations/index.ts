@@ -5,6 +5,7 @@ import * as migration_20260618_162028_security_versioning from './20260618_16202
 import * as migration_20260618_172305_drop_share_links_versions from './20260618_172305_drop_share_links_versions';
 import * as migration_20260620_195052_exercise_logs from './20260620_195052_exercise_logs';
 import * as migration_20260620_200543_exercise_logs_relations from './20260620_200543_exercise_logs_relations';
+import * as migration_20260622_112303_bundle_with_previous from './20260622_112303_bundle_with_previous';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20260620_200543_exercise_logs_relations.up,
     down: migration_20260620_200543_exercise_logs_relations.down,
-    name: '20260620_200543_exercise_logs_relations'
+    name: '20260620_200543_exercise_logs_relations',
+  },
+  {
+    up: migration_20260622_112303_bundle_with_previous.up,
+    down: migration_20260622_112303_bundle_with_previous.down,
+    name: '20260622_112303_bundle_with_previous'
   },
 ];

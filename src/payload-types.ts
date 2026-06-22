@@ -317,6 +317,10 @@ export interface WorkoutGroup {
    */
   label?: string | null;
   order?: number | null;
+  /**
+   * Render this group in the same colored block as the group above it
+   */
+  bundleWithPrevious?: boolean | null;
   protocol?: ('standard' | 'emom' | 'amrap' | 'for_time' | 'tabata') | null;
   /**
    * e.g. "4", "1-3"
@@ -769,6 +773,7 @@ export interface WorkoutGroupsSelect<T extends boolean = true> {
   sectionRowId?: T;
   label?: T;
   order?: T;
+  bundleWithPrevious?: T;
   protocol?: T;
   rounds?: T;
   durationMinutes?: T;

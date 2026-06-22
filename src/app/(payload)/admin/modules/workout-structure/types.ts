@@ -5,6 +5,7 @@ export type Group = {
   sectionRowId?: string | null
   order?: number | null
   label?: string | null
+  bundleWithPrevious?: boolean | null
   protocol?: string | null
   rounds?: string | null
   durationMinutes?: number | null

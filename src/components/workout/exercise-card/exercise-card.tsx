@@ -35,7 +35,7 @@ export function ExerciseCard({
   const prefillValues: Values = { reps: exercise.prefill.reps ?? '', rir: exercise.prefill.rir ?? '', note: '' }
 
   return (
-    <div className="border-t border-ui-border-base py-2 first:border-t-0">
+    <div className="border-t border-ui-border-base py-2.5 first:border-t-0 first:pt-0 last:pb-0">
       <ExerciseHeader numer={exercise.numer} name={exercise.name} videoUrl={exercise.videoUrl} />
 
       {exercise.meta.length > 0 && <MetaLine>{exercise.meta.join(' · ')}</MetaLine>}
