@@ -130,3 +130,13 @@ yarn seed                   # seed demo data
 yarn lint                   # ESLint
 npx skills add <src> -a claude-code -a codex --copy  # install skills
 ```
+
+---
+
+## Release
+
+Releases use [Changesets](https://github.com/changesets/changesets).
+
+- For any user-facing change, add a changeset: `yarn changeset` (or create a `.changeset/*.md` file with the bump level and summary).
+- **The maintainer runs the release flow** — `yarn prepare-release` (runs `changeset version`, commits the bump, pushes `develop`, creates the `release/vX.Y.Z` branch, and opens the release PR).
+- Agents must **not** run `prepare-release` or `git push` to remote. Prepare locally only — create the changeset and commits — then hand off with the exact command (`yarn prepare-release`). Push/publish only if the maintainer explicitly asks this time.
