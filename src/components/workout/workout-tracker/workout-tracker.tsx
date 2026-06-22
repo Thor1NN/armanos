@@ -58,12 +58,6 @@ export function WorkoutTracker({
         </Alert>
       )}
 
-      {hasLoaded && !session && (
-        <div className={`mt-3 text-xs ${mutedTextClass}`}>
-          Brak zapisanych serii dla tego treningu. Dodanie pierwszej serii utworzy sesję automatycznie.
-        </div>
-      )}
-
       {workout.sections.map((section, sectionIndex) => (
         <div className="pt-4 pb-2" key={sectionIndex}>
           {(section.title || section.subtitle) && (
