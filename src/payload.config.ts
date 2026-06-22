@@ -27,6 +27,13 @@ const dirname = path.dirname(filename)
 
 const serverURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
+// Allowed CORS / CSRF-trusted origins, comma-separated; defaults to the serverURL.
+// Use this to permit additional origins (e.g. a `www.` variant) without changing code.
+const allowedOrigins = (process.env.PAYLOAD_CORS ?? serverURL)
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
 // Fail fast on a misconfigured deploy: a missing secret or DB URL should crash at
 // startup with a clear message, not boot with an empty secret / no database.
 function requiredEnv(name: string): string {
@@ -40,9 +47,9 @@ const databaseURL = requiredEnv('DATABASE_URL')
 
 export default buildConfig({
   serverURL,
-  // Restrict cross-origin requests and CSRF-trusted origins to our own domain.
-  cors: [serverURL],
-  csrf: [serverURL],
+  // Restrict cross-origin requests and CSRF-trusted origins to our own domain(s).
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   // GraphQL is not used by the app; disable it to shrink the public API surface.
   graphQL: {
     disable: true,
