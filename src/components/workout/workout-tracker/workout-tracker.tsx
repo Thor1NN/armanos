@@ -27,7 +27,7 @@ export function WorkoutTracker({
 
   return (
     <div className={`mb-3 px-4 py-3 ${panelClass}`}>
-      <div className="flex items-center justify-between gap-2.5 border-b border-ui-border-base pb-2.5 text-sm font-semibold text-ui-fg-base">
+      <div className="-mx-4 flex items-center justify-between gap-2.5 border-b border-ui-border-base px-4 pb-2.5 text-sm font-semibold text-ui-fg-base">
         <span>
           <span className="break-words">{workout.title}</span>
           <span className={mutedTextClass}> · #{workout.id}</span>
@@ -97,7 +97,7 @@ export function WorkoutTracker({
       ))}
 
       {(!readOnly || sessionNote) && (
-        <div className="border-t border-ui-border-base pt-2.5">
+        <div className="-mx-4 border-t border-ui-border-base px-4 pt-2.5">
           <NoteField
             note={sessionNote}
             readOnly={readOnly}

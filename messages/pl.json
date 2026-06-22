@@ -20,8 +20,8 @@
     "cancelNote": "Anuluj"
   },
   "session": {
-    "noteLabel": "Notatka do sesji:",
-    "addNote": "notatka do sesji",
+    "noteLabel": "Notatka do treningu:",
+    "addNote": "notatka do treningu",
     "editNote": "Edytuj notatkę",
     "notePlaceholder": "notatka do całego treningu",
     "saveNote": "Zapisz",

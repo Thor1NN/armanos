@@ -20,10 +20,10 @@
     "cancelNote": "Cancel"
   },
   "session": {
-    "noteLabel": "Session note:",
-    "addNote": "session note",
+    "noteLabel": "Workout note:",
+    "addNote": "workout note",
     "editNote": "Edit note",
-    "notePlaceholder": "note for the whole session",
+    "notePlaceholder": "note for the whole workout",
     "saveNote": "Save",
     "cancelNote": "Cancel"
   },

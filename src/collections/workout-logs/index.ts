@@ -76,7 +76,7 @@ export const WorkoutLogs: CollectionConfig = {
     {
       name: 'notes',
       type: 'textarea',
-      label: 'Session note (client)',
+      label: 'Workout note (client)',
     },
   ],
 }
