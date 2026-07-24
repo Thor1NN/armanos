@@ -81,6 +81,9 @@ export function WorkoutTracker({
                         {group.protocolLabel && (group.label ? `(${group.protocolLabel})` : group.protocolLabel)}
                       </div>
                     )}
+                    {group.meta.length > 0 && (
+                      <div className="mb-1 text-xs text-ui-fg-muted">{group.meta.join(' · ')}</div>
+                    )}
                     {group.exercises.map((exercise) => (
                       <ExerciseCard
                         key={exercise.rowId}

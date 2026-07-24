@@ -107,6 +107,7 @@ export async function loadPlansItems(
         protocol: (group.protocol as string) ?? 'standard',
         label: (group.label as string | null) ?? '',
         protocolLabel: workoutGroupLabel(group),
+        meta: groupMeta,
         exercises: rowsByGroup(group.id).map((ex) => {
           const cat =
             ex.exercise && typeof ex.exercise === 'object'
@@ -130,10 +131,7 @@ export async function loadPlansItems(
             targetType: (ex.targetType as 'repetitions' | 'duration' | null) ?? 'repetitions',
             videoUrl: (cat?.videoUrl as string | null | undefined) ?? null,
             rounds: (ex.rounds as string | null) ?? null,
-            meta: [
-              ...buildExerciseMeta(ex as Parameters<typeof buildExerciseMeta>[0], labels),
-              ...groupMeta,
-            ],
+            meta: buildExerciseMeta(ex as Parameters<typeof buildExerciseMeta>[0], labels),
             prefill: {
               repsLeft: (ex.repsLeft as string | null) ?? null,
               repsRight: (ex.repsRight as string | null) ?? null,

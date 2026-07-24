@@ -141,19 +141,37 @@ export const workoutGroupMeta = (group: {
   intervalSeconds?: unknown
   workSeconds?: unknown
   restSeconds?: unknown
+  restBetweenRounds?: unknown
 }): string[] => {
   const protocol = group.protocol as string | undefined
   const rounds = group.rounds as string | null | undefined
   const intervalSeconds = group.intervalSeconds as number | null | undefined
   const workSeconds = group.workSeconds as number | null | undefined
   const restSeconds = group.restSeconds as number | null | undefined
-  if (protocol !== 'emom') return []
+  const restBetweenRounds = group.restBetweenRounds as string | null | undefined
+  const rest = isValidValue(restBetweenRounds)
+    ? /^\d+(?:\.\d+)?$/.test(restBetweenRounds!.trim())
+      ? `Rest: ${restBetweenRounds!.trim()} s`
+      : `Rest: ${restBetweenRounds!.trim()}`
+    : null
 
   const parts: string[] = []
-  if (rounds) parts.push(`Duration: ${rounds} min`)
-  if (intervalSeconds != null) parts.push(`Interval: ${intervalSeconds} s`)
-  if (workSeconds != null) parts.push(`Work: ${workSeconds} s`)
-  if (restSeconds != null) parts.push(`Rest: ${restSeconds} s`)
+  if (protocol === 'standard') {
+    if (rounds) parts.push(`Sets: ${rounds}`)
+    if (rest) parts.push(rest)
+    return parts
+  }
+
+  if (protocol === 'emom') {
+    if (rounds) parts.push(`Duration: ${rounds} min`)
+    if (intervalSeconds != null) parts.push(`Interval: ${intervalSeconds} s`)
+    return parts
+  }
+
+  if (protocol === 'tabata') {
+    if (workSeconds != null) parts.push(`Work: ${workSeconds} s`)
+    if (restSeconds != null) parts.push(`Rest: ${restSeconds} s`)
+  }
   return parts
 }
 

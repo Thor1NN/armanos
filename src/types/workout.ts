@@ -18,6 +18,7 @@ export type TGroup = {
   protocol: string
   label: string
   protocolLabel: string
+  meta: string[]
   exercises: TExercise[]
 }
 
