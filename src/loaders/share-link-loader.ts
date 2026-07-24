@@ -46,7 +46,6 @@ export async function loadShareLink(token: string): Promise<TShareLinkData> {
       [planId],
       {
         seriesPrefix: t('seriesPrefix'),
-        repsPrefix: t('repsPrefix'),
         durationPrefix: t('durationPrefix'),
         restPrefix: t('restPrefix'),
       },

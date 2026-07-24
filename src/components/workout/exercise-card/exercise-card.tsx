@@ -32,7 +32,11 @@ export function ExerciseCard({
 }) {
   const [open, setOpen] = useState(false)
   const fields = trackingFields(exercise.trackingType)
-  const prefillValues: Values = { reps: exercise.prefill.reps ?? '', rir: exercise.prefill.rir ?? '', note: '' }
+  const prefillValues: Values = {
+    repsLeft: exercise.prefill.repsLeft ?? '',
+    repsRight: exercise.prefill.repsRight ?? '',
+    note: '',
+  }
 
   return (
     <div className="border-t border-ui-border-base py-2.5 first:border-t-0 first:pt-0 last:pb-0">

@@ -35,9 +35,14 @@ export function SeriesForm({
   } = useForm<Values>({ defaultValues: initial })
 
   const isBodyweight = useWatch({ control, name: BODYWEIGHT_KEY }) === 'true'
+  const visibleFields = fields.filter((field) => !isBodyweight || !METRIC_FIELDS[field].bodyweightAffected)
+  const hasBodyweightFields = fields.some((field) => METRIC_FIELDS[field].bodyweightAffected)
   const toggleBodyweight = useCallback(() => {
     setValue(BODYWEIGHT_KEY, isBodyweight ? 'false' : 'true')
-    if (!isBodyweight) setValue('weight', '')
+    if (!isBodyweight) {
+      setValue('weightLeft', '')
+      setValue('weightRight', '')
+    }
   }, [isBodyweight, setValue])
 
   const validateAtLeastOne = () => {
@@ -56,12 +61,12 @@ export function SeriesForm({
     await onSubmit(data)
   })
 
-  const firstField = fields[0]
+  const firstField = visibleFields[0]
 
   return (
     <form className="mt-1.5 flex flex-col gap-2" onSubmit={submit} noValidate>
       <div className="flex flex-wrap gap-2">
-        {fields.map((field, index) => (
+        {visibleFields.map((field, index) => (
           <MetricFieldInput
             key={field}
             field={field}
@@ -72,10 +77,13 @@ export function SeriesForm({
             control={control}
             setValue={setValue}
             validate={validateAtLeastOne}
-            isBodyweight={isBodyweight}
-            onToggleBodyweight={toggleBodyweight}
           />
         ))}
+        {hasBodyweightFields && (
+          <Button size="sm" variant="secondary" type="button" onClick={toggleBodyweight}>
+            {isBodyweight ? t('bodyweightActive') : 'MC'}
+          </Button>
+        )}
       </div>
 
       <Field label={t('note')}>

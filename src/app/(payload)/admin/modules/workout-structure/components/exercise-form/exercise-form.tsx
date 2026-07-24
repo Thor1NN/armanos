@@ -6,7 +6,7 @@ import type { ExerciseRow } from '../../types'
 import { s } from '../../styles'
 import { sdk } from '@/lib/sdk'
 import { textField } from '@/app/(payload)/admin/utils/fields'
-import { validateKgOrReps, validateRepsOrKg, validateRounds } from '../../utils'
+import { validateKgOrRepsSides, validateRepsSidesOrKg, validateRounds } from '../../utils'
 
 type Props = {
   groupId: number
@@ -49,10 +49,13 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
 
       <div style={s.formRow}>
         <div style={{ flex: '1 1 70px' }}>
-          <TextField path="reps" field={textField('reps', 'Reps', '8')} validate={validateRepsOrKg} />
+          <TextField path="repsLeft" field={textField('repsLeft', 'Reps left', '8')} validate={validateRepsSidesOrKg} />
         </div>
         <div style={{ flex: '1 1 70px' }}>
-          <TextField path="kg" field={textField('kg', 'KG', '60')} validate={validateKgOrReps} />
+          <TextField path="repsRight" field={textField('repsRight', 'Reps right', '8')} validate={validateRepsSidesOrKg} />
+        </div>
+        <div style={{ flex: '1 1 70px' }}>
+          <TextField path="kg" field={textField('kg', 'KG', '60')} validate={validateKgOrRepsSides} />
         </div>
         <div style={{ flex: '1 1 70px' }}>
           <TextField path="rir" field={textField('rir', 'RIR', '2')} />
@@ -61,7 +64,7 @@ function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => voi
           <TextField path="tut" field={textField('tut', 'TUT', '3-0-1')} />
         </div>
         <div style={{ flex: '1 1 90px' }}>
-          <TextField path="rest" field={textField('rest', 'Rest', '90 sec')} />
+          <TextField path="rest" field={textField('rest', 'Rest(s)', '90')} />
         </div>
       </div>
 
@@ -85,7 +88,8 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
     rounds:   { value: initial?.rounds   ?? '' },
     exercise: { value: initial?.exercise ? { value: initial.exercise.id, relationTo: 'exercises' } : null },
     note:     { value: initial?.note     ?? '' },
-    reps:     { value: initial?.reps     ?? '' },
+    repsLeft: { value: initial?.repsLeft ?? '' },
+    repsRight: { value: initial?.repsRight ?? '' },
     kg:       { value: initial?.kg       ?? '' },
     rir:      { value: initial?.rir      ?? '' },
     tut:      { value: initial?.tut      ?? '' },
@@ -99,7 +103,8 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
       rounds:   (data.rounds  as string) || null,
       exercise: exerciseRaw ? Number(exerciseRaw.value) : null,
       note:     (data.note    as string) || null,
-      reps:     (data.reps    as string) || null,
+      repsLeft: (data.repsLeft as string) || null,
+      repsRight: (data.repsRight as string) || null,
       kg:       (data.kg      as string) || null,
       rir:      (data.rir     as string) || null,
       tut:      (data.tut     as string) || null,

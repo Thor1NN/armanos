@@ -36,7 +36,6 @@ export async function loadTrainingPlans(): Promise<LoadResult> {
     planIds,
     {
       seriesPrefix: t('seriesPrefix'),
-      repsPrefix: t('repsPrefix'),
       durationPrefix: t('durationPrefix'),
       restPrefix: t('restPrefix'),
     },

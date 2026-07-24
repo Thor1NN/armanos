@@ -1,7 +1,7 @@
 import { getPayload } from 'payload'
 
 import { STATUS_LABEL } from '@/types/constants'
-import { buildExerciseMeta, workoutGroupLabel } from '@/lib/metrics'
+import { buildExerciseMeta, workoutGroupLabel, workoutGroupMeta } from '@/lib/metrics'
 import type { TPlanAccordionItem } from '@/types/plan'
 import type { TBlock, TGroup, TWorkout } from '@/types/workout'
 
@@ -9,7 +9,6 @@ type Payload = Awaited<ReturnType<typeof getPayload>>
 
 export type PlanLabels = {
   seriesPrefix: string
-  repsPrefix: string
   durationPrefix: string
   restPrefix: string
 }
@@ -101,44 +100,52 @@ export async function loadPlansItems(
     }>
     const groups = groupsByWorkout(workout.id)
 
-    const serializeGroup = (group: (typeof groups)[number]): TGroup => ({
-      protocol: (group.protocol as string) ?? 'standard',
-      label: workoutGroupLabel(group),
-      exercises: rowsByGroup(group.id).map((ex) => {
-        const cat =
-          ex.exercise && typeof ex.exercise === 'object'
-            ? (ex.exercise as {
-                id: number
-                name?: string
-                trackingType?: string
-                videoUrl?: string
-              })
-            : null
-        const name = cat?.name || ex.note || ''
-        const extraNote = cat && ex.note && ex.note !== cat.name ? ex.note : null
-        return {
-          rowId: String(ex.id),
-          numer: (ex.numer as string | null) ?? null,
-          name,
-          note: extraNote as string | null,
-          exerciseId: cat?.id ?? null,
-          exerciseName: name,
-          trackingType: cat?.trackingType ?? null,
-          videoUrl: (cat?.videoUrl as string | null | undefined) ?? null,
-          rounds: (ex.rounds as string | null) ?? null,
-          meta: buildExerciseMeta(ex as Parameters<typeof buildExerciseMeta>[0], labels),
-          prefill: {
-            reps: (ex.reps as string | null) ?? null,
-            rir: (ex.rir as string | null) ?? null,
-          },
-          setParameters:
-            (ex.setParameters as
-              | Array<{ setNumber: number; reps?: string | null; kg?: string | null }>
-              | null
-              | undefined) ?? null,
-        }
-      }),
-    })
+    const serializeGroup = (group: (typeof groups)[number]): TGroup => {
+      const groupMeta = workoutGroupMeta(group)
+
+      return {
+        protocol: (group.protocol as string) ?? 'standard',
+        label: (group.label as string | null) ?? '',
+        protocolLabel: workoutGroupLabel(group),
+        exercises: rowsByGroup(group.id).map((ex) => {
+          const cat =
+            ex.exercise && typeof ex.exercise === 'object'
+              ? (ex.exercise as {
+                  id: number
+                  name?: string
+                  trackingType?: string
+                  videoUrl?: string
+                })
+              : null
+          const name = cat?.name || ex.note || ''
+          const extraNote = cat && ex.note && ex.note !== cat.name ? ex.note : null
+          return {
+            rowId: String(ex.id),
+            numer: (ex.numer as string | null) ?? null,
+            name,
+            note: extraNote as string | null,
+            exerciseId: cat?.id ?? null,
+            exerciseName: name,
+            trackingType: cat?.trackingType ?? null,
+            videoUrl: (cat?.videoUrl as string | null | undefined) ?? null,
+            rounds: (ex.rounds as string | null) ?? null,
+            meta: [
+              ...buildExerciseMeta(ex as Parameters<typeof buildExerciseMeta>[0], labels),
+              ...groupMeta,
+            ],
+            prefill: {
+              repsLeft: (ex.repsLeft as string | null) ?? null,
+              repsRight: (ex.repsRight as string | null) ?? null,
+            },
+            setParameters:
+              (ex.setParameters as
+                | Array<{ setNumber: number; reps?: string | null; kg?: string | null }>
+                | null
+                | undefined) ?? null,
+          }
+        }),
+      }
+    }
 
     return {
       id: workout.id,

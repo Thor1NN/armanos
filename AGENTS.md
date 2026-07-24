@@ -7,6 +7,7 @@ Operational guide for AI agents working in this repository.
 ## Before Writing Code
 
 - Write everything in English: code, comments, variable names, documentation.
+- Do not implement code, schema, migration, script, configuration, or documentation changes unless the user explicitly authorizes implementation with "wdrażamy" or an equivalent clear instruction. Analysis, investigation, and recommendations do not authorize changes.
 - Check `.ai/specs/` before coding any non-trivial feature.
 - Skills are installed in `.claude/skills/` (Claude Code) and `.agents/skills/` (Codex). `.agents/skills/` is the local source of truth — edit a skill **only** there, then run `ags push-skill` to propagate it to the source repo (it also syncs the `.claude/skills/` copy). See Installing skills.
 - Prefer minimal, focused changes. Do not refactor code outside the task scope.
@@ -123,13 +124,31 @@ src/
 ```bash
 yarn dev                    # start dev server
 yarn build                  # production build — run after every implementation
-yarn payload migrate        # run pending DB migrations
+yarn payload migrate:create # generate a migration after a schema change - run manually
+yarn payload migrate        # run pending DB migrations - run manually
 yarn generate:types         # regenerate payload-types.ts
 yarn generate:importmap     # regenerate admin import map (after adding custom views)
+yarn backfill:set-log-sides # backfill legacy set-log sides - run manually
+yarn backfill:workout-exercise-reps-sides # backfill legacy exercise-row reps - run manually
+yarn normalize:reps-sides  # split legacy left+right reps - run manually
+yarn normalize:workout-exercise-kg # normalize legacy exercise-row KG - run manually
 yarn seed                   # seed demo data
 yarn lint                   # ESLint
 npx skills add <src> -a claude-code -a codex --copy  # install skills
 ```
+
+## Database Migrations
+
+- Generate migrations with `yarn payload migrate:create` after every schema change.
+- Maintainers run `yarn payload migrate:create` and `yarn payload migrate` manually. Agents must not run either command.
+- Agents must never create migration files manually or edit Payload-generated migration files.
+- Keep Payload-generated schema migrations in their generated form. Do not add manual SQL or data updates to them.
+
+## Data Backfills
+
+- Implement every data backfill as a separate, idempotent script through the Payload Local API.
+- Do not add data backfill SQL to Payload-generated schema migrations.
+- Maintainers run backfill scripts manually. Agents must not run them.
 
 ---
 

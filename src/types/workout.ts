@@ -9,13 +9,14 @@ export type TExercise = {
   videoUrl?: string | null
   rounds?: string | null
   meta: string[]
-  prefill: { reps?: string | null; rir?: string | null }
+  prefill: { repsLeft?: string | null; repsRight?: string | null }
   setParameters?: Array<{ setNumber: number; reps?: string | null; kg?: string | null }> | null
 }
 
 export type TGroup = {
   protocol: string
   label: string
+  protocolLabel: string
   exercises: TExercise[]
 }
 
@@ -32,10 +33,14 @@ export type SetLog = {
   exerciseRow?: number | null
   setNumber?: number | null
   weight?: number | null
+  weightLeft?: number | null
+  weightRight?: number | null
   isBodyweight?: boolean | null
   distanceM?: number | null
   durationSec?: number | null
   reps?: string | null
+  repsLeft?: string | null
+  repsRight?: string | null
   rir?: string | null
   note?: string | null
 }

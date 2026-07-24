@@ -8,7 +8,6 @@ import { minKey, secKey, unitKey } from '@/lib/metric-keys'
 import { Field } from '@/components/ui/field'
 import { Input, Select } from '@/components/ui/input'
 import type { Values } from '@/types/workout'
-import { BodyweightField } from '../bodyweight-field'
 import { DurationInput } from '../duration-input'
 
 export function MetricFieldInput({
@@ -20,8 +19,6 @@ export function MetricFieldInput({
   control,
   setValue,
   validate,
-  isBodyweight,
-  onToggleBodyweight,
 }: {
   field: MetricField
   isFirst: boolean
@@ -31,8 +28,6 @@ export function MetricFieldInput({
   control: Control<Values>
   setValue: UseFormSetValue<Values>
   validate: () => true | string
-  isBodyweight: boolean
-  onToggleBodyweight: () => void
 }) {
   const meta = METRIC_FIELDS[field]
   const firstFieldOptions: RegisterOptions<Values> = isFirst ? { validate } : {}
@@ -85,20 +80,6 @@ export function MetricFieldInput({
           />
         </span>
       </Field>
-    )
-  }
-
-  if (field === 'weight') {
-    return (
-      <BodyweightField
-        label={meta.label}
-        placeholder={meta.placeholder}
-        autoFocus={autoFocus}
-        register={register}
-        registerOptions={firstFieldOptions}
-        isBodyweight={isBodyweight}
-        onToggleBodyweight={onToggleBodyweight}
-      />
     )
   }
 

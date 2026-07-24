@@ -83,6 +83,8 @@ export async function loadWorkoutStructure(
         : null,
     note: r.note ?? null,
     reps: r.reps ?? null,
+    repsLeft: r.repsLeft ?? null,
+    repsRight: r.repsRight ?? null,
     kg: r.kg ?? null,
     tut: r.tut ?? null,
     rir: r.rir ?? null,

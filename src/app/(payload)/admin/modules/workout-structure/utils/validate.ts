@@ -7,13 +7,15 @@ export const validateRounds: TextFieldValidation = (value) => {
   return true
 }
 
-export const validateRepsOrKg: TextFieldValidation = (value, { siblingData }) => {
-  if (!value && !(siblingData as SiblingData)?.kg) return 'Enter reps or load'
+export const validateRepsSidesOrKg: TextFieldValidation = (value, { siblingData }) => {
+  const data = siblingData as SiblingData
+  if (!value && !data.repsLeft && !data.repsRight && !data.kg) return 'Enter reps or load'
   return true
 }
 
-export const validateKgOrReps: TextFieldValidation = (value, { siblingData }) => {
-  if (!value && !(siblingData as SiblingData)?.reps) return 'Enter reps or load'
+export const validateKgOrRepsSides: TextFieldValidation = (value, { siblingData }) => {
+  const data = siblingData as SiblingData
+  if (!value && !data.repsLeft && !data.repsRight) return 'Enter reps or load'
   return true
 }
 

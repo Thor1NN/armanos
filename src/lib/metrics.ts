@@ -6,12 +6,20 @@ import { BODYWEIGHT_KEY, minKey, secKey, unitKey } from './metric-keys'
 
 type ExerciseMetaLabels = {
   seriesPrefix: string
-  repsPrefix: string
   durationPrefix: string
   restPrefix: string
 }
 
 type UnitMeta = { options: { value: string; factor: number }[]; default: string }
+
+const numericOrNull = (value?: string): number | null => {
+  const trimmed = value?.trim() ?? ''
+  if (trimmed === '') return null
+  const numericValue = Number(trimmed)
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+const textOrNull = (value?: string): string | null => value?.trim() || null
 
 /** Returns the conversion factor for a unit, defaulting to 1 when not found. */
 const unitFactor = (units: UnitMeta, unit: string): number =>
@@ -23,10 +31,20 @@ export const isValidValue = (value?: string | null): boolean => {
   return trimmed !== '' && trimmed.toLowerCase() !== 'x'
 }
 
+export const formatSideReps = (repsLeft?: string | null, repsRight?: string | null): string | null => {
+  const left = isValidValue(repsLeft) ? repsLeft!.trim() : null
+  const right = isValidValue(repsRight) ? repsRight!.trim() : null
+
+  if (left && right) return `${left}+${right}`
+  return left ?? right
+}
+
 export const buildExerciseMeta = (
   ex: {
     rounds?: string | null
     reps?: string | null
+    repsLeft?: string | null
+    repsRight?: string | null
     durationMin?: number | null
     durationSec?: number | null
     rest?: string | null
@@ -38,13 +56,15 @@ export const buildExerciseMeta = (
 ): string[] => {
   const parts: string[] = []
   if (isValidValue(ex.rounds)) parts.push(`${labels.seriesPrefix}: ${ex.rounds}`)
-  if (isValidValue(ex.reps)) parts.push(`${labels.repsPrefix}: ${ex.reps}`)
+  const sideReps = formatSideReps(ex.repsLeft, ex.repsRight)
+  if (sideReps) parts.push(`Steps: ${sideReps}`)
+  else if (isValidValue(ex.reps)) parts.push(`Steps: ${ex.reps}`)
   const dur = formatMinSec(ex.durationMin, ex.durationSec)
   if (dur) parts.push(`${labels.durationPrefix}: ${dur}`)
   if (isValidValue(ex.rest)) parts.push(`${labels.restPrefix}: ${ex.rest}`)
   if (isValidValue(ex.tut)) parts.push(`TUT: ${ex.tut}`)
   if (isValidValue(ex.rir)) parts.push(`RIR: ${ex.rir}`)
-  if (isValidValue(ex.kg)) parts.push(`${ex.kg} kg`)
+  if (isValidValue(ex.kg)) parts.push(`KG: ${ex.kg}`)
   return parts
 }
 
@@ -61,8 +81,8 @@ export const metricBody = (fields: MetricField[], values: Values): Record<string
       continue
     }
 
-    if (field === 'weight' && isBodyweight) {
-      body.weight = null
+    if (isBodyweight && meta.bodyweightAffected) {
+      body[field] = null
       continue
     }
 
@@ -73,7 +93,7 @@ export const metricBody = (fields: MetricField[], values: Values): Record<string
       const unit = values[unitKey(field)] || meta.units.default
       body[field] = Number(raw) * unitFactor(meta.units, unit)
     } else {
-      body[field] = meta.numeric ? Number(raw) : raw
+      body[field] = meta.numeric ? numericOrNull(raw) : textOrNull(raw)
     }
   }
 
@@ -92,32 +112,45 @@ export const toDefaultUnit = (field: MetricField, base: number): { value: string
 export const setSummary = (set: SetLog): string => {
   const parts: string[] = []
   if (set.isBodyweight) parts.push('MC')
-  else if (set.weight != null) parts.push(`${set.weight} kg`)
+  else {
+    if (set.weightLeft != null) parts.push(`L ${set.weightLeft} kg`)
+    if (set.weightRight != null) parts.push(`R ${set.weightRight} kg`)
+  }
   if (set.distanceM != null) parts.push(`${set.distanceM} m`)
   if (set.durationSec != null) parts.push(formatSec(set.durationSec))
-  // reps is free text - empty string means "not filled", so only render a truthy value
-  if (set.reps) parts.push(`× ${set.reps}`)
-  if (set.rir) parts.push(`RIR ${set.rir}`)
+  const sideReps = formatSideReps(set.repsLeft, set.repsRight)
+  if (sideReps) parts.push(`Steps: ${sideReps}`)
   if (set.note) parts.push(set.note)
   return parts.length ? parts.join(' · ') : '—'
 }
 
 export const workoutGroupLabel = (group: {
-  label?: unknown
+  protocol?: unknown
+}): string => {
+  const protocol = group.protocol as keyof typeof PROTOCOL_LABEL | undefined
+  return protocol ? (PROTOCOL_LABEL[protocol] ?? protocol) : ''
+}
+
+export const workoutGroupMeta = (group: {
   protocol?: unknown
   rounds?: unknown
-  durationMinutes?: unknown
-}): string => {
-  if (group.label) return group.label as string
-  const protocol = group.protocol as string
+  intervalSeconds?: unknown
+  workSeconds?: unknown
+  restSeconds?: unknown
+}): string[] => {
+  const protocol = group.protocol as string | undefined
   const rounds = group.rounds as string | null | undefined
-  const durationMinutes = group.durationMinutes as number | null | undefined
-  if (protocol === 'emom') return rounds ? `${PROTOCOL_LABEL.emom} · ${rounds} min` : PROTOCOL_LABEL.emom
-  if (protocol === 'amrap')
-    return durationMinutes ? `${PROTOCOL_LABEL.amrap} · ${durationMinutes} min` : PROTOCOL_LABEL.amrap
-  if (protocol === 'for_time') return rounds ? `${PROTOCOL_LABEL.for_time} · ${rounds} rund` : PROTOCOL_LABEL.for_time
-  if (protocol === 'tabata') return PROTOCOL_LABEL.tabata
-  return rounds ? `${rounds} serie` : ''
+  const intervalSeconds = group.intervalSeconds as number | null | undefined
+  const workSeconds = group.workSeconds as number | null | undefined
+  const restSeconds = group.restSeconds as number | null | undefined
+  if (protocol !== 'emom') return []
+
+  const parts: string[] = []
+  if (rounds) parts.push(`Duration: ${rounds} min`)
+  if (intervalSeconds != null) parts.push(`Interval: ${intervalSeconds} s`)
+  if (workSeconds != null) parts.push(`Work: ${workSeconds} s`)
+  if (restSeconds != null) parts.push(`Rest: ${restSeconds} s`)
+  return parts
 }
 
 export const setLogToFormValues = (set: SetLog, fields: MetricField[]): Values => {

@@ -174,7 +174,7 @@ async function run() {
       data: {
         ...pick(row, [
           'order', 'numer', 'note',
-          'rounds', 'reps', 'kg',
+          'rounds', 'reps', 'repsLeft', 'repsRight', 'kg',
           'tut', 'rir', 'rest',
           'durationMin', 'durationSec',
           'setParameters', 'override',

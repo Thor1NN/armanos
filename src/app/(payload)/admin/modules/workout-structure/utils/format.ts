@@ -1,4 +1,5 @@
 import type { ExerciseRow, Group } from '../types'
+import { formatSideReps } from '@/lib/metrics'
 
 export const groupLabel = (g: Group): string => {
   const p = g.protocol ?? 'standard'
@@ -17,10 +18,12 @@ export const exerciseLabel = (row: ExerciseRow): string =>
 export const exerciseMeta = (row: ExerciseRow): string => {
   const parts: string[] = []
   if (row.rounds) parts.push(`${row.rounds} sets`)
-  if (row.reps) parts.push(`${row.reps} reps`)
-  if (row.kg) parts.push(`${row.kg} kg`)
+  const sideReps = formatSideReps(row.repsLeft, row.repsRight)
+  if (sideReps) parts.push(`Steps: ${sideReps}`)
+  else if (row.reps) parts.push(`Steps: ${row.reps}`)
+  if (row.kg) parts.push(`KG: ${row.kg}`)
   if (row.rir) parts.push(`RIR ${row.rir}`)
   if (row.tut) parts.push(`TUT ${row.tut}`)
-  if (row.rest) parts.push(`rest ${row.rest}`)
+  if (row.rest) parts.push(`Rest(s): ${row.rest}`)
   return parts.join(' · ')
 }

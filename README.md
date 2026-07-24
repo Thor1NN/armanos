@@ -194,8 +194,11 @@ PAYLOAD_SECRET=your-long-random-secret-here
 Run migrations:
 
 ```bash
+yarn payload migrate:create # after a schema change
 yarn payload migrate
 ```
+
+Run both migration commands manually. Agents do not generate or apply database migrations.
 
 ### Run
 
@@ -263,7 +266,12 @@ src/
 | `yarn dev` | Start dev server |
 | `yarn build` | Production build |
 | `yarn start` | Start production server |
+| `yarn payload migrate:create` | Generate a database migration after a schema change. Run manually. |
 | `yarn payload migrate` | Run pending database migrations |
+| `yarn backfill:set-log-sides` | Copy legacy set-log values into left and right fields. Run manually. |
+| `yarn backfill:workout-exercise-reps-sides` | Copy legacy exercise-row reps into left and right fields. Run manually. |
+| `yarn normalize:reps-sides` | Split legacy left and right rep values. Run manually. |
+| `yarn normalize:workout-exercise-kg` | Normalize legacy exercise-row KG values. Run manually. |
 | `yarn generate:types` | Regenerate `payload-types.ts` from collection configs |
 | `yarn generate:importmap` | Regenerate Payload admin import map (run after adding custom views) |
 | `yarn seed` | Seed database with demo data |

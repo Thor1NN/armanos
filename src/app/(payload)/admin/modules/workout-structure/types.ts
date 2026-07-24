@@ -24,6 +24,8 @@ export type ExerciseRow = {
   note?: string | null
   rounds?: string | null
   reps?: string | null
+  repsLeft?: string | null
+  repsRight?: string | null
   kg?: string | null
   tut?: string | null
   rir?: string | null

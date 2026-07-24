@@ -74,7 +74,13 @@ export function WorkoutTracker({
               >
                 {block.groups.map((group, groupIndex) => (
                   <div key={groupIndex} className={groupIndex > 0 ? 'mt-2' : undefined}>
-                    {group.label && <div className={`mb-1 ${sectionLabelClass}`}>{group.label}</div>}
+                    {(group.label || group.protocolLabel) && (
+                      <div className={`mb-1 ${sectionLabelClass}`}>
+                        {group.label}
+                        {group.label && group.protocolLabel ? ' ' : ''}
+                        {group.protocolLabel && (group.label ? `(${group.protocolLabel})` : group.protocolLabel)}
+                      </div>
+                    )}
                     {group.exercises.map((exercise) => (
                       <ExerciseCard
                         key={exercise.rowId}
