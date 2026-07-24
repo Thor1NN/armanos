@@ -88,7 +88,7 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
               <TextField path="workSeconds" field={textField('workSeconds', 'Work (s)')} validate={validateWorkSeconds} />
             </div>
             <div style={{ flex: '1 1 70px' }}>
-              <TextField path="restSeconds" field={textField('restSeconds', 'Rest (s)')} validate={validateRestSeconds} />
+              <TextField path="restSeconds" field={textField('restSeconds', 'Rest(s)')} validate={validateRestSeconds} />
             </div>
           </>
         )}
