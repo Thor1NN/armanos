@@ -45,6 +45,7 @@ export const buildExerciseMeta = (
     reps?: string | null
     repsLeft?: string | null
     repsRight?: string | null
+    targetType?: 'repetitions' | 'duration' | null
     durationMin?: number | null
     durationSec?: number | null
     rest?: string | null
@@ -56,11 +57,14 @@ export const buildExerciseMeta = (
 ): string[] => {
   const parts: string[] = []
   if (isValidValue(ex.rounds)) parts.push(`${labels.seriesPrefix}: ${ex.rounds}`)
-  const sideReps = formatSideReps(ex.repsLeft, ex.repsRight)
-  if (sideReps) parts.push(`Steps: ${sideReps}`)
-  else if (isValidValue(ex.reps)) parts.push(`Steps: ${ex.reps}`)
-  const dur = formatMinSec(ex.durationMin, ex.durationSec)
-  if (dur) parts.push(`${labels.durationPrefix}: ${dur}`)
+  if (ex.targetType === 'duration') {
+    const duration = formatMinSec(ex.durationMin, ex.durationSec)
+    if (duration) parts.push(`${labels.durationPrefix}: ${duration}`)
+  } else {
+    const sideReps = formatSideReps(ex.repsLeft, ex.repsRight)
+    if (sideReps) parts.push(`Steps: ${sideReps}`)
+    else if (isValidValue(ex.reps)) parts.push(`Steps: ${ex.reps}`)
+  }
   if (isValidValue(ex.rest)) parts.push(`${labels.restPrefix}: ${ex.rest}`)
   if (isValidValue(ex.tut)) parts.push(`TUT: ${ex.tut}`)
   if (isValidValue(ex.rir)) parts.push(`RIR: ${ex.rir}`)

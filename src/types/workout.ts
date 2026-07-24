@@ -6,6 +6,7 @@ export type TExercise = {
   exerciseId?: number | null
   exerciseName: string
   trackingType?: string | null
+  targetType?: 'repetitions' | 'duration' | null
   videoUrl?: string | null
   rounds?: string | null
   meta: string[]

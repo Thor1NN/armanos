@@ -72,10 +72,8 @@ export function SeriesForm({
             field={field}
             isFirst={field === firstField}
             autoFocus={index === 0}
-            initial={initial}
             register={register}
             control={control}
-            setValue={setValue}
             validate={validateAtLeastOne}
           />
         ))}

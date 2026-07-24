@@ -2,6 +2,9 @@ import type { TextFieldValidation } from 'payload'
 
 type SiblingData = Record<string, unknown>
 
+const hasValue = (value: unknown): boolean =>
+  value !== null && value !== undefined && String(value).trim() !== ''
+
 export const validateRounds: TextFieldValidation = (value) => {
   if (value && !/^[\d\-–]+$/.test(String(value))) return 'Format: number or range (e.g. 4, 3–4)'
   return true
@@ -9,13 +12,19 @@ export const validateRounds: TextFieldValidation = (value) => {
 
 export const validateRepsSidesOrKg: TextFieldValidation = (value, { siblingData }) => {
   const data = siblingData as SiblingData
-  if (!value && !data.repsLeft && !data.repsRight && !data.kg) return 'Enter reps or load'
+  if (!hasValue(value) && !hasValue(data.repsLeft) && !hasValue(data.repsRight) && !hasValue(data.kg)) return 'Enter reps or load'
   return true
 }
 
 export const validateKgOrRepsSides: TextFieldValidation = (value, { siblingData }) => {
   const data = siblingData as SiblingData
-  if (!value && !data.repsLeft && !data.repsRight) return 'Enter reps or load'
+  if (!hasValue(value) && !hasValue(data.repsLeft) && !hasValue(data.repsRight)) return 'Enter reps or load'
+  return true
+}
+
+export const validateDuration: TextFieldValidation = (value, { siblingData }) => {
+  const data = siblingData as SiblingData
+  if (!hasValue(value) && !hasValue(data.durationMin) && !hasValue(data.durationSec)) return 'Enter duration'
   return true
 }
 

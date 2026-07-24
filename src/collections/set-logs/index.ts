@@ -21,7 +21,7 @@ export const SetLogs: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [
-      async ({ data, req }) => {
+      async ({ data, originalDoc, req }) => {
         if (!data) return data
         if (req.user?.collection === 'clients' && data.session) {
           const session = await req.payload.findByID({
@@ -34,7 +34,21 @@ export const SetLogs: CollectionConfig = {
             throw new Error('You cannot log sets to someone else\'s session.')
           }
         }
-        if (data.exercise) {
+        const exerciseRowId = data.exerciseRow ?? originalDoc?.exerciseRow
+        const exerciseRow = exerciseRowId
+          ? await req.payload.findByID({
+              collection: 'workout-exercise-rows',
+              id: exerciseRowId,
+              depth: 0,
+            })
+          : null
+
+        if (exerciseRow?.targetType === 'duration') {
+          const allowedFields = new Set<string>(['weightLeft', 'weightRight', 'durationSec', ...LEGACY_SET_LOG_FIELDS])
+          for (const field of [...ALL_METRIC_FIELDS, ...LEGACY_SET_LOG_FIELDS]) {
+            if (!allowedFields.has(field)) data[field] = null
+          }
+        } else if (data.exercise) {
           const ex = await req.payload.findByID({
             collection: 'exercises',
             id: data.exercise,
@@ -43,7 +57,7 @@ export const SetLogs: CollectionConfig = {
           const allowed = trackingFields(ex?.trackingType)
           const allowedFields = new Set<string>([...allowed, ...LEGACY_SET_LOG_FIELDS])
           for (const field of [...ALL_METRIC_FIELDS, ...LEGACY_SET_LOG_FIELDS]) {
-            if (!allowedFields.has(field) && data[field] != null) data[field] = null
+            if (!allowedFields.has(field)) data[field] = null
           }
         }
         return data

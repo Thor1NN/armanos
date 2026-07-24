@@ -366,6 +366,7 @@ export interface WorkoutExerciseRow {
    */
   exercise?: (number | null) | Exercise;
   note?: string | null;
+  targetType?: ('repetitions' | 'duration') | null;
   /**
    * e.g. 4, 3-4
    */
@@ -800,6 +801,7 @@ export interface WorkoutExerciseRowsSelect<T extends boolean = true> {
   numer?: T;
   exercise?: T;
   note?: T;
+  targetType?: T;
   rounds?: T;
   reps?: T;
   repsLeft?: T;

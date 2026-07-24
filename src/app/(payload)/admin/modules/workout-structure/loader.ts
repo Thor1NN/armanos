@@ -82,6 +82,7 @@ export async function loadWorkoutStructure(
         ? { id: (r.exercise as { id: number }).id, name: (r.exercise as { name?: string | null }).name ?? null }
         : null,
     note: r.note ?? null,
+    targetType: (r as { targetType?: 'repetitions' | 'duration' | null }).targetType ?? 'repetitions',
     reps: r.reps ?? null,
     repsLeft: r.repsLeft ?? null,
     repsRight: r.repsRight ?? null,

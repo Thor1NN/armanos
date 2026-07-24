@@ -8,6 +8,7 @@ import * as migration_20260620_200543_exercise_logs_relations from './20260620_2
 import * as migration_20260622_112303_bundle_with_previous from './20260622_112303_bundle_with_previous';
 import * as migration_20260724_065545 from './20260724_065545';
 import * as migration_20260724_073306 from './20260724_073306';
+import * as migration_20260724_090318 from './20260724_090318';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20260724_073306.up,
     down: migration_20260724_073306.down,
-    name: '20260724_073306'
+    name: '20260724_073306',
+  },
+  {
+    up: migration_20260724_090318.up,
+    down: migration_20260724_090318.down,
+    name: '20260724_090318'
   },
 ];

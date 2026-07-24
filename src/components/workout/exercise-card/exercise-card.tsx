@@ -31,7 +31,10 @@ export function ExerciseCard({
   readOnly?: boolean
 }) {
   const [open, setOpen] = useState(false)
-  const fields = trackingFields(exercise.trackingType)
+  const fields: MetricField[] =
+    exercise.targetType === 'duration'
+      ? ['weightLeft', 'weightRight', 'durationSec']
+      : trackingFields(exercise.trackingType)
   const prefillValues: Values = {
     repsLeft: exercise.prefill.repsLeft ?? '',
     repsRight: exercise.prefill.repsRight ?? '',

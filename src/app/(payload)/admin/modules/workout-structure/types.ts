@@ -22,6 +22,7 @@ export type ExerciseRow = {
   numer?: string | null
   exercise?: { id: number; name?: string | null } | null
   note?: string | null
+  targetType?: 'repetitions' | 'duration' | null
   rounds?: string | null
   reps?: string | null
   repsLeft?: string | null

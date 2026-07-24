@@ -72,12 +72,38 @@ export const WorkoutExerciseRows: CollectionConfig = {
       label: 'Note / variant',
     },
     {
+      name: 'targetType',
+      type: 'select',
+      label: 'Target type',
+      defaultValue: 'repetitions',
+      options: [
+        { label: 'Repetitions', value: 'repetitions' },
+        { label: 'Duration', value: 'duration' },
+      ],
+    },
+    {
       type: 'row',
       fields: [
         { name: 'rounds', type: 'text', label: 'Sets', admin: { width: '25%', description: 'e.g. 4, 3-4' } },
         { name: 'reps', type: 'text', label: 'Reps', admin: { hidden: true } },
-        { name: 'repsLeft', type: 'text', label: 'Reps left', admin: { width: '25%' } },
-        { name: 'repsRight', type: 'text', label: 'Reps right', admin: { width: '25%' } },
+        {
+          name: 'repsLeft',
+          type: 'text',
+          label: 'Reps left',
+          admin: {
+            condition: (_, siblingData) => (siblingData.targetType ?? 'repetitions') === 'repetitions',
+            width: '25%',
+          },
+        },
+        {
+          name: 'repsRight',
+          type: 'text',
+          label: 'Reps right',
+          admin: {
+            condition: (_, siblingData) => (siblingData.targetType ?? 'repetitions') === 'repetitions',
+            width: '25%',
+          },
+        },
         { name: 'kg', type: 'text', label: 'KG', admin: { width: '25%' } },
       ],
     },
@@ -97,7 +123,10 @@ export const WorkoutExerciseRows: CollectionConfig = {
           type: 'number',
           label: 'Duration — minutes',
           min: 0,
-          admin: { width: '50%' },
+          admin: {
+            condition: (_, siblingData) => siblingData.targetType === 'duration',
+            width: '50%',
+          },
         },
         {
           name: 'durationSec',
@@ -105,7 +134,10 @@ export const WorkoutExerciseRows: CollectionConfig = {
           label: 'Duration — seconds',
           min: 0,
           max: 59,
-          admin: { width: '50%' },
+          admin: {
+            condition: (_, siblingData) => siblingData.targetType === 'duration',
+            width: '50%',
+          },
         },
       ],
     },

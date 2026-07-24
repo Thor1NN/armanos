@@ -127,6 +127,7 @@ export async function loadPlansItems(
             exerciseId: cat?.id ?? null,
             exerciseName: name,
             trackingType: cat?.trackingType ?? null,
+            targetType: (ex.targetType as 'repetitions' | 'duration' | null) ?? 'repetitions',
             videoUrl: (cat?.videoUrl as string | null | undefined) ?? null,
             rounds: (ex.rounds as string | null) ?? null,
             meta: [
