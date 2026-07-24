@@ -2,6 +2,7 @@ import React from 'react'
 
 export const s = {
   container: { padding: '20px 24px', fontFamily: 'var(--font-body)' } as React.CSSProperties,
+  header: { marginBottom: 16 } as React.CSSProperties,
   sectionBlock: { marginBottom: 28 } as React.CSSProperties,
   sectionHeader: {
     fontSize: 11,

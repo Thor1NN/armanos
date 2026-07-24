@@ -11,6 +11,7 @@ import { ExerciseForm } from '../exercise-form'
 import { useWorkoutMutations } from './hooks/use-workout-mutations'
 
 type Props = {
+  header?: React.ReactNode
   sections: Section[]
   initialGroups: Group[]
   initialExerciseRows: ExerciseRow[]
@@ -19,6 +20,7 @@ type Props = {
 }
 
 export function WorkoutStructureEditor({
+  header,
   sections,
   initialGroups,
   initialExerciseRows,
@@ -48,6 +50,7 @@ export function WorkoutStructureEditor({
 
   return (
     <div style={s.container}>
+      {header && <div style={s.header}>{header}</div>}
 
       {exerciseRowsWithLogs.size === 0 && (
         <div style={s.infoMsg}>

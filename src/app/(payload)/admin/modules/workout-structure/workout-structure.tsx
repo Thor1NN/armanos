@@ -1,4 +1,5 @@
 import React from 'react'
+import { WorkoutStructureBreadcrumb } from '../training-navigation/training-navigation'
 import { loadWorkoutStructure } from './loader'
 import { WorkoutStructureEditor } from './components/editor'
 
@@ -21,5 +22,10 @@ export async function WorkoutStructureView({
   }
 
   const data = await loadWorkoutStructure(payload, docId)
-  return <WorkoutStructureEditor {...data} />
+  return (
+    <WorkoutStructureEditor
+      {...data}
+      header={<WorkoutStructureBreadcrumb id={docId} payload={payload} />}
+    />
+  )
 }

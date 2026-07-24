@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Form, RelationshipField, TextField, toast, useFormProcessing } from '@payloadcms/ui'
-import type { FormState, SingleRelationshipFieldClient, ValueWithRelation } from 'payload'
+import type { FormState, SingleRelationshipFieldClient } from 'payload'
 import type { ExerciseRow } from '../../types'
 import { s } from '../../styles'
 import { sdk } from '@/lib/sdk'
@@ -86,7 +86,7 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
   const initialState: FormState = {
     numer:    { value: initial?.numer    ?? '' },
     rounds:   { value: initial?.rounds   ?? '' },
-    exercise: { value: initial?.exercise ? { value: initial.exercise.id, relationTo: 'exercises' } : null },
+    exercise: { value: initial?.exercise?.id ?? null },
     note:     { value: initial?.note     ?? '' },
     repsLeft: { value: initial?.repsLeft ?? '' },
     repsRight: { value: initial?.repsRight ?? '' },
@@ -97,11 +97,11 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
   }
 
   const handleSubmit = async (_: FormState, data: Record<string, unknown>) => {
-    const exerciseRaw = data.exercise as ValueWithRelation | null
+    const exerciseId = data.exercise as number | string | null
     const body = {
       numer:    (data.numer   as string) || null,
       rounds:   (data.rounds  as string) || null,
-      exercise: exerciseRaw ? Number(exerciseRaw.value) : null,
+      exercise: exerciseId ? Number(exerciseId) : null,
       note:     (data.note    as string) || null,
       repsLeft: (data.repsLeft as string) || null,
       repsRight: (data.repsRight as string) || null,

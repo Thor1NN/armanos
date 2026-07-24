@@ -1,3 +1,5 @@
+import { PlanMicrocycles as PlanMicrocycles_97d8c339b0a7b72f91585277739d5b79 } from '@/app/(payload)/admin/modules/training-navigation/training-navigation'
+import { MicrocycleWorkouts as MicrocycleWorkouts_97d8c339b0a7b72f91585277739d5b79 } from '@/app/(payload)/admin/modules/training-navigation/training-navigation'
 import { WorkoutLogsNotice as WorkoutLogsNotice_39bf38d00355d79c704c09f118dbdf2d } from '@/app/(payload)/admin/modules/workout-logs-notice/workout-logs-notice'
 import { WorkoutStructureView as WorkoutStructureView_30ad39f13ceb101227cf63fc7340b241 } from '@/app/(payload)/admin/modules/workout-structure/workout-structure'
 import { ShareLinkUrl as ShareLinkUrl_650cf55127df39a4288b83046d4e6bf2 } from '@/app/(payload)/admin/modules/share-link-url/share-link-url'
@@ -5,6 +7,8 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/app/(payload)/admin/modules/training-navigation/training-navigation#PlanMicrocycles": PlanMicrocycles_97d8c339b0a7b72f91585277739d5b79,
+  "@/app/(payload)/admin/modules/training-navigation/training-navigation#MicrocycleWorkouts": MicrocycleWorkouts_97d8c339b0a7b72f91585277739d5b79,
   "@/app/(payload)/admin/modules/workout-logs-notice/workout-logs-notice#WorkoutLogsNotice": WorkoutLogsNotice_39bf38d00355d79c704c09f118dbdf2d,
   "@/app/(payload)/admin/modules/workout-structure/workout-structure#WorkoutStructureView": WorkoutStructureView_30ad39f13ceb101227cf63fc7340b241,
   "@/app/(payload)/admin/modules/share-link-url/share-link-url#ShareLinkUrl": ShareLinkUrl_650cf55127df39a4288b83046d4e6bf2,
