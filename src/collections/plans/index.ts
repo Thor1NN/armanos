@@ -77,7 +77,7 @@ export const Plans: CollectionConfig = {
       admin: {
         components: {
           Field: {
-            path: '@/app/(payload)/admin/modules/training-navigation/training-navigation',
+            path: '@/modules/training/admin/training-navigation/training-navigation',
             exportName: 'PlanMicrocycles',
           },
         },

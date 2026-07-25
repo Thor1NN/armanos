@@ -24,7 +24,7 @@ Match the task to the table before starting. A single task often maps to multipl
 |---|---|
 | Creating a new collection or extending the schema | Load skill `payload-build-collections` |
 | Adding a custom admin view, tab, or field UI | Load skill `payload-build-modules` |
-| Building a front-end component or page (`src/components`, `(frontend)`) | Load skill `payload-frontend-build-components` |
+| Building a front-end component or page (`src/components`, `src/modules/*/components`, `(frontend)`) | Load skill `payload-frontend-build-components` |
 | Debugging hooks, queries, access control, transactions | Load skill `payload` |
 | Security review, or adding/modifying auth, access control, uploads, CORS/CSRF, headers | Load skill `payload-security`; keep `.ai/audits/security-audit.md` current |
 | Writing questions for a client or stakeholder | Load skill `writing-questions` |
@@ -98,16 +98,19 @@ src/
 │   └── (payload)/             # Payload admin routes and API
 ├── collections/               # One folder per collection (index.ts + optional hooks.ts, types.ts)
 ├── components/
-│   ├── common/
-│   ├── ui/
-│   └── workout/
+│   ├── common/                # App-wide, non-domain components
+│   └── ui/                    # Domain-agnostic UI primitives
 ├── data/                      # Static/seed data
 ├── i18n/                      # next-intl config
-├── lib/                       # Utilities and SDK client
-├── loaders/                   # Server-side data fetching
+├── lib/                       # Business-agnostic utilities and SDK client
 ├── migrations/                # Payload DB migrations (auto-generated)
+├── modules/                   # Vertical business modules
+│   └── <module>/
+│       ├── <area>/            # Domain area (types, constants, rules)
+│       ├── components/        # Module-owned frontend components
+│       ├── server/            # Server-only queries and use cases
+│       └── admin/             # Module-owned Payload Admin UI
 ├── scripts/                   # One-off CLI scripts
-├── types/
 ├── payload-types.ts           # Auto-generated — do not edit
 └── payload.config.ts
 .claude/skills/                # Skills for Claude Code
@@ -116,6 +119,40 @@ src/
 ├── specs/                     # Feature specs (tracked)
 └── audits/                    # Security audit status (gitignored — lists unpatched gaps)
 ```
+
+---
+
+## Module Architecture
+
+- `src/modules/` is organized by business capability, not by Payload collection. A module
+  is a vertical slice that may own domain rules, frontend components, server queries, and
+  Payload Admin UI.
+- Closely related concepts belong to areas inside one module. For example, `training`
+  contains `exercises`, `plans`, and `logs`; do not create a separate top-level module for
+  every table or entity.
+- Keep `src/app/` thin: route files compose module entry points but do not own feature
+  implementations. Modules must never import from `src/app/`.
+- Keep Payload `CollectionConfig`, fields, hooks, access control, relationships, and
+  indexes in `src/collections/`. Collections may import only client-safe domain APIs from
+  modules, never module components, admin UI, or server entry points.
+- Put domain-specific React components under `src/modules/<module>/components/`. Keep only
+  domain-agnostic primitives in `src/components/ui/` and cross-module application UI in
+  `src/components/common/`.
+- Put server-side queries and use cases under an explicit `server/` entry point and add
+  `import 'server-only'`. Do not re-export server code from a client-safe module barrel.
+- Put Payload Admin implementations under `src/modules/<module>/admin/<feature>/`.
+  Collection configuration must reference the exact component file and the import map
+  must be regenerated after a path changes.
+- Use `types.ts` only for types and interfaces, and `constants.ts` only for constants and
+  declarative configuration. Name operation files after their responsibility; do not add
+  generic `utils.ts`, `helpers.ts`, or `models.ts` files.
+- Code outside a domain area must use its public `index.ts`. Environment-specific APIs use
+  explicit subpaths such as `@/modules/training/plans/server` or
+  `@/modules/training/components/workout-plans`.
+- Cross-module dependencies must use public entry points, remain one-directional, and
+  stay cycle-free. For example, `sharing` may use the public `training/plans/server` API;
+  `training` must not depend back on `sharing`.
+- Keep only business-agnostic technical functions and SDK clients in `src/lib/`.
 
 ---
 

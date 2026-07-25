@@ -9,6 +9,7 @@ A coach-facing admin and client-facing training tracker built with Payload CMS a
 **Client (web app)** — logs in, sees their active plan, works through workouts session by session, and logs each set (reps, weight, RIR, time, etc.).
 
 ## Navigation
+
 - [Data model & flow](#data-model--flow)
 - [Tech stack](#tech-stack)
 - [Getting started](#getting-started)
@@ -159,7 +160,7 @@ For every log collection: a client may only create/read/update/delete **their ow
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 15 (App Router) |
+| Framework | Next.js 16 (App Router) |
 | CMS / Auth | Payload CMS 3 |
 | Database | PostgreSQL (`@payloadcms/db-postgres`) |
 | Styling | Tailwind CSS |
@@ -189,16 +190,23 @@ Edit `.env`:
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/training_app
 PAYLOAD_SECRET=your-long-random-secret-here
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-Run migrations:
+Apply existing migrations:
 
 ```bash
-yarn payload migrate:create # after a schema change
 yarn payload migrate
 ```
 
-Run both migration commands manually. Agents do not generate or apply database migrations.
+Create a new migration only after changing the Payload schema:
+
+```bash
+yarn payload migrate:create
+yarn payload migrate
+```
+
+Maintainers run migration commands manually. Agents do not generate or apply database migrations.
 
 ### Run
 
@@ -242,16 +250,23 @@ src/
 │   └── users/
 ├── components/
 │   ├── common/                # App-wide UI (logout button…)
-│   ├── ui/                    # Primitive components (button, input, surface…)
-│   └── workout/               # Workout tracker components
+│   └── ui/                    # Domain-agnostic primitives (button, input, surface…)
 ├── data/                      # Static/seed data
 ├── i18n/                      # next-intl routing and request config
-├── lib/                       # Shared utilities and SDK client
-├── loaders/                   # Server-side data fetching functions
+├── lib/                       # Domain-agnostic technical functions and SDK client
 ├── migrations/                # Payload database migrations
+├── modules/                   # Vertical business modules
+│   ├── training/
+│   │   ├── exercises/         # Exercise types, constants, tracking rules, formatters
+│   │   ├── plans/             # Plan types, constants, formatters, server queries
+│   │   ├── logs/              # Training-log types, constants, metric transformations
+│   │   ├── components/        # Training-specific frontend components and hooks
+│   │   └── admin/             # Training-specific Payload Admin UI
+│   └── sharing/
+│       ├── server/            # Share-link validation and data loading
+│       └── admin/             # Sharing-specific Payload Admin UI
 ├── scripts/                   # One-off CLI scripts (seed, import-plan…)
-├── types/                     # Shared TypeScript types
-├── middleware.ts
+├── proxy.ts                   # Locale routing and share-token cookie handling
 ├── payload-types.ts           # Auto-generated — do not edit manually
 └── payload.config.ts
 .claude/skills/                # AI skills for Claude Code
@@ -259,11 +274,26 @@ src/
 .ai/specs/                     # Feature specifications
 ```
 
+### Module architecture
+
+- A module represents a business capability, not a Payload collection.
+- Closely related areas stay inside one module. `training` owns `exercises`, `plans`, and
+  `logs`.
+- `src/app` contains routing and page composition. Feature implementations live outside it.
+- Domain-specific frontend components live in `src/modules/<module>/components`.
+- Server queries and use cases use an explicit `server/` entry point with `server-only`.
+- Payload Admin implementations live in `src/modules/<module>/admin`.
+- Payload collection configuration, access control, hooks, and relationships remain in
+  `src/collections`.
+- Cross-module imports use public entry points and must remain one-directional.
+- `src/lib` is reserved for technical, domain-agnostic functions and SDK clients.
+
 ## Key scripts
 
 | Script | Description |
 |---|---|
 | `yarn dev` | Start dev server |
+| `yarn devsafe` | Clear the Next.js build cache and start the dev server |
 | `yarn build` | Production build |
 | `yarn start` | Start production server |
 | `yarn payload migrate:create` | Generate a database migration after a schema change. Run manually. |
@@ -273,17 +303,22 @@ src/
 | `yarn normalize:reps-sides` | Split legacy left and right rep values. Run manually. |
 | `yarn normalize:workout-exercise-kg` | Normalize legacy exercise-row KG values. Run manually. |
 | `yarn generate:types` | Regenerate `payload-types.ts` from collection configs |
-| `yarn generate:importmap` | Regenerate Payload admin import map (run after adding custom views) |
+| `yarn generate:importmap` | Regenerate the Payload admin import map after adding or moving a custom admin component |
 | `yarn seed` | Seed database with demo data |
 | `yarn seed:export` | Export current database state to seed file |
 | `yarn lint` | Run ESLint |
+| `yarn format` | Format TypeScript and TSX files with Prettier |
+| `yarn format:check` | Check TypeScript and TSX formatting |
+| `yarn install-skills` | Install the repository's AI skills |
+| `yarn changeset` | Create a release changeset |
 | `npx skills add <source>` | Install AI skills into `.claude/skills/` and `.agents/skills/` |
 
 ## Development
 
 ### Adding a collection
 
-Follow `.ai/skills/payload-build-collections` — each collection lives in `src/collections/{kebab-case}/index.ts` and is registered in `src/collections/index.ts`.
+Follow `.agents/skills/payload-build-collections` — each collection lives in
+`src/collections/{kebab-case}/index.ts` and is registered in `src/collections/index.ts`.
 
 After changing collection configs, regenerate types:
 
@@ -293,11 +328,22 @@ yarn generate:types
 
 ### Adding an admin view or custom field UI
 
-Follow `.ai/skills/payload-build-modules`. After registering a new component path, run:
+Follow `.agents/skills/payload-build-modules`. Place the implementation in
+`src/modules/<module>/admin/<feature>/`. After adding or changing a registered component
+path, run:
 
 ```bash
 yarn generate:importmap
 ```
+
+### Adding a frontend component
+
+Follow `.agents/skills/payload-frontend-build-components`.
+
+- Generic primitives belong in `src/components/ui`.
+- Cross-module application components belong in `src/components/common`.
+- Domain-specific components belong in `src/modules/<module>/components/<feature>`.
+- Routed pages remain in `src/app/[locale]/(frontend)`.
 
 ### AI skills
 
@@ -308,6 +354,14 @@ To install skills from the source repository:
 ```bash
 npx skills add <source-path-or-url> -a claude-code -a codex --copy
 ```
+
+`.agents/skills/` is the local source of truth. After editing a skill, synchronize it with:
+
+```bash
+ags push-skill
+```
+
+Do not edit `.claude/skills/` manually; it is a generated copy.
 
 Skills cover: Payload patterns, collection scaffolding, admin module structure, UI copy, and spec writing.
 

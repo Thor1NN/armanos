@@ -46,16 +46,17 @@ src/
 │   └── share-links/
 │       └── index.ts                          # new collection
 ├── app/
-│   ├── (payload)/
-│   │   └── admin/modules/share-link-url/
-│   │       ├── share-link-url.tsx            # custom UI component (admin)
-│   │       └── index.ts
 │   └── [locale]/(frontend)/
 │       └── share/
 │           └── [token]/
 │               └── page.tsx                  # public share page
-└── loaders/
-    └── share-link-loader.ts                  # token validation + data fetching
+└── modules/
+    └── sharing/
+        ├── admin/share-link-url/
+        │   ├── share-link-url.tsx            # custom UI component (admin)
+        │   └── index.ts
+        └── server/
+            └── load-share-link.ts            # token validation + data fetching
 ```
 
 ### Modified files
@@ -89,7 +90,7 @@ src/
 
 ## Token Validation (loader)
 
-`loadShareLink(token: string)` in `src/loaders/share-link-loader.ts`:
+`loadShareLink(token: string)` in `src/modules/sharing/server/load-share-link.ts`:
 
 1. Query `share-links` with `where: { token: { equals: token } }`, `overrideAccess: true`, `limit: 1`
 2. If no document found → return `null`
@@ -166,8 +167,8 @@ Build the loader, the share page, and any read-only variants of existing workout
 
 ### Phase 2
 
-- [ ] Create `src/app/(payload)/admin/modules/share-link-url/share-link-url.tsx` — client component using `useFormFields` to read `token`, compose URL from `NEXT_PUBLIC_SERVER_URL`, render copy button
-- [ ] Create `src/app/(payload)/admin/modules/share-link-url/index.ts` — re-export
+- [ ] Create `src/modules/sharing/admin/share-link-url/share-link-url.tsx` — client component using `useFormFields` to read `token`, compose URL from `NEXT_PUBLIC_SERVER_URL`, render copy button
+- [ ] Create `src/modules/sharing/admin/share-link-url/index.ts` — re-export
 - [ ] Wire component into `shareUrl` ui field in the collection
 - [ ] Run `yarn generate:importmap`
 - [ ] Run `yarn build` — verify no type errors
@@ -175,7 +176,7 @@ Build the loader, the share page, and any read-only variants of existing workout
 ### Phase 3
 
 - [ ] Add `share` namespace keys to `messages/pl.json` and `messages/en.json`
-- [ ] Create `src/loaders/share-link-loader.ts`
+- [ ] Create `src/modules/sharing/server/load-share-link.ts`
 - [ ] Create `src/app/[locale]/(frontend)/share/[token]/page.tsx`
 - [ ] Adapt plan components to support `readOnly` prop (hide set forms, logging buttons) — or create a read-only wrapper
 - [ ] Run `yarn build` — verify no type errors

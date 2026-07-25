@@ -1,0 +1,48 @@
+import 'server-only'
+
+import { headers as getHeaders } from 'next/headers.js'
+import { getTranslations } from 'next-intl/server'
+import { getPayload } from 'payload'
+
+import config from '@/payload.config'
+import type { TrainingPlansLoadResult } from '@/modules/training/plans'
+
+import { loadPlanItems } from './load-plan-items'
+
+export async function loadTrainingPlans(): Promise<TrainingPlansLoadResult> {
+  const headers = await getHeaders()
+  const payload = await getPayload({ config: await config })
+  const { user } = await payload.auth({ headers })
+
+  if (!user || user.collection !== 'clients') {
+    return { user: null }
+  }
+
+  const t = await getTranslations('home')
+
+  const plans = await payload.find({
+    collection: 'plans',
+    where: { client: { equals: user.id } },
+    sort: '-createdAt',
+    depth: 0,
+    limit: 100,
+  })
+
+  const planIds = plans.docs.map((plan) => plan.id)
+
+  const accordionPlans = await loadPlanItems(
+    payload,
+    planIds,
+    {
+      seriesPrefix: t('seriesPrefix'),
+      durationPrefix: t('durationPrefix'),
+      restPrefix: t('restPrefix'),
+    },
+    true,
+  )
+
+  return {
+    user: { id: user.id, name: user.name ?? null, email: user.email ?? null },
+    plans: accordionPlans,
+  }
+}

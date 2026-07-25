@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { adminOrOwnByClient, canReadViaShareToken } from '../../access'
-import { trackingFields, ALL_METRIC_FIELDS, LEGACY_SET_LOG_FIELDS } from '../exercises/types'
+import { ALL_METRIC_FIELDS, getTrackingFields } from '@/modules/training/exercises'
+import { LEGACY_SET_LOG_FIELDS } from '@/modules/training/logs'
 
 export const SetLogs: CollectionConfig = {
   slug: 'set-logs',
@@ -54,7 +55,7 @@ export const SetLogs: CollectionConfig = {
             id: data.exercise,
             depth: 0,
           })
-          const allowed = trackingFields(ex?.trackingType)
+          const allowed = getTrackingFields(ex?.trackingType)
           const allowedFields = new Set<string>([...allowed, ...LEGACY_SET_LOG_FIELDS])
           for (const field of [...ALL_METRIC_FIELDS, ...LEGACY_SET_LOG_FIELDS]) {
             if (!allowedFields.has(field)) data[field] = null

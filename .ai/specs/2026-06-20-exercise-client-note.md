@@ -24,7 +24,7 @@ Today a client can only add a note **per set** (`set-logs.note`). We add a new l
 
 ## Problem Statement
 
-In the workout tracker a client logs exercise execution as sets (`set-logs`). Each set can have its own note (`set-logs.note`, the field in [SeriesForm](../../src/components/workout/series-form/series-form.tsx)). What is missing is a note **for the whole exercise** — an annotation like "shoulders felt weak today, lower the weight next time" that applies to the exercise as a whole, not to one specific set.
+In the workout tracker a client logs exercise execution as sets (`set-logs`). Each set can have its own note (`set-logs.note`, the field in [SeriesForm](../../src/modules/training/components/series-form/series-form.tsx)). What is missing is a note **for the whole exercise** — an annotation like "shoulders felt weak today, lower the weight next time" that applies to the exercise as a whole, not to one specific set.
 
 The note cannot live in the plan: `workout-exercise-rows` has `update: isAdmin` — clients do not write to the template. It must therefore be created in the log layer, tied to the **(session, exercise)** pair.
 
@@ -111,7 +111,7 @@ src/
 │   │   └── index.ts                  # NEW collection
 │   └── index.ts                      # + re-export ExerciseLogs
 ├── payload.config.ts                 # + register in collections[]
-├── components/workout/
+├── modules/training/components/
 │   ├── workout-tracker/
 │   │   ├── workout-tracker.tsx       # pass note + onSaveNote to the card
 │   │   └── hooks/
@@ -192,7 +192,7 @@ useWorkoutSession (hook)
             └── update local state
 ```
 
-UI: [workout-tracker.tsx](../../src/components/workout/workout-tracker/workout-tracker.tsx) passes `note` + `onSaveNote` to [exercise-card.tsx](../../src/components/workout/exercise-card/exercise-card.tsx), which renders the note in the exercise header (distinct from the plan note) and — when `!readOnly` — exposes an editable field.
+UI: [workout-tracker.tsx](../../src/modules/training/components/workout-tracker/workout-tracker.tsx) passes `note` + `onSaveNote` to [exercise-card.tsx](../../src/modules/training/components/exercise-card/exercise-card.tsx), which renders the note in the exercise header (distinct from the plan note) and — when `!readOnly` — exposes an editable field.
 
 ---
 
@@ -220,13 +220,13 @@ Render and edit the note in `ExerciseCard`, strings in `pl.json`/`en.json`, visi
 - [x] `yarn payload migrate` — run by the user (DB-mutating step).
 
 ### Phase 2 — Runtime
-- [x] [use-workout-session.ts](../../src/components/workout/workout-tracker/hooks/use-workout-session.ts): load `exercise-logs` by `session` (parallel with set-logs), add `exerciseNotes` state.
+- [x] [use-workout-session.ts](../../src/modules/training/components/workout-tracker/hooks/use-workout-session.ts): load `exercise-logs` by `session` (parallel with set-logs), add `exerciseNotes` state.
 - [x] Add the `noteForRow(rowId)` selector and the `saveExerciseNote(ex, note)` mutation (upsert).
 - [x] Expose both in the hook's returned API.
 
 ### Phase 3 — UI + i18n
-- [x] [workout-tracker.tsx](../../src/components/workout/workout-tracker/workout-tracker.tsx): pass `clientNote` + `onSaveNote` to `ExerciseCard`.
-- [x] [exercise-card.tsx](../../src/components/workout/exercise-card/exercise-card.tsx): render the client note in the header (new `exercise-note` subcomponent) + allow editing when `!readOnly`.
+- [x] [workout-tracker.tsx](../../src/modules/training/components/workout-tracker/workout-tracker.tsx): pass `clientNote` + `onSaveNote` to `ExerciseCard`.
+- [x] [exercise-card.tsx](../../src/modules/training/components/exercise-card/exercise-card.tsx): render the client note in the header (new `exercise-note` subcomponent) + allow editing when `!readOnly`.
 - [x] Strings (`addNote`, `notePlaceholder`, `saveNote`, `cancelNote`) in `messages/pl.json` + `messages/en.json`.
 - [x] [export-seed.ts](../../src/scripts/export-seed.ts): comment updated (logs already excluded via the allow-list).
 - [x] Typecheck (`tsc --noEmit`) + lint pass.

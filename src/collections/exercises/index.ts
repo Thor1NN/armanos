@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAuthenticated } from '../../access'
-import { trackingOptions, DEFAULT_TRACKING } from './types'
+import { DEFAULT_TRACKING, TRACKING_OPTIONS } from '@/modules/training/exercises'
 
 export const Exercises: CollectionConfig = {
   slug: 'exercises',
@@ -27,7 +27,7 @@ export const Exercises: CollectionConfig = {
       type: 'select',
       label: 'Tracking type',
       defaultValue: DEFAULT_TRACKING,
-      options: trackingOptions,
+      options: TRACKING_OPTIONS,
       admin: { description: 'Determines which fields are shown in the set logging form' },
     },
     {
