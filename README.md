@@ -258,14 +258,14 @@ src/
 ├── modules/                   # Vertical business modules
 │   ├── training/
 │   │   ├── exercises/         # Exercise types, constants, tracking rules, formatters
-│   │   ├── plans/             # Plan types, constants, formatters, server queries
+│   │   ├── plans/             # Payload plan documents, tree building, formatters, server loaders
 │   │   ├── logs/              # Training-log types, constants, metric transformations
 │   │   ├── components/        # Training-specific frontend components and hooks
 │   │   └── admin/             # Training-specific Payload Admin UI
 │   └── sharing/
 │       ├── server/            # Share-link validation and data loading
 │       └── admin/             # Sharing-specific Payload Admin UI
-├── scripts/                   # One-off CLI scripts (seed, import-plan…)
+├── scripts/                   # Seed and seed-export CLI scripts
 ├── proxy.ts                   # Locale routing and share-token cookie handling
 ├── payload-types.ts           # Auto-generated — do not edit manually
 └── payload.config.ts
