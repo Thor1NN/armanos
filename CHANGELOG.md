@@ -1,5 +1,20 @@
 # training-app
 
+## 1.4.0
+
+### Minor Changes
+
+- 2b1669d: Add plan and workout structure navigation in the admin panel and fix exercise catalog selection in the structure editor.
+- 2d3214f: Allow workout exercises to use either repetition or duration targets.
+- 4d7378b: Record left and right weights and repetitions separately for strength sets and exercise defaults.
+- 8adc18d: Show group protocol details above exercises in workout tracking.
+
+### Patch Changes
+
+- 420d6b9: Support multiple CORS / CSRF-trusted origins via the optional `PAYLOAD_CORS` env var (comma-separated). Defaults to `serverURL`, so existing single-origin deployments are unaffected. Useful for permitting an extra origin (e.g. a `www.` variant) without code changes.
+- fd08425: Reorganize training and sharing code into domain-oriented business modules. Move frontend components, server queries, and Payload Admin extensions behind explicit module boundaries without changing user-facing behavior.
+- 66d61f7: Standardize rest duration labels as `Rest(s)` in workout group configuration.
+
 ## 1.3.0
 
 ### Minor Changes
