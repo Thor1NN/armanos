@@ -41,5 +41,18 @@ export const Microcycles: CollectionConfig = {
       label: 'Order',
       defaultValue: 0,
     },
+    {
+      name: 'workoutsNavigation',
+      type: 'ui',
+      label: '',
+      admin: {
+        components: {
+          Field: {
+            path: '@/modules/training/admin/training-navigation/training-navigation',
+            exportName: 'MicrocycleWorkouts',
+          },
+        },
+      },
+    },
   ],
 }

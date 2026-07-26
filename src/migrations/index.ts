@@ -6,6 +6,9 @@ import * as migration_20260618_172305_drop_share_links_versions from './20260618
 import * as migration_20260620_195052_exercise_logs from './20260620_195052_exercise_logs';
 import * as migration_20260620_200543_exercise_logs_relations from './20260620_200543_exercise_logs_relations';
 import * as migration_20260622_112303_bundle_with_previous from './20260622_112303_bundle_with_previous';
+import * as migration_20260724_065545 from './20260724_065545';
+import * as migration_20260724_073306 from './20260724_073306';
+import * as migration_20260724_090318 from './20260724_090318';
 
 export const migrations = [
   {
@@ -46,6 +49,21 @@ export const migrations = [
   {
     up: migration_20260622_112303_bundle_with_previous.up,
     down: migration_20260622_112303_bundle_with_previous.down,
-    name: '20260622_112303_bundle_with_previous'
+    name: '20260622_112303_bundle_with_previous',
+  },
+  {
+    up: migration_20260724_065545.up,
+    down: migration_20260724_065545.down,
+    name: '20260724_065545',
+  },
+  {
+    up: migration_20260724_073306.up,
+    down: migration_20260724_073306.down,
+    name: '20260724_073306',
+  },
+  {
+    up: migration_20260724_090318.up,
+    down: migration_20260724_090318.down,
+    name: '20260724_090318'
   },
 ];

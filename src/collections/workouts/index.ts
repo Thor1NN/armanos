@@ -40,7 +40,7 @@ export const Workouts: CollectionConfig = {
         edit: {
           structure: {
             Component: {
-              path: '@/app/(payload)/admin/modules/workout-structure/workout-structure',
+              path: '@/modules/training/admin/workout-structure/workout-structure',
               exportName: 'WorkoutStructureView',
             },
             path: '/structure',
@@ -72,7 +72,7 @@ export const Workouts: CollectionConfig = {
       admin: {
         components: {
           Field: {
-            path: '@/app/(payload)/admin/modules/workout-logs-notice/workout-logs-notice',
+            path: '@/modules/training/admin/workout-logs-notice/workout-logs-notice',
             exportName: 'WorkoutLogsNotice',
           },
         },

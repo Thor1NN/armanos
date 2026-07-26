@@ -70,5 +70,18 @@ export const Plans: CollectionConfig = {
       label: 'Source (file)',
       admin: { description: 'Where the plan was imported from' },
     },
+    {
+      name: 'microcyclesNavigation',
+      type: 'ui',
+      label: '',
+      admin: {
+        components: {
+          Field: {
+            path: '@/modules/training/admin/training-navigation/training-navigation',
+            exportName: 'PlanMicrocycles',
+          },
+        },
+      },
+    },
   ],
 }

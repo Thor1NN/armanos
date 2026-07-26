@@ -1,12 +1,13 @@
 import type { CollectionConfig } from 'payload'
 import { adminOrOwnByClient, canReadViaShareToken } from '../../access'
-import { trackingFields, ALL_METRIC_FIELDS } from '../exercises/types'
+import { ALL_METRIC_FIELDS, getTrackingFields } from '@/modules/training/exercises'
+import { LEGACY_SET_LOG_FIELDS } from '@/modules/training/logs'
 
 export const SetLogs: CollectionConfig = {
   slug: 'set-logs',
   admin: {
     useAsTitle: 'id',
-    defaultColumns: ['exerciseName', 'setNumber', 'weight', 'reps', 'client'],
+    defaultColumns: ['exerciseName', 'setNumber', 'weightLeft', 'weightRight', 'repsLeft', 'repsRight', 'client'],
     group: 'Training log',
   },
   access: {
@@ -21,7 +22,7 @@ export const SetLogs: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [
-      async ({ data, req }) => {
+      async ({ data, originalDoc, req }) => {
         if (!data) return data
         if (req.user?.collection === 'clients' && data.session) {
           const session = await req.payload.findByID({
@@ -34,15 +35,30 @@ export const SetLogs: CollectionConfig = {
             throw new Error('You cannot log sets to someone else\'s session.')
           }
         }
-        if (data.exercise) {
+        const exerciseRowId = data.exerciseRow ?? originalDoc?.exerciseRow
+        const exerciseRow = exerciseRowId
+          ? await req.payload.findByID({
+              collection: 'workout-exercise-rows',
+              id: exerciseRowId,
+              depth: 0,
+            })
+          : null
+
+        if (exerciseRow?.targetType === 'duration') {
+          const allowedFields = new Set<string>(['weightLeft', 'weightRight', 'durationSec', ...LEGACY_SET_LOG_FIELDS])
+          for (const field of [...ALL_METRIC_FIELDS, ...LEGACY_SET_LOG_FIELDS]) {
+            if (!allowedFields.has(field)) data[field] = null
+          }
+        } else if (data.exercise) {
           const ex = await req.payload.findByID({
             collection: 'exercises',
             id: data.exercise,
             depth: 0,
           })
-          const allowed = trackingFields(ex?.trackingType)
-          for (const f of ALL_METRIC_FIELDS) {
-            if (!allowed.includes(f) && data[f] != null) data[f] = null
+          const allowed = getTrackingFields(ex?.trackingType)
+          const allowedFields = new Set<string>([...allowed, ...LEGACY_SET_LOG_FIELDS])
+          for (const field of [...ALL_METRIC_FIELDS, ...LEGACY_SET_LOG_FIELDS]) {
+            if (!allowedFields.has(field)) data[field] = null
           }
         }
         return data
@@ -106,6 +122,17 @@ export const SetLogs: CollectionConfig = {
       name: 'weight',
       type: 'number',
       label: 'Weight (kg)',
+      admin: { hidden: true },
+    },
+    {
+      name: 'weightLeft',
+      type: 'number',
+      label: 'Weight left (kg)',
+    },
+    {
+      name: 'weightRight',
+      type: 'number',
+      label: 'Weight right (kg)',
     },
     {
       name: 'isBodyweight',
@@ -127,11 +154,23 @@ export const SetLogs: CollectionConfig = {
       name: 'reps',
       type: 'text',
       label: 'Reps',
+      admin: { hidden: true },
+    },
+    {
+      name: 'repsLeft',
+      type: 'text',
+      label: 'Reps left',
+    },
+    {
+      name: 'repsRight',
+      type: 'text',
+      label: 'Reps right',
     },
     {
       name: 'rir',
       type: 'text',
       label: 'RIR',
+      admin: { hidden: true },
     },
     {
       name: 'note',

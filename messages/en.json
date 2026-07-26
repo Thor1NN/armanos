@@ -6,7 +6,7 @@
     "seriesPrefix": "Sets",
     "repsPrefix": "Reps",
     "durationPrefix": "Time",
-    "restPrefix": "Rest"
+    "restPrefix": "Rest(s)"
   },
   "exercise": {
     "video": "▶ video",
@@ -68,6 +68,6 @@
     "seriesPrefix": "Sets",
     "repsPrefix": "Reps",
     "durationPrefix": "Time",
-    "restPrefix": "Rest"
+    "restPrefix": "Rest(s)"
   }
 }

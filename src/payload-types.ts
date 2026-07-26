@@ -366,11 +366,14 @@ export interface WorkoutExerciseRow {
    */
   exercise?: (number | null) | Exercise;
   note?: string | null;
+  targetType?: ('repetitions' | 'duration') | null;
   /**
    * e.g. 4, 3-4
    */
   rounds?: string | null;
   reps?: string | null;
+  repsLeft?: string | null;
+  repsRight?: string | null;
   kg?: string | null;
   tut?: string | null;
   rir?: string | null;
@@ -471,10 +474,14 @@ export interface SetLog {
   roundLog?: (number | null) | RoundLog;
   setNumber?: number | null;
   weight?: number | null;
+  weightLeft?: number | null;
+  weightRight?: number | null;
   isBodyweight?: boolean | null;
   distanceM?: number | null;
   durationSec?: number | null;
   reps?: string | null;
+  repsLeft?: string | null;
+  repsRight?: string | null;
   rir?: string | null;
   note?: string | null;
   completedAt?: string | null;
@@ -794,8 +801,11 @@ export interface WorkoutExerciseRowsSelect<T extends boolean = true> {
   numer?: T;
   exercise?: T;
   note?: T;
+  targetType?: T;
   rounds?: T;
   reps?: T;
+  repsLeft?: T;
+  repsRight?: T;
   kg?: T;
   tut?: T;
   rir?: T;
@@ -865,10 +875,14 @@ export interface SetLogsSelect<T extends boolean = true> {
   roundLog?: T;
   setNumber?: T;
   weight?: T;
+  weightLeft?: T;
+  weightRight?: T;
   isBodyweight?: T;
   distanceM?: T;
   durationSec?: T;
   reps?: T;
+  repsLeft?: T;
+  repsRight?: T;
   rir?: T;
   note?: T;
   completedAt?: T;
