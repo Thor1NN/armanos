@@ -4,13 +4,13 @@ import { PROTOCOL_LABEL } from './constants'
 import type {
   BuildExerciseMetaInput,
   BuildWorkoutGroupMetaInput,
-  Exercise,
   ExerciseMetaLabels,
   FormatWorkoutGroupLabelInput,
+  WorkoutExerciseTree,
 } from './types'
 
 export const getExerciseName = (
-  exercise: Pick<Exercise, 'exercise' | 'note'>,
+  exercise: Pick<WorkoutExerciseTree, 'exercise' | 'note'>,
 ): string => exercise.exercise?.name ?? exercise.note ?? ''
 
 export const buildExerciseMeta = (

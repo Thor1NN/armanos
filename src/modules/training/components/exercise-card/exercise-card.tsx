@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { SeriesForm } from '@/modules/training/components/series-form'
 import { getTrackingFields, type MetricField } from '@/modules/training/exercises'
-import { getExerciseName, type Exercise } from '@/modules/training/plans'
+import { getExerciseName, type WorkoutExerciseTree } from '@/modules/training/plans'
 import type { SetLog } from '@/payload-types'
 import {
   toMetricFormValues,
@@ -25,13 +25,17 @@ export function ExerciseCard({
   onSaveNote,
   readOnly,
 }: {
-  exercise: Exercise
+  exercise: WorkoutExerciseTree
   sets: SetLog[]
   clientNote?: string
-  onAdd?: (exercise: Exercise, fields: MetricField[], values: MetricFormValues) => Promise<void>
+  onAdd?: (
+    exercise: WorkoutExerciseTree,
+    fields: MetricField[],
+    values: MetricFormValues,
+  ) => Promise<void>
   onUpdate?: (id: number, fields: MetricField[], values: MetricFormValues) => Promise<void>
   onDelete?: (id: number) => Promise<void>
-  onSaveNote?: (exercise: Exercise, note: string) => Promise<void>
+  onSaveNote?: (exercise: WorkoutExerciseTree, note: string) => Promise<void>
   readOnly?: boolean
 }) {
   const [open, setOpen] = useState(false)

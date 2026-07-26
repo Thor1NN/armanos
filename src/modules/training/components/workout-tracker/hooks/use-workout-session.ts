@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { sdk } from '@/lib/sdk'
 import type { MetricField } from '@/modules/training/exercises'
-import { getExerciseName, type Exercise, type Workout } from '@/modules/training/plans'
+import {
+  getExerciseName,
+  type WorkoutExerciseTree,
+  type WorkoutTree,
+} from '@/modules/training/plans'
 import { toSetLogMetricData, type MetricFormValues } from '@/modules/training/logs'
 import type { ExerciseLog, SetLog, WorkoutLog } from '@/payload-types'
 
@@ -13,7 +17,7 @@ const relationshipId = (
   relationship && typeof relationship === 'object' ? relationship.id : (relationship ?? null)
 
 export function useWorkoutSession(
-  workout: Workout,
+  workout: WorkoutTree,
   options: { readOnly?: boolean; showResults?: boolean },
 ) {
   const { readOnly, showResults } = options
@@ -132,19 +136,23 @@ export function useWorkoutSession(
       setSession(doc)
     }, 'Błąd zapisu czasu')
 
-  const addSet = (ex: Exercise, fields: MetricField[], values: MetricFormValues) =>
+  const addSet = (
+    exercise: WorkoutExerciseTree,
+    fields: MetricField[],
+    values: MetricFormValues,
+  ) =>
     runMutation(async () => {
       const s = await ensureSession()
-      const setNumber = setsForRow(ex.id).length + 1
-      const exerciseName = getExerciseName(ex)
+      const setNumber = setsForRow(exercise.id).length + 1
+      const exerciseName = getExerciseName(exercise)
       const doc = await sdk.create({
         collection: 'set-logs',
         depth: 0,
         data: {
           session: s.id,
-          exercise: ex.exercise?.id ?? undefined,
+          exercise: exercise.exercise?.id ?? undefined,
           exerciseName,
-          exerciseRow: ex.id,
+          exerciseRow: exercise.id,
           setNumber,
           ...toSetLogMetricData(fields, values),
         },
@@ -183,11 +191,11 @@ export function useWorkoutSession(
       setSession(doc)
     }, 'Błąd zapisu notatki')
 
-  const saveExerciseNote = (ex: Exercise, note: string) =>
+  const saveExerciseNote = (exercise: WorkoutExerciseTree, note: string) =>
     runMutation(async () => {
       const s = await ensureSession()
-      const rowId = ex.id
-      const exerciseName = getExerciseName(ex)
+      const rowId = exercise.id
+      const exerciseName = getExerciseName(exercise)
       const existing = exerciseNotes.find(
         (entry) => relationshipId(entry.exerciseRow) === rowId,
       )
@@ -205,7 +213,7 @@ export function useWorkoutSession(
             depth: 0,
             data: {
               session: s.id,
-              exercise: ex.exercise?.id ?? undefined,
+              exercise: exercise.exercise?.id ?? undefined,
               exerciseName,
               exerciseRow: rowId,
               note: trimmed,

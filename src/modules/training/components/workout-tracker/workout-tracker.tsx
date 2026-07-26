@@ -7,7 +7,7 @@ import { Alert } from '@/components/ui/alert'
 import { ExerciseCard } from '@/modules/training/components/exercise-card'
 import { NoteField } from '@/modules/training/components/note-field'
 import { SessionTimesBadge, SessionTimesForm } from '@/modules/training/components/session-times'
-import type { Workout } from '@/modules/training/plans'
+import type { WorkoutTree } from '@/modules/training/plans'
 import { useWorkoutSession } from './hooks/use-workout-session'
 
 export function WorkoutTracker({
@@ -15,7 +15,7 @@ export function WorkoutTracker({
   readOnly,
   showResults,
 }: {
-  workout: Workout
+  workout: WorkoutTree
   readOnly?: boolean
   showResults?: boolean
 }) {

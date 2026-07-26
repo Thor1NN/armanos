@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Button } from '@/components/ui/button'
-import type { Microcycle, Workout } from '@/modules/training/plans'
+import type { MicrocycleTree, WorkoutTree } from '@/modules/training/plans'
 
 type Id = number | string | null | undefined
 
@@ -11,9 +11,9 @@ export function MicrocyclePicker({
   activeMicrocycleId,
   onSelect,
 }: {
-  microcycles: Microcycle[]
+  microcycles: MicrocycleTree[]
   activeMicrocycleId: Id
-  onSelect: (microcycleId: Microcycle['id']) => void
+  onSelect: (microcycleId: MicrocycleTree['id']) => void
 }) {
   return (
     <div className="flex gap-1.5">
@@ -37,9 +37,9 @@ export function WorkoutPicker({
   activeWorkoutId,
   onSelect,
 }: {
-  workouts: Workout[]
+  workouts: WorkoutTree[]
   activeWorkoutId: Id
-  onSelect: (workoutId: Workout['id']) => void
+  onSelect: (workoutId: WorkoutTree['id']) => void
 }) {
   return (
     <div className="flex flex-wrap gap-1">

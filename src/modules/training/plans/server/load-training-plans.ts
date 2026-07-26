@@ -7,7 +7,7 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import type { LoadTrainingPlansOutput } from '@/modules/training/plans'
 
-import { loadPlanItems } from './load-plan-items'
+import { loadPlanTree } from './load-plan-tree'
 
 export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
   const headers = await getHeaders()
@@ -30,7 +30,7 @@ export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
 
   const planIds = plans.docs.map((plan) => plan.id)
 
-  const accordionPlans = await loadPlanItems(
+  const planTree = await loadPlanTree(
     payload,
     planIds,
     {
@@ -43,6 +43,6 @@ export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
 
   return {
     user: { id: user.id, name: user.name ?? null, email: user.email ?? null },
-    plans: accordionPlans,
+    plans: planTree,
   }
 }

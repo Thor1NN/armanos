@@ -4,8 +4,8 @@ import { getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
-import type { Plan } from '@/modules/training/plans'
-import { loadPlanItems } from '@/modules/training/plans/server'
+import type { PlanTree } from '@/modules/training/plans'
+import { loadPlanTree } from '@/modules/training/plans/server'
 import type { LoadShareLinkOutput } from '@/modules/sharing'
 
 export async function loadShareLink(token: string): Promise<LoadShareLinkOutput> {
@@ -32,10 +32,10 @@ export async function loadShareLink(token: string): Promise<LoadShareLinkOutput>
 
   const t = await getTranslations('share')
 
-  let planData: Plan[] | undefined
+  let planData: PlanTree[] | undefined
 
   if (permissions.includes('plan')) {
-    planData = await loadPlanItems(
+    planData = await loadPlanTree(
       payload,
       [planId],
       {

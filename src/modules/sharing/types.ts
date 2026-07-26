@@ -1,4 +1,4 @@
-import type { Plan } from '@/modules/training/plans'
+import type { PlanTree } from '@/modules/training/plans'
 
 export type LoadShareLinkOutput = {
   meta: {
@@ -6,5 +6,5 @@ export type LoadShareLinkOutput = {
     permissions: ('plan' | 'results')[]
     expiresAt: string
   }
-  plan?: Plan[]
+  plan?: PlanTree[]
 } | null

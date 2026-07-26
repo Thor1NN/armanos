@@ -5,18 +5,20 @@ export {
   formatWorkoutGroupLabel,
   getExerciseName,
 } from './formatters'
+export { buildPlanTree } from './build-plan-tree'
 export type {
-  Block,
   BuildExerciseMetaInput,
   BuildWorkoutGroupMetaInput,
-  Exercise,
   ExerciseMetaLabels,
   FormatWorkoutGroupLabelInput,
-  Group,
   LoadTrainingPlansOutput,
-  Microcycle,
-  Plan,
-  Section,
-  Workout,
+  MicrocycleTree,
+  PlanDocuments,
+  PlanTree,
+  WorkoutBlock,
+  WorkoutExerciseTree,
+  WorkoutGroupTree,
   WorkoutProtocol,
+  WorkoutSectionTree,
+  WorkoutTree,
 } from './types'

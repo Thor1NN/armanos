@@ -7,50 +7,59 @@ import type {
   WorkoutGroup,
 } from '@/payload-types'
 
-export type Exercise = Omit<WorkoutExerciseRow, 'exercise' | 'group'> & {
+export type PlanDocuments = {
+  plans: PayloadPlan[]
+  microcycles: PayloadMicrocycle[]
+  workouts: PayloadWorkout[]
+  groups: WorkoutGroup[]
+  exerciseRows: WorkoutExerciseRow[]
+}
+
+export type WorkoutExerciseTree = WorkoutExerciseRow & {
+  group: WorkoutGroup['id']
   exercise: PayloadExercise | null
   meta: string[]
 }
 
-export type Group = {
+export type WorkoutGroupTree = WorkoutGroup & {
   protocol: NonNullable<WorkoutGroup['protocol']>
   label: string
   protocolLabel: string
   meta: string[]
-  exercises: Exercise[]
+  exercises: WorkoutExerciseTree[]
 }
 
 // A block bundles consecutive groups that share one colored band in the tracker.
-export type Block = {
+export type WorkoutBlock = {
   index: number
-  groups: Group[]
+  groups: WorkoutGroupTree[]
 }
 
 type PayloadWorkoutSection = NonNullable<PayloadWorkout['sections']>[number]
 
-export type Section = Pick<PayloadWorkoutSection, 'title' | 'subtitle'> & {
-  blocks: Block[]
+export type WorkoutSectionTree = PayloadWorkoutSection & {
+  blocks: WorkoutBlock[]
 }
 
-export type Workout = Pick<PayloadWorkout, 'id' | 'title' | 'rpe'> & {
-  sections: Section[]
+export type WorkoutTree = Omit<PayloadWorkout, 'sections'> & {
+  sections: WorkoutSectionTree[]
 }
 
-export type Microcycle = Pick<PayloadMicrocycle, 'id' | 'title' | 'rpe'> & {
-  workouts: Workout[]
+export type MicrocycleTree = PayloadMicrocycle & {
+  workouts: WorkoutTree[]
 }
 
-export type Plan = Pick<PayloadPlan, 'id' | 'title' | 'description'> & {
+export type PlanTree = PayloadPlan & {
   status: NonNullable<PayloadPlan['status']>
   statusLabel: string
-  dateRange?: string | null
-  microcycles: Microcycle[]
+  dateRange: string | null
+  microcycles: MicrocycleTree[]
 }
 
 export type LoadTrainingPlansOutput =
   | {
       user: { id: number | string; name?: string | null; email?: string | null }
-      plans: Plan[]
+      plans: PlanTree[]
     }
   | { user: null }
 
