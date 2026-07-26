@@ -6,7 +6,7 @@
     "seriesPrefix": "Serie",
     "repsPrefix": "Powt.",
     "durationPrefix": "Czas",
-    "restPrefix": "Przerwa"
+    "restPrefix": "Przerwa (s)"
   },
   "exercise": {
     "video": "▶ wideo",
@@ -68,6 +68,6 @@
     "seriesPrefix": "Serie",
     "repsPrefix": "Powt.",
     "durationPrefix": "Czas",
-    "restPrefix": "Przerwa"
+    "restPrefix": "Przerwa (s)"
   }
 }

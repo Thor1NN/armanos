@@ -1,4 +1,5 @@
 import { APIError, type CollectionConfig } from 'payload'
+import { EXERCISE_TARGET_TYPE_OPTIONS } from '@/modules/training/exercises'
 import { isAdmin, isAuthenticated } from '../../access'
 
 const PROTOCOL_OPTIONS = [
@@ -14,7 +15,7 @@ export const WorkoutExerciseRows: CollectionConfig = {
   slug: 'workout-exercise-rows',
   admin: {
     useAsTitle: 'numer',
-    defaultColumns: ['numer', 'exercise', 'group', 'reps', 'kg'],
+    defaultColumns: ['numer', 'exercise', 'group', 'repsLeft', 'repsRight', 'kg'],
     group: 'Training plan',
   },
   access: {
@@ -72,11 +73,36 @@ export const WorkoutExerciseRows: CollectionConfig = {
       label: 'Note / variant',
     },
     {
+      name: 'targetType',
+      type: 'select',
+      label: 'Target type',
+      defaultValue: 'repetitions',
+      options: EXERCISE_TARGET_TYPE_OPTIONS,
+    },
+    {
       type: 'row',
       fields: [
         { name: 'rounds', type: 'text', label: 'Sets', admin: { width: '25%', description: 'e.g. 4, 3-4' } },
-        { name: 'reps', type: 'text', label: 'Reps', admin: { width: '25%' } },
-        { name: 'kg', type: 'text', label: 'KG', admin: { width: '50%' } },
+        { name: 'reps', type: 'text', label: 'Reps', admin: { hidden: true } },
+        {
+          name: 'repsLeft',
+          type: 'text',
+          label: 'Reps left',
+          admin: {
+            condition: (_, siblingData) => (siblingData.targetType ?? 'repetitions') === 'repetitions',
+            width: '25%',
+          },
+        },
+        {
+          name: 'repsRight',
+          type: 'text',
+          label: 'Reps right',
+          admin: {
+            condition: (_, siblingData) => (siblingData.targetType ?? 'repetitions') === 'repetitions',
+            width: '25%',
+          },
+        },
+        { name: 'kg', type: 'text', label: 'KG', admin: { width: '25%' } },
       ],
     },
     {
@@ -84,7 +110,7 @@ export const WorkoutExerciseRows: CollectionConfig = {
       fields: [
         { name: 'tut', type: 'text', label: 'TUT', admin: { width: '33%' } },
         { name: 'rir', type: 'text', label: 'RIR', admin: { width: '33%' } },
-        { name: 'rest', type: 'text', label: 'Rest', admin: { width: '34%' } },
+        { name: 'rest', type: 'text', label: 'Rest(s)', admin: { width: '34%' } },
       ],
     },
     {
@@ -95,7 +121,10 @@ export const WorkoutExerciseRows: CollectionConfig = {
           type: 'number',
           label: 'Duration — minutes',
           min: 0,
-          admin: { width: '50%' },
+          admin: {
+            condition: (_, siblingData) => siblingData.targetType === 'duration',
+            width: '50%',
+          },
         },
         {
           name: 'durationSec',
@@ -103,7 +132,10 @@ export const WorkoutExerciseRows: CollectionConfig = {
           label: 'Duration — seconds',
           min: 0,
           max: 59,
-          admin: { width: '50%' },
+          admin: {
+            condition: (_, siblingData) => siblingData.targetType === 'duration',
+            width: '50%',
+          },
         },
       ],
     },
@@ -138,7 +170,7 @@ export const WorkoutExerciseRows: CollectionConfig = {
         { name: 'durationMinutes', type: 'number', label: 'Duration (minutes)', min: 0 },
         { name: 'intervalSeconds', type: 'number', label: 'Interval (s)', min: 1 },
         { name: 'workSeconds', type: 'number', label: 'Work time (s)', min: 1 },
-        { name: 'restSeconds', type: 'number', label: 'Rest (s)', min: 0 },
+        { name: 'restSeconds', type: 'number', label: 'Rest(s)', min: 0 },
       ],
     },
   ],

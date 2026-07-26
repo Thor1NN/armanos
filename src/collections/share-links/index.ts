@@ -90,7 +90,7 @@ export const ShareLinks: CollectionConfig = {
         position: 'sidebar',
         components: {
           Field: {
-            path: '@/app/(payload)/admin/modules/share-link-url/share-link-url',
+            path: '@/modules/sharing/admin/share-link-url/share-link-url',
             exportName: 'ShareLinkUrl',
           },
         },

@@ -119,7 +119,7 @@ export const WorkoutGroups: CollectionConfig = {
     {
       name: 'restSeconds',
       type: 'number',
-      label: 'Rest (s)',
+      label: 'Rest(s)',
       min: 0,
       admin: { description: 'Used for Tabata — default 10' },
       defaultValue: 10,

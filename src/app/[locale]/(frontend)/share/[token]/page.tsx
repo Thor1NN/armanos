@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation'
 import { getFormatter, getTranslations } from 'next-intl/server'
 import React from 'react'
 
-import { loadShareLink } from '@/loaders/share-link-loader'
-import { WorkoutPlans } from '@/components/workout/workout-plans'
+import { loadShareLink } from '@/modules/sharing/server'
+import { WorkoutPlans } from '@/modules/training/components/workout-plans'
 import { PageContainer } from '@/components/ui/page-container'
 import { PageHeader } from '@/components/ui/page-header'
 
