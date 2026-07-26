@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { Surface } from '@/components/ui/surface'
 import { mutedTextClass } from '@/lib/class-names'
-import type { TPlanAccordionItem } from '@/modules/training/plans'
+import type { Plan } from '@/modules/training/plans'
 import { ActiveContextBanner } from './components/active-context-banner'
 import { MicrocyclePicker, WorkoutPicker } from './components/workout-pickers'
 import { useWorkoutSelection } from './hooks/use-workout-selection'
@@ -16,7 +16,7 @@ export function WorkoutPlans({
   readOnly,
   showResults,
 }: {
-  plans: TPlanAccordionItem[]
+  plans: Plan[]
   readOnly?: boolean
   showResults?: boolean
 }) {

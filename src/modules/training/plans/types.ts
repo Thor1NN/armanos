@@ -1,73 +1,56 @@
-export type WorkoutProtocol = 'standard' | 'emom' | 'amrap' | 'for_time' | 'tabata'
+import type {
+  Exercise as PayloadExercise,
+  Microcycle as PayloadMicrocycle,
+  Plan as PayloadPlan,
+  Workout as PayloadWorkout,
+  WorkoutExerciseRow,
+  WorkoutGroup,
+} from '@/payload-types'
 
-export type TExercise = {
-  rowId: string
-  numer?: string | null
-  name: string
-  note?: string | null
-  exerciseId?: number | null
-  exerciseName: string
-  trackingType?: string | null
-  targetType?: 'repetitions' | 'duration' | null
-  videoUrl?: string | null
-  rounds?: string | null
+export type Exercise = Omit<WorkoutExerciseRow, 'exercise' | 'group'> & {
+  exercise: PayloadExercise | null
   meta: string[]
-  prefill: { repsLeft?: string | null; repsRight?: string | null }
-  setParameters?: Array<{ setNumber: number; reps?: string | null; kg?: string | null }> | null
 }
 
-export type TGroup = {
-  protocol: WorkoutProtocol
+export type Group = {
+  protocol: NonNullable<WorkoutGroup['protocol']>
   label: string
   protocolLabel: string
   meta: string[]
-  exercises: TExercise[]
+  exercises: Exercise[]
 }
 
 // A block bundles consecutive groups that share one colored band in the tracker.
-export type TBlock = {
+export type Block = {
   index: number
-  groups: TGroup[]
+  groups: Group[]
 }
 
-export type TSection = {
-  title?: string | null
-  subtitle?: string | null
-  blocks: TBlock[]
+type PayloadWorkoutSection = NonNullable<PayloadWorkout['sections']>[number]
+
+export type Section = Pick<PayloadWorkoutSection, 'title' | 'subtitle'> & {
+  blocks: Block[]
 }
 
-export type TWorkout = {
-  id: number
-  title: string
-  rpe?: number | null
-  sections: TSection[]
+export type Workout = Pick<PayloadWorkout, 'id' | 'title' | 'rpe'> & {
+  sections: Section[]
 }
 
-export type TPlanAccordionItem = {
-  id: number | string
-  title: string
-  status: string
+export type Microcycle = Pick<PayloadMicrocycle, 'id' | 'title' | 'rpe'> & {
+  workouts: Workout[]
+}
+
+export type Plan = Pick<PayloadPlan, 'id' | 'title' | 'description'> & {
+  status: NonNullable<PayloadPlan['status']>
   statusLabel: string
   dateRange?: string | null
-  description?: string | null
-  microcycles: Array<{
-    id: number | string
-    title: string
-    rpe?: number | null
-    workouts: TWorkout[]
-  }>
+  microcycles: Microcycle[]
 }
 
-export type PlanLabels = {
-  seriesPrefix: string
-  durationPrefix: string
-  restPrefix: string
-}
-
-export type TrainingPlansLoadResult =
+export type LoadTrainingPlansOutput =
   | {
       user: { id: number | string; name?: string | null; email?: string | null }
-      plans: TPlanAccordionItem[]
+      plans: Plan[]
     }
   | { user: null }
 
@@ -77,27 +60,31 @@ export type ExerciseMetaLabels = {
   restPrefix: string
 }
 
-export type ExerciseMetaSource = {
-  rounds?: string | null
-  reps?: string | null
-  repsLeft?: string | null
-  repsRight?: string | null
-  targetType?: 'repetitions' | 'duration' | null
-  durationMin?: number | null
-  durationSec?: number | null
-  rest?: string | null
-  tut?: string | null
-  rir?: string | null
-  kg?: string | null
-}
+export type BuildExerciseMetaInput = Pick<
+  WorkoutExerciseRow,
+  | 'rounds'
+  | 'reps'
+  | 'repsLeft'
+  | 'repsRight'
+  | 'targetType'
+  | 'durationMin'
+  | 'durationSec'
+  | 'rest'
+  | 'tut'
+  | 'rir'
+  | 'kg'
+>
 
-export type WorkoutGroupMetaSource = {
-  protocol?: WorkoutProtocol | null
-  rounds?: string | null
-  intervalSeconds?: number | null
-  workSeconds?: number | null
-  restSeconds?: number | null
-  restBetweenRounds?: string | null
-}
+export type BuildWorkoutGroupMetaInput = Pick<
+  WorkoutGroup,
+  | 'protocol'
+  | 'rounds'
+  | 'intervalSeconds'
+  | 'workSeconds'
+  | 'restSeconds'
+  | 'restBetweenRounds'
+>
 
-export type WorkoutGroupLabelSource = Pick<WorkoutGroupMetaSource, 'protocol'>
+export type FormatWorkoutGroupLabelInput = Pick<BuildWorkoutGroupMetaInput, 'protocol'>
+
+export type WorkoutProtocol = NonNullable<WorkoutGroup['protocol']>

@@ -7,21 +7,21 @@ import {
   buildWorkoutGroupMeta,
   formatWorkoutGroupLabel,
   STATUS_LABEL,
-  type TBlock,
-  type TGroup,
-  type PlanLabels,
-  type TPlanAccordionItem,
-  type TWorkout,
+  type Block,
+  type ExerciseMetaLabels,
+  type Group,
+  type Plan,
+  type Workout,
 } from '@/modules/training/plans'
 
-type Payload = Awaited<ReturnType<typeof getPayload>>
+type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 
 export async function loadPlanItems(
-  payload: Payload,
+  payload: PayloadInstance,
   planIds: (number | string)[],
-  labels: PlanLabels,
+  labels: ExerciseMetaLabels,
   overrideAccess = false,
-): Promise<TPlanAccordionItem[]> {
+): Promise<Plan[]> {
   if (!planIds.length) return []
 
   const plans = await payload.find({
@@ -97,59 +97,29 @@ export async function loadPlanItems(
   const rowsByGroup = (groupId: number | string) =>
     exerciseRows.docs.filter((row) => resolveId(row.group) === groupId)
 
-  const serializeWorkout = (workout: (typeof workouts.docs)[number]): TWorkout => {
-    const sections = (workout.sections ?? []) as Array<{
-      id?: string
-      title?: string | null
-      subtitle?: string | null
-    }>
+  const serializeWorkout = (workout: (typeof workouts.docs)[number]): Workout => {
+    const sections = workout.sections ?? []
     const groups = groupsByWorkout(workout.id)
 
-    const serializeGroup = (group: (typeof groups)[number]): TGroup => {
+    const serializeGroup = (group: (typeof groups)[number]): Group => {
       const groupMeta = buildWorkoutGroupMeta(group)
 
       return {
         protocol: group.protocol ?? 'standard',
-        label: (group.label as string | null) ?? '',
+        label: group.label ?? '',
         protocolLabel: formatWorkoutGroupLabel(group),
         meta: groupMeta,
         exercises: rowsByGroup(group.id).map((exerciseRow) => {
+          const { exercise: exerciseRelationship, group: _group, ...exerciseData } = exerciseRow
           const catalogExercise =
-            exerciseRow.exercise && typeof exerciseRow.exercise === 'object'
-              ? (exerciseRow.exercise as {
-                  id: number
-                  name?: string
-                  trackingType?: string
-                  videoUrl?: string
-                })
+            exerciseRelationship && typeof exerciseRelationship === 'object'
+              ? exerciseRelationship
               : null
-          const name = catalogExercise?.name || exerciseRow.note || ''
-          const extraNote =
-            catalogExercise && exerciseRow.note && exerciseRow.note !== catalogExercise.name
-              ? exerciseRow.note
-              : null
+
           return {
-            rowId: String(exerciseRow.id),
-            numer: (exerciseRow.numer as string | null) ?? null,
-            name,
-            note: extraNote as string | null,
-            exerciseId: catalogExercise?.id ?? null,
-            exerciseName: name,
-            trackingType: catalogExercise?.trackingType ?? null,
-            targetType:
-              (exerciseRow.targetType as 'repetitions' | 'duration' | null) ?? 'repetitions',
-            videoUrl: (catalogExercise?.videoUrl as string | null | undefined) ?? null,
-            rounds: (exerciseRow.rounds as string | null) ?? null,
+            ...exerciseData,
+            exercise: catalogExercise,
             meta: buildExerciseMeta(exerciseRow, labels),
-            prefill: {
-              repsLeft: (exerciseRow.repsLeft as string | null) ?? null,
-              repsRight: (exerciseRow.repsRight as string | null) ?? null,
-            },
-            setParameters:
-              (exerciseRow.setParameters as
-                | Array<{ setNumber: number; reps?: string | null; kg?: string | null }>
-                | null
-                | undefined) ?? null,
           }
         }),
       }
@@ -170,7 +140,7 @@ export async function loadPlanItems(
          * A new colored block starts at the first group or whenever a group does not
          * bundle with the previous one. The block index resets for every section.
          */
-        const blocks: TBlock[] = []
+        const blocks: Block[] = []
         sectionGroups.forEach((group, groupIndexInSection) => {
           if (groupIndexInSection === 0 || !group.bundleWithPrevious) {
             blocks.push({ index: blocks.length, groups: [] })
@@ -187,7 +157,7 @@ export async function loadPlanItems(
   }
 
   return plans.docs.map((plan) => {
-    const status = (plan.status as string) || 'active'
+    const status = plan.status ?? 'active'
     return {
       id: plan.id,
       title: plan.title,

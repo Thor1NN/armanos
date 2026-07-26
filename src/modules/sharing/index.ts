@@ -1,1 +1,1 @@
-export type { ShareLinkData } from './types'
+export type { LoadShareLinkOutput } from './types'

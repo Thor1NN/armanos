@@ -1,5 +1,6 @@
 import 'server-only'
 
+import type { Payload } from 'payload'
 import React from 'react'
 import { WorkoutStructureBreadcrumb } from '../training-navigation/training-navigation'
 import { loadWorkoutStructure } from './loader'
@@ -10,8 +11,7 @@ export async function WorkoutStructureView({
   payload,
 }: {
   initPageResult?: { docID?: number | string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any
+  payload?: Payload
 }) {
   const docId = initPageResult?.docID
 

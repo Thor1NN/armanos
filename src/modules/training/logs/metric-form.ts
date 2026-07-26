@@ -3,8 +3,9 @@ import {
   type MetricField,
   type MetricUnits,
 } from '@/modules/training/exercises'
+import type { SetLog } from '@/payload-types'
 import { BODYWEIGHT_FORM_FIELD } from './constants'
-import type { MetricFormValues, SetLog, SetLogMetricData } from './types'
+import type { MetricFormValues, SetLogMetricInput } from './types'
 
 export const getMetricMinutesField = <Field extends MetricField>(field: Field): `${Field}__min` =>
   `${field}__min`
@@ -55,36 +56,50 @@ const fromBaseUnit = (field: MetricField, baseValue: number): { value: string; u
 export const toSetLogMetricData = (
   fields: MetricField[],
   values: MetricFormValues,
-): SetLogMetricData => {
-  const metricValues: Partial<Record<MetricField, number | string | null>> = {}
+): SetLogMetricInput => {
   const isBodyweight = values[BODYWEIGHT_FORM_FIELD] === 'true'
+  const metricValues: { [Field in MetricField]?: SetLog[Field] } = {}
+  const setMetricValue = <Field extends MetricField>(
+    field: Field,
+    value: SetLog[Field],
+  ) => {
+    metricValues[field] = value
+  }
 
   for (const field of fields) {
     const meta = METRIC_FIELDS[field]
 
     if (meta.composite === 'duration') {
-      metricValues[field] = toDurationSeconds(
-        values[getMetricMinutesField(field)],
-        values[getMetricSecondsField(field)],
+      setMetricValue(
+        field,
+        toDurationSeconds(
+          values[getMetricMinutesField(field)],
+          values[getMetricSecondsField(field)],
+        ),
       )
       continue
     }
 
     if (isBodyweight && meta.bodyweightAffected) {
-      metricValues[field] = null
+      setMetricValue(field, null)
       continue
     }
 
     const rawValue = values[field]
     if (rawValue?.trim() === '') {
-      metricValues[field] = null
+      setMetricValue(field, null)
     } else if (meta.units) {
       const numericValue = parseFiniteNumber(rawValue)
       const unit = values[getMetricUnitField(field)] || meta.units.default
-      metricValues[field] =
+      setMetricValue(
+        field,
         numericValue === null ? null : numericValue * getUnitFactor(meta.units, unit)
+      )
     } else {
-      metricValues[field] = meta.numeric ? parseFiniteNumber(rawValue) : textOrNull(rawValue)
+      setMetricValue(
+        field,
+        meta.numeric ? parseFiniteNumber(rawValue) : textOrNull(rawValue),
+      )
     }
   }
 

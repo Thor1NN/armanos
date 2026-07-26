@@ -2,9 +2,8 @@
 
 import React from 'react'
 import { Button } from '@/components/ui/button'
-import type { TPlanAccordionItem, TWorkout } from '@/modules/training/plans'
+import type { Microcycle, Workout } from '@/modules/training/plans'
 
-type Microcycle = TPlanAccordionItem['microcycles'][number]
 type Id = number | string | null | undefined
 
 export function MicrocyclePicker({
@@ -38,9 +37,9 @@ export function WorkoutPicker({
   activeWorkoutId,
   onSelect,
 }: {
-  workouts: TWorkout[]
+  workouts: Workout[]
   activeWorkoutId: Id
-  onSelect: (workoutId: TWorkout['id']) => void
+  onSelect: (workoutId: Workout['id']) => void
 }) {
   return (
     <div className="flex flex-wrap gap-1">

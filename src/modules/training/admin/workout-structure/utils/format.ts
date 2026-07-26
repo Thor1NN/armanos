@@ -1,8 +1,9 @@
-import type { ExerciseRow, Group } from '../types'
+import type { WorkoutGroup } from '@/payload-types'
+import type { ExerciseRow } from '../types'
 import { formatMinSec } from '@/lib/date'
 import { formatSideReps } from '@/modules/training/exercises'
 
-export const groupLabel = (g: Group): string => {
+export const groupLabel = (g: WorkoutGroup): string => {
   const p = g.protocol ?? 'standard'
   const r = g.rounds
   const d = g.durationMinutes

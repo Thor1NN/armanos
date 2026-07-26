@@ -1,17 +1,22 @@
 export { PROTOCOL_LABEL, PROTOCOL_OPTIONS, STATUS_LABEL } from './constants'
-export { buildExerciseMeta, buildWorkoutGroupMeta, formatWorkoutGroupLabel } from './formatters'
+export {
+  buildExerciseMeta,
+  buildWorkoutGroupMeta,
+  formatWorkoutGroupLabel,
+  getExerciseName,
+} from './formatters'
 export type {
+  Block,
+  BuildExerciseMetaInput,
+  BuildWorkoutGroupMetaInput,
+  Exercise,
   ExerciseMetaLabels,
-  ExerciseMetaSource,
-  PlanLabels,
-  TBlock,
-  TExercise,
-  TGroup,
-  TPlanAccordionItem,
-  TSection,
-  TWorkout,
-  TrainingPlansLoadResult,
-  WorkoutGroupLabelSource,
-  WorkoutGroupMetaSource,
+  FormatWorkoutGroupLabelInput,
+  Group,
+  LoadTrainingPlansOutput,
+  Microcycle,
+  Plan,
+  Section,
+  Workout,
   WorkoutProtocol,
 } from './types'

@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { toast } from '@payloadcms/ui'
 import { sdk } from '@/lib/sdk'
-import type { ExerciseRow, Group } from '../../../types'
+import type { WorkoutGroup } from '@/payload-types'
+import type { ExerciseRow } from '../../../types'
 
 export function useWorkoutMutations(
-  setGroups: React.Dispatch<React.SetStateAction<Group[]>>,
+  setGroups: React.Dispatch<React.SetStateAction<WorkoutGroup[]>>,
   setExerciseRows: React.Dispatch<React.SetStateAction<ExerciseRow[]>>,
 ) {
   const [deletingGroup, setDeletingGroup] = useState<number | null>(null)

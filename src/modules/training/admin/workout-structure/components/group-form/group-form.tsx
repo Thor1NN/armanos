@@ -2,11 +2,10 @@
 
 import { Button, CheckboxField, Form, SelectField, TextField, toast, useDocumentInfo, useFormFields, useFormProcessing } from '@payloadcms/ui'
 import type { CheckboxFieldClient, FormState, SelectFieldClient } from 'payload'
-import type { Group } from '../../types'
 import { s } from '../../styles'
 import type { WorkoutGroup } from '@/payload-types'
 import { sdk } from '@/lib/sdk'
-import { PROTOCOL_OPTIONS } from '@/modules/training/plans'
+import { PROTOCOL_OPTIONS, type WorkoutProtocol } from '@/modules/training/plans'
 
 import { textField } from '../../utils/fields'
 import {
@@ -30,20 +29,20 @@ const bundleField: CheckboxFieldClient = {
   label: 'Merge into the previous block',
 } as CheckboxFieldClient
 
-type Props = {
-  sectionRowId: string | undefined
+type GroupFormProps = {
+  sectionRowId: string | null | undefined
   nextOrder: number
-  initial?: Group
-  onSaved: (group: Group) => void
+  initial?: WorkoutGroup
+  onSaved: (group: WorkoutGroup) => void
   onCancel: () => void
 }
 
-type AnyFields = Record<string, { value: unknown } | undefined>
+type FieldStateMap = Record<string, { value: unknown } | undefined>
 
 function FormFields({ onCancel }: { onCancel: () => void }) {
   const processing = useFormProcessing()
   const protocol = useFormFields(
-    ([fields]) => ((fields as unknown as AnyFields)['protocol']?.value as string) ?? 'standard'
+    ([fields]) => ((fields as unknown as FieldStateMap)['protocol']?.value as string) ?? 'standard'
   )
 
   return (
@@ -113,7 +112,13 @@ function FormFields({ onCancel }: { onCancel: () => void }) {
   )
 }
 
-export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel }: Props) {
+export function GroupForm({
+  sectionRowId,
+  nextOrder,
+  initial,
+  onSaved,
+  onCancel,
+}: GroupFormProps) {
   const { id: docId } = useDocumentInfo()
   const isEdit = !!initial
 
@@ -130,26 +135,38 @@ export function GroupForm({ sectionRowId, nextOrder, initial, onSaved, onCancel 
   }
 
   const handleSubmit = async (_: FormState, data: Record<string, unknown>) => {
-    const protocol = data.protocol as string
-    const body: Record<string, unknown> = {
+    const body = {
       label:             (data.label             as string) || null,
       bundleWithPrevious: Boolean(data.bundleWithPrevious),
-      protocol,
+      protocol:           data.protocol as WorkoutProtocol,
       rounds:            (data.rounds            as string) || null,
       durationMinutes:   data.durationMinutes    ? Number(data.durationMinutes)  : null,
       intervalSeconds:   data.intervalSeconds    ? Number(data.intervalSeconds)  : null,
       workSeconds:       data.workSeconds        ? Number(data.workSeconds)      : null,
       restSeconds:       data.restSeconds        ? Number(data.restSeconds)      : null,
       restBetweenRounds: (data.restBetweenRounds as string) || null,
-      ...(!isEdit && { workout: docId, sectionRowId: sectionRowId ?? '', order: nextOrder }),
     }
 
     try {
-      const doc = isEdit
-        ? await sdk.update({ collection: 'workout-groups', id: initial!.id, data: body as unknown as WorkoutGroup })
-        : await sdk.create({ collection: 'workout-groups', data: body as unknown as WorkoutGroup })
+      let doc: WorkoutGroup
+
+      if (isEdit) {
+        doc = await sdk.update({ collection: 'workout-groups', id: initial!.id, data: body })
+      } else {
+        if (docId == null) return
+        doc = await sdk.create({
+          collection: 'workout-groups',
+          data: {
+            ...body,
+            workout: Number(docId),
+            sectionRowId: sectionRowId ?? '',
+            order: nextOrder,
+          },
+        })
+      }
+
       toast.success(isEdit ? 'Group updated' : 'Group added')
-      onSaved(doc as unknown as Group)
+      onSaved(doc)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Save failed')
     }

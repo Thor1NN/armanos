@@ -298,10 +298,6 @@ src/
 | `yarn start` | Start production server |
 | `yarn payload migrate:create` | Generate a database migration after a schema change. Run manually. |
 | `yarn payload migrate` | Run pending database migrations |
-| `yarn backfill:set-log-sides` | Copy legacy set-log values into left and right fields. Run manually. |
-| `yarn backfill:workout-exercise-reps-sides` | Copy legacy exercise-row reps into left and right fields. Run manually. |
-| `yarn normalize:reps-sides` | Split legacy left and right rep values. Run manually. |
-| `yarn normalize:workout-exercise-kg` | Normalize legacy exercise-row KG values. Run manually. |
 | `yarn generate:types` | Regenerate `payload-types.ts` from collection configs |
 | `yarn generate:importmap` | Regenerate the Payload admin import map after adding or moving a custom admin component |
 | `yarn seed` | Seed database with demo data |

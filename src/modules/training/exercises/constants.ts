@@ -1,4 +1,9 @@
-import type { MetricField, MetricMeta, TrackingType } from './types'
+import type { ExerciseTargetType, MetricField, MetricMeta, TrackingType } from './types'
+
+export const EXERCISE_TARGET_TYPE_OPTIONS = [
+  { label: 'Repetitions', value: 'repetitions' },
+  { label: 'Duration', value: 'duration' },
+] satisfies Array<{ label: string; value: ExerciseTargetType }>
 
 export const METRIC_FIELDS: Record<MetricField, MetricMeta> = {
   weightLeft: {

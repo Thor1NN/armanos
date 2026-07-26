@@ -5,11 +5,11 @@ import { getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
-import type { TrainingPlansLoadResult } from '@/modules/training/plans'
+import type { LoadTrainingPlansOutput } from '@/modules/training/plans'
 
 import { loadPlanItems } from './load-plan-items'
 
-export async function loadTrainingPlans(): Promise<TrainingPlansLoadResult> {
+export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
   const headers = await getHeaders()
   const payload = await getPayload({ config: await config })
   const { user } = await payload.auth({ headers })

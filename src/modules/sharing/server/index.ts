@@ -1,4 +1,4 @@
 import 'server-only'
 
 export { loadShareLink } from './load-share-link'
-export type { ShareLinkData } from '../types'
+export type { LoadShareLinkOutput } from '../types'

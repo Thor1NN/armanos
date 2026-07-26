@@ -1,10 +1,10 @@
-import type { TPlanAccordionItem } from '@/modules/training/plans'
+import type { Plan } from '@/modules/training/plans'
 
-export type ShareLinkData = {
+export type LoadShareLinkOutput = {
   meta: {
     planTitle: string
     permissions: ('plan' | 'results')[]
     expiresAt: string
   }
-  plan?: TPlanAccordionItem[]
+  plan?: Plan[]
 } | null

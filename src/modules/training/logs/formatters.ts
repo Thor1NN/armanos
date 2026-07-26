@@ -1,6 +1,6 @@
 import { formatSideReps } from '@/modules/training/exercises'
 import { formatSec } from '@/lib/date'
-import type { SetLog } from './types'
+import type { SetLog } from '@/payload-types'
 
 export const formatSetLogSummary = (set: SetLog): string => {
   const parts: string[] = []

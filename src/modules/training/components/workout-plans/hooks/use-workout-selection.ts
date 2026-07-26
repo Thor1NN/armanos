@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
-import type { TPlanAccordionItem, TWorkout } from '@/modules/training/plans'
+import type { Microcycle, Plan, Workout } from '@/modules/training/plans'
 
 const STORAGE_KEY = 'training-app:active-workout-selection'
 const SSR_SNAPSHOT = '__SSR_SELECTION__'
 
-type Microcycle = TPlanAccordionItem['microcycles'][number]
-
-type Selection = {
+type WorkoutSelection = {
   planId: number | string | null
   microcycleId: number | string | null
   workoutId: number | string | null
@@ -19,7 +17,7 @@ const subscribeToSelection = (onStoreChange: () => void) => {
   return () => window.removeEventListener('storage', onStoreChange)
 }
 
-const firstAvailableSelection = (plans: TPlanAccordionItem[]): Selection => {
+const firstAvailableSelection = (plans: Plan[]): WorkoutSelection => {
   const plan = plans[0]
   const microcycle = plan?.microcycles[0]
   const workout = microcycle?.workouts[0]
@@ -31,7 +29,7 @@ const firstAvailableSelection = (plans: TPlanAccordionItem[]): Selection => {
   }
 }
 
-const isValidSelection = (plans: TPlanAccordionItem[], selection: Selection) => {
+const isValidSelection = (plans: Plan[], selection: WorkoutSelection) => {
   const plan = plans.find((item) => item.id === selection.planId)
   if (!plan) return false
 
@@ -42,20 +40,20 @@ const isValidSelection = (plans: TPlanAccordionItem[], selection: Selection) => 
 }
 
 export function useWorkoutSelection(
-  plans: TPlanAccordionItem[],
+  plans: Plan[],
   options: { readOnly?: boolean },
 ): {
-  resolvedSelection: Selection
-  activePlan: TPlanAccordionItem | null
+  resolvedSelection: WorkoutSelection
+  activePlan: Plan | null
   activeMicrocycle: Microcycle | null
-  activeWorkout: TWorkout | null
-  selectPlan: (plan: TPlanAccordionItem) => void
-  selectMicrocycle: (plan: TPlanAccordionItem, microcycleId: number | string) => void
+  activeWorkout: Workout | null
+  selectPlan: (plan: Plan) => void
+  selectMicrocycle: (plan: Plan, microcycleId: number | string) => void
   selectWorkout: (workoutId: number | string) => void
 } {
   const { readOnly } = options
   const initialSelection = useMemo(() => firstAvailableSelection(plans), [plans])
-  const [selection, setSelection] = useState<Selection | null>(null)
+  const [selection, setSelection] = useState<WorkoutSelection | null>(null)
   const storedSelectionRaw = useSyncExternalStore(
     subscribeToSelection,
     () => (readOnly ? SSR_SNAPSHOT : window.localStorage.getItem(STORAGE_KEY)),
@@ -65,7 +63,7 @@ export function useWorkoutSelection(
     if (storedSelectionRaw === SSR_SNAPSHOT || !storedSelectionRaw) return initialSelection
 
     try {
-      return JSON.parse(storedSelectionRaw) as Selection
+      return JSON.parse(storedSelectionRaw) as WorkoutSelection
     } catch {
       window.localStorage.removeItem(STORAGE_KEY)
       return initialSelection
@@ -84,7 +82,7 @@ export function useWorkoutSelection(
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(resolvedSelection))
   }, [plans, readOnly, resolvedSelection, storedSelectionRaw])
 
-  const selectPlan = (plan: TPlanAccordionItem) => {
+  const selectPlan = (plan: Plan) => {
     const nextMicrocycle = plan.microcycles[0] ?? null
     const nextWorkout = nextMicrocycle?.workouts[0] ?? null
     setSelection({
@@ -94,7 +92,7 @@ export function useWorkoutSelection(
     })
   }
 
-  const selectMicrocycle = (plan: TPlanAccordionItem, microcycleId: number | string) => {
+  const selectMicrocycle = (plan: Plan, microcycleId: number | string) => {
     const microcycle = plan.microcycles.find((item) => item.id === microcycleId) ?? null
     const nextWorkout = microcycle?.workouts[0] ?? null
     setSelection({

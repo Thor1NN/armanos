@@ -6,7 +6,7 @@ import { joinClasses, mutedTextClass } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import type { Session } from '@/modules/training/logs'
+import type { WorkoutLog } from '@/payload-types'
 import { combineDateTime, formatDuration, isoToDateInput, isoToTimeInput } from '@/lib/date'
 
 export function SessionTimesBadge({
@@ -14,7 +14,7 @@ export function SessionTimesBadge({
   open,
   onOpen,
 }: {
-  session: Session | null
+  session: WorkoutLog | null
   open: boolean
   onOpen: () => void
 }) {
@@ -54,7 +54,7 @@ export function SessionTimesForm({
   onSave,
   onClose,
 }: {
-  session: Session | null
+  session: WorkoutLog | null
   onSet: (field: 'startedAt' | 'finishedAt', iso: string | null) => void
   onSave: (startedAt: string | null, finishedAt: string | null) => Promise<void>
   onClose: () => void

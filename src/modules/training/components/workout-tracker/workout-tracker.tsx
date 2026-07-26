@@ -7,7 +7,7 @@ import { Alert } from '@/components/ui/alert'
 import { ExerciseCard } from '@/modules/training/components/exercise-card'
 import { NoteField } from '@/modules/training/components/note-field'
 import { SessionTimesBadge, SessionTimesForm } from '@/modules/training/components/session-times'
-import type { TWorkout } from '@/modules/training/plans'
+import type { Workout } from '@/modules/training/plans'
 import { useWorkoutSession } from './hooks/use-workout-session'
 
 export function WorkoutTracker({
@@ -15,7 +15,7 @@ export function WorkoutTracker({
   readOnly,
   showResults,
 }: {
-  workout: TWorkout
+  workout: Workout
   readOnly?: boolean
   showResults?: boolean
 }) {
@@ -86,10 +86,10 @@ export function WorkoutTracker({
                     )}
                     {group.exercises.map((exercise) => (
                       <ExerciseCard
-                        key={exercise.rowId}
+                        key={exercise.id}
                         exercise={exercise}
-                        sets={setsForRow(exercise.rowId)}
-                        clientNote={noteForRow(exercise.rowId)}
+                        sets={setsForRow(exercise.id)}
+                        clientNote={noteForRow(exercise.id)}
                         onAdd={addSet}
                         onUpdate={updateSet}
                         onDelete={deleteSet}

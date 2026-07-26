@@ -2,14 +2,19 @@ import { formatSideReps, hasMetricValue } from '@/modules/training/exercises'
 import { formatMinSec } from '@/lib/date'
 import { PROTOCOL_LABEL } from './constants'
 import type {
+  BuildExerciseMetaInput,
+  BuildWorkoutGroupMetaInput,
+  Exercise,
   ExerciseMetaLabels,
-  ExerciseMetaSource,
-  WorkoutGroupLabelSource,
-  WorkoutGroupMetaSource,
+  FormatWorkoutGroupLabelInput,
 } from './types'
 
+export const getExerciseName = (
+  exercise: Pick<Exercise, 'exercise' | 'note'>,
+): string => exercise.exercise?.name ?? exercise.note ?? ''
+
 export const buildExerciseMeta = (
-  exercise: ExerciseMetaSource,
+  exercise: BuildExerciseMetaInput,
   labels: ExerciseMetaLabels,
 ): string[] => {
   const parts: string[] = []
@@ -35,12 +40,12 @@ export const buildExerciseMeta = (
   return parts
 }
 
-export const formatWorkoutGroupLabel = (group: WorkoutGroupLabelSource): string => {
+export const formatWorkoutGroupLabel = (group: FormatWorkoutGroupLabelInput): string => {
   const protocol = group.protocol
   return protocol && protocol !== 'standard' ? PROTOCOL_LABEL[protocol] : ''
 }
 
-export const buildWorkoutGroupMeta = (group: WorkoutGroupMetaSource): string[] => {
+export const buildWorkoutGroupMeta = (group: BuildWorkoutGroupMetaInput): string[] => {
   const restValue = group.restBetweenRounds?.trim() ?? ''
   const rest = hasMetricValue(restValue)
     ? /^\d+(?:\.\d+)?$/.test(restValue)

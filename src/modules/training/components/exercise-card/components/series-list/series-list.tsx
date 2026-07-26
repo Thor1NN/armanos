@@ -3,7 +3,8 @@
 import React from 'react'
 import { SeriesRow } from '@/modules/training/components/series-row'
 import type { MetricField } from '@/modules/training/exercises'
-import type { MetricFormValues, SetLog } from '@/modules/training/logs'
+import type { MetricFormValues } from '@/modules/training/logs'
+import type { SetLog } from '@/payload-types'
 
 export function SeriesList({
   sets,

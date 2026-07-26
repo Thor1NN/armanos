@@ -1,12 +1,15 @@
 import 'server-only'
 
-import type { ExerciseRow, Group, RawExerciseRow, Section, WorkoutStructureData } from './types'
+import type { Payload } from 'payload'
+import type { ExerciseRow, LoadWorkoutStructureOutput } from './types'
+
+const relationshipId = (relationship: number | { id: number }): number =>
+  typeof relationship === 'object' ? relationship.id : relationship
 
 export async function loadWorkoutStructure(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload: any,
+  payload: Payload,
   docId: number | string,
-): Promise<WorkoutStructureData> {
+): Promise<LoadWorkoutStructureOutput> {
   const workout = await payload.findByID({ collection: 'workouts', id: docId, depth: 0 })
 
   const groupsResult = await payload.find({
@@ -17,7 +20,7 @@ export async function loadWorkoutStructure(
     depth: 0,
   })
 
-  const groupIds = groupsResult.docs.map((group: Group) => group.id)
+  const groupIds = groupsResult.docs.map((group) => group.id)
 
   const exerciseRowsResult = groupIds.length
     ? await payload.find({
@@ -29,9 +32,7 @@ export async function loadWorkoutStructure(
       })
     : { docs: [] }
 
-  const exerciseRowIds = exerciseRowsResult.docs.map(
-    (exerciseRow: RawExerciseRow) => exerciseRow.id,
-  )
+  const exerciseRowIds = exerciseRowsResult.docs.map((exerciseRow) => exerciseRow.id)
 
   const [roundLogsResult, setLogsResult] = await Promise.all([
     groupIds.length
@@ -54,69 +55,40 @@ export async function loadWorkoutStructure(
 
   const groupIdsWithLogs: number[] = [
     ...new Set(
-      roundLogsResult.docs.map((roundLog: { group: number | { id: number } }) =>
-        typeof roundLog.group === 'object' ? roundLog.group.id : roundLog.group
-      ) as number[],
+      roundLogsResult.docs.map((roundLog) => relationshipId(roundLog.group)),
     ),
   ]
 
   const exerciseRowIdsWithLogs: number[] = [
     ...new Set(
-      setLogsResult.docs.map((setLog: { exerciseRow: number | { id: number } }) =>
-        typeof setLog.exerciseRow === 'object' ? setLog.exerciseRow.id : setLog.exerciseRow
-      ) as number[],
+      setLogsResult.docs
+        .map((setLog) => setLog.exerciseRow)
+        .filter((exerciseRow) => exerciseRow != null)
+        .map((exerciseRow) => relationshipId(exerciseRow)),
     ),
   ]
 
-  const sections: Section[] = (workout.sections ?? []) as Section[]
-
-  const initialGroups: Group[] = groupsResult.docs.map((group: Group) => ({
-    id: group.id,
-    sectionRowId: group.sectionRowId ?? null,
-    order: group.order ?? 0,
-    label: group.label ?? null,
-    bundleWithPrevious: group.bundleWithPrevious ?? false,
-    protocol: group.protocol ?? 'standard',
-    rounds: group.rounds ?? null,
-    durationMinutes: group.durationMinutes ?? null,
-    intervalSeconds: group.intervalSeconds ?? null,
-    workSeconds: group.workSeconds ?? null,
-    restSeconds: group.restSeconds ?? null,
-    restBetweenRounds: group.restBetweenRounds ?? null,
-  }))
+  const sections = workout.sections ?? []
 
   const initialExerciseRows: ExerciseRow[] = exerciseRowsResult.docs.map(
-    (exerciseRow: RawExerciseRow) => ({
-      id: exerciseRow.id,
-      group:
-        typeof exerciseRow.group === 'object' && exerciseRow.group !== null
-          ? exerciseRow.group.id
-          : (exerciseRow.group ?? null),
-      order: exerciseRow.order ?? 0,
-      numer: exerciseRow.numer ?? null,
-      rounds: exerciseRow.rounds ?? null,
+    (exerciseRow) => ({
+      ...exerciseRow,
+      group: relationshipId(exerciseRow.group),
       exercise:
         exerciseRow.exercise && typeof exerciseRow.exercise === 'object'
           ? {
-              id: (exerciseRow.exercise as { id: number }).id,
-              name: (exerciseRow.exercise as { name?: string | null }).name ?? null,
+              id: exerciseRow.exercise.id,
+              name: exerciseRow.exercise.name,
             }
           : null,
-      note: exerciseRow.note ?? null,
-      targetType:
-        (exerciseRow as { targetType?: 'repetitions' | 'duration' | null }).targetType ??
-        'repetitions',
-      reps: exerciseRow.reps ?? null,
-      repsLeft: exerciseRow.repsLeft ?? null,
-      repsRight: exerciseRow.repsRight ?? null,
-      kg: exerciseRow.kg ?? null,
-      tut: exerciseRow.tut ?? null,
-      rir: exerciseRow.rir ?? null,
-      rest: exerciseRow.rest ?? null,
-      durationMin: exerciseRow.durationMin ?? null,
-      durationSec: exerciseRow.durationSec ?? null,
     }),
   )
 
-  return { sections, initialGroups, initialExerciseRows, groupIdsWithLogs, exerciseRowIdsWithLogs }
+  return {
+    sections,
+    initialGroups: groupsResult.docs,
+    initialExerciseRows,
+    groupIdsWithLogs,
+    exerciseRowIdsWithLogs,
+  }
 }

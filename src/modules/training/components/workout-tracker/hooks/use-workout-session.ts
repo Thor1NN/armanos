@@ -3,29 +3,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { sdk } from '@/lib/sdk'
 import type { MetricField } from '@/modules/training/exercises'
-import type { TExercise, TWorkout } from '@/modules/training/plans'
-import {
-  toSetLogMetricData,
-  type MetricFormValues,
-  type Session,
-  type SetLog,
-} from '@/modules/training/logs'
+import { getExerciseName, type Exercise, type Workout } from '@/modules/training/plans'
+import { toSetLogMetricData, type MetricFormValues } from '@/modules/training/logs'
+import type { ExerciseLog, SetLog, WorkoutLog } from '@/payload-types'
 
-const toSession = (doc: unknown): Session => doc as unknown as Session
-const toSetLog = (doc: unknown): SetLog => doc as unknown as SetLog
-
-type ExerciseNote = { id: number; exerciseRow: number; note: string | null }
-const toExerciseNote = (doc: unknown): ExerciseNote => doc as unknown as ExerciseNote
+const relationshipId = (
+  relationship: number | { id: number } | null | undefined,
+): number | null =>
+  relationship && typeof relationship === 'object' ? relationship.id : (relationship ?? null)
 
 export function useWorkoutSession(
-  workout: TWorkout,
+  workout: Workout,
   options: { readOnly?: boolean; showResults?: boolean },
 ) {
   const { readOnly, showResults } = options
 
-  const [session, setSession] = useState<Session | null>(null)
+  const [session, setSession] = useState<WorkoutLog | null>(null)
   const [sets, setSets] = useState<SetLog[]>([])
-  const [exerciseNotes, setExerciseNotes] = useState<ExerciseNote[]>([])
+  const [exerciseNotes, setExerciseNotes] = useState<ExerciseLog[]>([])
   const [loadedWorkoutId, setLoadedWorkoutId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,7 +37,7 @@ export function useWorkoutSession(
       .find({ collection: 'workout-logs', where: { workout: { equals: workout.id } }, limit: 1, depth: 0, sort: '-updatedAt' })
       .then(async (result) => {
         if (!active) return
-        const loadedSession = (result.docs[0] ?? null) as Session | null
+        const loadedSession = result.docs[0] ?? null
 
         if (!loadedSession) {
           setSession(null)
@@ -70,8 +65,8 @@ export function useWorkoutSession(
         ])
         if (!active) return
 
-        setSets(setsResult.docs as unknown as SetLog[])
-        setExerciseNotes(notesResult.docs.map(toExerciseNote))
+        setSets(setsResult.docs)
+        setExerciseNotes(notesResult.docs)
         setLoadedWorkoutId(workout.id)
       })
       .catch((loadError) => {
@@ -94,69 +89,80 @@ export function useWorkoutSession(
     }
   }
 
-  const creating = useRef<Promise<Session> | null>(null)
-  const ensureSession = async (): Promise<Session> => {
+  const creating = useRef<Promise<WorkoutLog> | null>(null)
+  const ensureSession = async (): Promise<WorkoutLog> => {
     if (displayedSession) return displayedSession
     if (!creating.current) {
       creating.current = sdk
-        .create({ collection: 'workout-logs', data: { workout: workout.id } as never })
+        .create({ collection: 'workout-logs', data: { workout: workout.id } })
         .then((doc) => {
-          const created = toSession(doc)
-          setSession(created)
+          setSession(doc)
           setLoadedWorkoutId(workout.id)
-          return created
+          return doc
         })
     }
     return creating.current
   }
 
-  const setsForRow = (rowId: string) =>
+  const setsForRow = (rowId: number) =>
     displayedSets
-      .filter((set) => String(set.exerciseRow) === rowId)
+      .filter((set) => relationshipId(set.exerciseRow) === rowId)
       .sort(
         (firstSet, secondSet) => (firstSet.setNumber ?? 0) - (secondSet.setNumber ?? 0),
       )
 
-  const noteForRow = (rowId: string): string =>
-    displayedNotes.find((entry) => String(entry.exerciseRow) === rowId)?.note ?? ''
+  const noteForRow = (rowId: number): string =>
+    displayedNotes.find((entry) => relationshipId(entry.exerciseRow) === rowId)?.note ?? ''
 
   const setTime = (field: 'startedAt' | 'finishedAt', iso: string | null) =>
     runMutation(async () => {
       const s = await ensureSession()
-      const doc = await sdk.update({ collection: 'workout-logs', id: s.id, data: { [field]: iso } as never })
-      setSession(toSession(doc))
+      const doc = await sdk.update({ collection: 'workout-logs', id: s.id, data: { [field]: iso } })
+      setSession(doc)
     }, 'Błąd zapisu czasu')
 
   const saveTimes = (startedAt: string | null, finishedAt: string | null) =>
     runMutation(async () => {
       const s = await ensureSession()
-      const doc = await sdk.update({ collection: 'workout-logs', id: s.id, data: { startedAt, finishedAt } as never })
-      setSession(toSession(doc))
+      const doc = await sdk.update({
+        collection: 'workout-logs',
+        id: s.id,
+        data: { startedAt, finishedAt },
+      })
+      setSession(doc)
     }, 'Błąd zapisu czasu')
 
-  const addSet = (ex: TExercise, fields: MetricField[], values: MetricFormValues) =>
+  const addSet = (ex: Exercise, fields: MetricField[], values: MetricFormValues) =>
     runMutation(async () => {
       const s = await ensureSession()
-      const setNumber = setsForRow(ex.rowId).length + 1
+      const setNumber = setsForRow(ex.id).length + 1
+      const exerciseName = getExerciseName(ex)
       const doc = await sdk.create({
         collection: 'set-logs',
         depth: 0,
         data: {
           session: s.id,
-          exercise: ex.exerciseId ?? undefined,
-          exerciseName: ex.exerciseName,
-          exerciseRow: Number(ex.rowId),
+          exercise: ex.exercise?.id ?? undefined,
+          exerciseName,
+          exerciseRow: ex.id,
           setNumber,
           ...toSetLogMetricData(fields, values),
-        } as never,
+        },
       })
-      setSets((prev) => [...prev, toSetLog(doc)])
+      setSets((prev) => [...prev, doc])
     }, 'Błąd zapisu serii')
 
   const updateSet = (id: number, fields: MetricField[], values: MetricFormValues) =>
     runMutation(async () => {
-      const doc = await sdk.update({ collection: 'set-logs', id, depth: 0, data: toSetLogMetricData(fields, values) as never })
-      setSets((prev) => prev.map((set) => (set.id === id ? { ...set, ...toSetLog(doc) } : set)))
+      const doc = await sdk.update({
+        collection: 'set-logs',
+        id,
+        depth: 0,
+        data: toSetLogMetricData(fields, values),
+      })
+      setSets((prev) =>
+        prev.map((set) => (set.id === id ? doc : set)),
+      )
     }, 'Błąd aktualizacji serii')
 
   const deleteSet = (id: number) =>
@@ -168,34 +174,46 @@ export function useWorkoutSession(
   const saveSessionNote = (note: string) =>
     runMutation(async () => {
       const s = await ensureSession()
-      const doc = await sdk.update({ collection: 'workout-logs', id: s.id, depth: 0, data: { notes: note.trim() } as never })
-      setSession(toSession(doc))
+      const doc = await sdk.update({
+        collection: 'workout-logs',
+        id: s.id,
+        depth: 0,
+        data: { notes: note.trim() },
+      })
+      setSession(doc)
     }, 'Błąd zapisu notatki')
 
-  const saveExerciseNote = (ex: TExercise, note: string) =>
+  const saveExerciseNote = (ex: Exercise, note: string) =>
     runMutation(async () => {
       const s = await ensureSession()
-      const rowId = Number(ex.rowId)
-      const existing = exerciseNotes.find((entry) => entry.exerciseRow === rowId)
+      const rowId = ex.id
+      const exerciseName = getExerciseName(ex)
+      const existing = exerciseNotes.find(
+        (entry) => relationshipId(entry.exerciseRow) === rowId,
+      )
       const trimmed = note.trim()
 
       const doc = existing
-        ? await sdk.update({ collection: 'exercise-logs', id: existing.id, depth: 0, data: { note: trimmed } as never })
+        ? await sdk.update({
+            collection: 'exercise-logs',
+            id: existing.id,
+            depth: 0,
+            data: { note: trimmed },
+          })
         : await sdk.create({
             collection: 'exercise-logs',
             depth: 0,
             data: {
               session: s.id,
-              exercise: ex.exerciseId ?? undefined,
-              exerciseName: ex.exerciseName,
+              exercise: ex.exercise?.id ?? undefined,
+              exerciseName,
               exerciseRow: rowId,
               note: trimmed,
-            } as never,
+            },
           })
 
-      const saved = toExerciseNote(doc)
       setExerciseNotes((prev) =>
-        existing ? prev.map((entry) => (entry.id === saved.id ? saved : entry)) : [...prev, saved],
+        existing ? prev.map((entry) => (entry.id === doc.id ? doc : entry)) : [...prev, doc],
       )
     }, 'Błąd zapisu notatki')
 

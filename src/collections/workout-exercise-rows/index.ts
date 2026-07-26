@@ -1,4 +1,5 @@
 import { APIError, type CollectionConfig } from 'payload'
+import { EXERCISE_TARGET_TYPE_OPTIONS } from '@/modules/training/exercises'
 import { isAdmin, isAuthenticated } from '../../access'
 
 const PROTOCOL_OPTIONS = [
@@ -76,10 +77,7 @@ export const WorkoutExerciseRows: CollectionConfig = {
       type: 'select',
       label: 'Target type',
       defaultValue: 'repetitions',
-      options: [
-        { label: 'Repetitions', value: 'repetitions' },
-        { label: 'Duration', value: 'duration' },
-      ],
+      options: EXERCISE_TARGET_TYPE_OPTIONS,
     },
     {
       type: 'row',

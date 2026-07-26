@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react'
 import { Button } from '@payloadcms/ui'
-import type { ExerciseRow, Group, Section } from '../../types'
+import type { WorkoutGroup } from '@/payload-types'
+import type { ExerciseRow, Section } from '../../types'
 import { PROTOCOL_LABEL } from '@/modules/training/plans'
 import { exerciseLabel, exerciseMeta, groupLabel } from '../../utils'
 import { s } from '../../styles'
@@ -10,10 +11,10 @@ import { GroupForm } from '../group-form'
 import { ExerciseForm } from '../exercise-form'
 import { useWorkoutMutations } from './hooks/use-workout-mutations'
 
-type Props = {
+type WorkoutStructureEditorProps = {
   header?: React.ReactNode
   sections: Section[]
-  initialGroups: Group[]
+  initialGroups: WorkoutGroup[]
   initialExerciseRows: ExerciseRow[]
   groupIdsWithLogs?: number[]
   exerciseRowIdsWithLogs?: number[]
@@ -26,10 +27,10 @@ export function WorkoutStructureEditor({
   initialExerciseRows,
   groupIdsWithLogs = [],
   exerciseRowIdsWithLogs = [],
-}: Props) {
+}: WorkoutStructureEditorProps) {
   const groupsWithLogs = new Set(groupIdsWithLogs)
   const exerciseRowsWithLogs = new Set(exerciseRowIdsWithLogs)
-  const [groups, setGroups] = useState<Group[]>(initialGroups)
+  const [groups, setGroups] = useState<WorkoutGroup[]>(initialGroups)
   const [exerciseRows, setExerciseRows] = useState<ExerciseRow[]>(initialExerciseRows)
   const [addingGroupFor, setAddingGroupFor] = useState<string | null>(null)
   const [editingGroup, setEditingGroup] = useState<number | null>(null)
@@ -42,7 +43,7 @@ export function WorkoutStructureEditor({
   const sectionsWithFallback: Section[] =
     sections.length > 0 ? sections : [{ id: undefined, title: null, subtitle: null }]
 
-  const groupsForSection = (sectionId: string | undefined) =>
+  const groupsForSection = (sectionId: string | null | undefined) =>
     groups.filter((group) => group.sectionRowId === (sectionId ?? ''))
 
   const rowsForGroup = (groupId: number) =>

@@ -1,3 +1,5 @@
+import type { Exercise, WorkoutExerciseRow } from '@/payload-types'
+
 export type MetricField =
   | 'weightLeft'
   | 'weightRight'
@@ -6,7 +8,9 @@ export type MetricField =
   | 'distanceM'
   | 'durationSec'
 
-export type TrackingType = 'strength' | 'cardio'
+export type TrackingType = NonNullable<Exercise['trackingType']>
+
+export type ExerciseTargetType = NonNullable<WorkoutExerciseRow['targetType']>
 
 type UnitOption = {
   label: string

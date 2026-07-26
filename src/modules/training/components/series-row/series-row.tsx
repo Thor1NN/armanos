@@ -6,11 +6,11 @@ import { joinClasses, panelClass } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
 import { SeriesForm } from '@/modules/training/components/series-form'
 import type { MetricField } from '@/modules/training/exercises'
+import type { SetLog } from '@/payload-types'
 import {
   formatSetLogSummary,
   toMetricFormValues,
   type MetricFormValues,
-  type SetLog,
 } from '@/modules/training/logs'
 
 export function SeriesRow({

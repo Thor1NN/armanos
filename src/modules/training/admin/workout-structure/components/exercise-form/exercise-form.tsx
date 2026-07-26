@@ -5,10 +5,14 @@ import type { FormState, SelectFieldClient, SingleRelationshipFieldClient } from
 import type { ExerciseRow } from '../../types'
 import { s } from '../../styles'
 import { sdk } from '@/lib/sdk'
+import {
+  EXERCISE_TARGET_TYPE_OPTIONS,
+  type ExerciseTargetType,
+} from '@/modules/training/exercises'
 import { textField } from '../../utils/fields'
 import { validateDuration, validateKgOrRepsSides, validateRepsSidesOrKg, validateRounds } from '../../utils'
 
-type Props = {
+type ExerciseFormProps = {
   groupId: number
   nextOrder: number
   initial?: ExerciseRow
@@ -28,18 +32,15 @@ const targetTypeField: SelectFieldClient = {
   name: 'targetType',
   type: 'select',
   label: 'Target type',
-  options: [
-    { label: 'Repetitions', value: 'repetitions' },
-    { label: 'Duration', value: 'duration' },
-  ],
+  options: EXERCISE_TARGET_TYPE_OPTIONS,
 } as SelectFieldClient
 
-type FormFieldsState = Record<string, { value: unknown } | undefined>
+type FieldStateMap = Record<string, { value: unknown } | undefined>
 
 function FormFields({ isEdit, onCancel }: { isEdit: boolean; onCancel: () => void }) {
   const processing = useFormProcessing()
   const targetType = useFormFields(
-    ([fields]) => ((fields as unknown as FormFieldsState).targetType?.value as string) ?? 'repetitions',
+    ([fields]) => ((fields as unknown as FieldStateMap).targetType?.value as string) ?? 'repetitions',
   )
 
   return (
@@ -125,7 +126,13 @@ function ExerciseDetailsFields({ targetType }: { targetType: string }) {
   )
 }
 
-export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }: Props) {
+export function ExerciseForm({
+  groupId,
+  nextOrder,
+  initial,
+  onSaved,
+  onCancel,
+}: ExerciseFormProps) {
   const isEdit = !!initial
 
   const initialState: FormState = {
@@ -146,7 +153,7 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
 
   const handleSubmit = async (_: FormState, data: Record<string, unknown>) => {
     const exerciseId = data.exercise as number | string | null
-    const targetType = (data.targetType as 'repetitions' | 'duration') ?? 'repetitions'
+    const targetType = (data.targetType as ExerciseTargetType) ?? 'repetitions'
     const body = {
       numer:    (data.numer   as string) || null,
       rounds:   (data.rounds  as string) || null,
@@ -161,23 +168,31 @@ export function ExerciseForm({ groupId, nextOrder, initial, onSaved, onCancel }:
       rest:     (data.rest    as string) || null,
       durationMin: targetType === 'duration' && String(data.durationMin ?? '').trim() !== '' ? Number(data.durationMin) : null,
       durationSec: targetType === 'duration' && String(data.durationSec ?? '').trim() !== '' ? Number(data.durationSec) : null,
-      ...(!isEdit && { group: groupId, order: nextOrder }),
     }
 
     try {
       const doc = isEdit
-        ? await sdk.update({ collection: 'workout-exercise-rows', id: initial!.id, data: body as never, depth: 1 })
-        : await sdk.create({ collection: 'workout-exercise-rows', data: body as never, depth: 1 })
+        ? await sdk.update({
+            collection: 'workout-exercise-rows',
+            id: initial!.id,
+            data: body,
+            depth: 1,
+          })
+        : await sdk.create({
+            collection: 'workout-exercise-rows',
+            data: { ...body, group: groupId, order: nextOrder },
+            depth: 1,
+          })
 
       const exerciseDoc = doc.exercise
       const exerciseObj = exerciseDoc && typeof exerciseDoc === 'object'
-        ? { id: (exerciseDoc as { id: number }).id, name: (exerciseDoc as { name?: string | null }).name ?? null }
+        ? { id: exerciseDoc.id, name: exerciseDoc.name }
         : null
       const normalizedGroup =
-        typeof doc.group === 'object' && doc.group !== null ? (doc.group as { id: number }).id : doc.group
+        typeof doc.group === 'object' ? doc.group.id : doc.group
 
       toast.success(isEdit ? 'Exercise updated' : 'Exercise added')
-      onSaved({ ...doc, group: normalizedGroup, exercise: exerciseObj } as ExerciseRow)
+      onSaved({ ...doc, group: normalizedGroup, exercise: exerciseObj })
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Save failed')
     }

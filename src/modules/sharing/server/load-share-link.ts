@@ -4,11 +4,11 @@ import { getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
-import type { TPlanAccordionItem } from '@/modules/training/plans'
+import type { Plan } from '@/modules/training/plans'
 import { loadPlanItems } from '@/modules/training/plans/server'
-import type { ShareLinkData } from '@/modules/sharing'
+import type { LoadShareLinkOutput } from '@/modules/sharing'
 
-export async function loadShareLink(token: string): Promise<ShareLinkData> {
+export async function loadShareLink(token: string): Promise<LoadShareLinkOutput> {
   const payload = await getPayload({ config: await config })
 
   const result = await payload.find({
@@ -32,7 +32,7 @@ export async function loadShareLink(token: string): Promise<ShareLinkData> {
 
   const t = await getTranslations('share')
 
-  let planData: TPlanAccordionItem[] | undefined
+  let planData: Plan[] | undefined
 
   if (permissions.includes('plan')) {
     planData = await loadPlanItems(

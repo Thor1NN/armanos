@@ -7,4 +7,8 @@ export {
   toMetricFormValues,
   toSetLogMetricData,
 } from './metric-form'
-export type { MetricFormField, MetricFormValues, Session, SetLog, SetLogMetricData } from './types'
+export type {
+  MetricFormField,
+  MetricFormValues,
+  SetLogMetricInput,
+} from './types'
