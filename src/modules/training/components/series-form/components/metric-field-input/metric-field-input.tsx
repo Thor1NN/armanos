@@ -98,7 +98,10 @@ export function MetricFieldInput({
       <Input
         variant="compact"
         type={meta.numeric ? 'number' : 'text'}
-        step={meta.numeric ? '0.5' : undefined}
+        step={meta.numeric ? (meta.step ?? '0.5') : undefined}
+        min={meta.numeric ? meta.min : undefined}
+        max={meta.numeric ? meta.max : undefined}
+        inputMode={meta.inputMode}
         placeholder={meta.placeholder}
         autoFocus={autoFocus}
         {...register(field, firstFieldOptions)}

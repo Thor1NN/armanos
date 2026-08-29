@@ -17,7 +17,11 @@
     "editNote": "Edytuj notatkę",
     "notePlaceholder": "notatka do całego ćwiczenia",
     "saveNote": "Zapisz",
-    "cancelNote": "Anuluj"
+    "cancelNote": "Anuluj",
+    "previousSession": "Ostatnio",
+    "setLabel": "Seria",
+    "editSet": "Edytuj",
+    "deleteSet": "Usuń"
   },
   "session": {
     "noteLabel": "Notatka do treningu:",
@@ -25,7 +29,25 @@
     "editNote": "Edytuj notatkę",
     "notePlaceholder": "notatka do całego treningu",
     "saveNote": "Zapisz",
-    "cancelNote": "Anuluj"
+    "cancelNote": "Anuluj",
+    "saving": "Zapisywanie…",
+    "saved": "Zapisano",
+    "saveFailed": "Błąd zapisu — spróbuj ponownie",
+    "restLabel": "Przerwa",
+    "restDone": "Koniec przerwy — następna seria!",
+    "restSkip": "Pomiń przerwę",
+    "finishButton": "Zakończ trening",
+    "finishConfirmText": "Zakończyć trening? Zapisane serie nie będą już edytowalne.",
+    "finishConfirmYes": "Tak, zakończ",
+    "finishConfirmNo": "Trenuj dalej",
+    "completedBanner": "Trening ukończony",
+    "loadError": "Błąd ładowania sesji",
+    "timeSaveError": "Błąd zapisu czasu",
+    "setSaveError": "Błąd zapisu serii",
+    "setUpdateError": "Błąd aktualizacji serii",
+    "setDeleteError": "Błąd usunięcia serii",
+    "finishError": "Błąd zakończenia treningu",
+    "noteSaveError": "Błąd zapisu notatki"
   },
   "seriesForm": {
     "note": "Notatka",

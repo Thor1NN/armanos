@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Alert } from '@/components/ui/alert'
@@ -17,15 +17,23 @@ import {
 } from '@/modules/training/logs'
 import { MetricFieldInput } from './components/metric-field-input'
 
+const AUTOSAVE_DEBOUNCE_MS = 900
+
 export function SeriesForm({
   fields,
   initial,
   onSubmit,
+  onAutosave,
   onCancel,
 }: {
   fields: MetricField[]
   initial: MetricFormValues
   onSubmit: (values: MetricFormValues) => Promise<void>
+  /**
+   * Debounced autosave while typing (same payload as onSubmit, but the form
+   * stays open). The save target is idempotent, so repeated calls are safe.
+   */
+  onAutosave?: (values: MetricFormValues) => Promise<void>
   onCancel?: () => void
 }) {
   const t = useTranslations('seriesForm')
@@ -61,7 +69,30 @@ export function SeriesForm({
     return filled || t('atLeastOneValue')
   }
 
+  // Debounced autosave: any change persists after a short pause, without
+  // closing the form. Skips until at least one metric has a value.
+  const watchedValues = useWatch({ control })
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isFirstWatch = useRef(true)
+  useEffect(() => {
+    if (!onAutosave) return
+    if (isFirstWatch.current) {
+      isFirstWatch.current = false
+      return
+    }
+    if (validateAtLeastOne() !== true) return
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current)
+    autosaveTimer.current = setTimeout(() => {
+      void onAutosave(getValues())
+    }, AUTOSAVE_DEBOUNCE_MS)
+    return () => {
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(watchedValues)])
+
   const submit = handleSubmit(async (data) => {
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current)
     await onSubmit(data)
   })
 

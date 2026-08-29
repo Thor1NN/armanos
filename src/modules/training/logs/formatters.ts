@@ -16,7 +16,8 @@ export const formatSetLogSummary = (set: SetLog): string => {
   if (set.durationSec != null) parts.push(formatSec(set.durationSec))
 
   const sideReps = formatSideReps(set.repsLeft, set.repsRight)
-  if (sideReps) parts.push(`Steps: ${sideReps}`)
+  if (sideReps) parts.push(`Reps: ${sideReps}`)
+  if (set.rir) parts.push(`RIR ${set.rir}`)
   if (set.note) parts.push(set.note)
 
   return parts.length ? parts.join(' · ') : '—'

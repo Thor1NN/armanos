@@ -5,10 +5,27 @@ import React, { useState } from 'react'
 import { mutedTextClass, panelClass, sectionLabelClass } from '@/lib/class-names'
 import { Alert } from '@/components/ui/alert'
 import { ExerciseCard } from '@/modules/training/components/exercise-card'
+import { FinishWorkout } from '@/modules/training/components/finish-workout'
 import { NoteField } from '@/modules/training/components/note-field'
+import { RestTimer } from '@/modules/training/components/rest-timer'
+import { SaveStatusChip } from '@/modules/training/components/save-status'
 import { SessionTimesBadge, SessionTimesForm } from '@/modules/training/components/session-times'
-import type { WorkoutTree } from '@/modules/training/plans'
+import type { WorkoutExerciseTree, WorkoutTree } from '@/modules/training/plans'
 import { useWorkoutSession } from './hooks/use-workout-session'
+
+const DEFAULT_REST_SECONDS = 90
+
+/** Prescribed rest for a row: protocol override first, then the free-text
+ *  `rest` field (seconds; "2 min" style values are converted). */
+const parseRestSeconds = (exercise: WorkoutExerciseTree): number => {
+  if (exercise.override?.restSeconds != null) return exercise.override.restSeconds
+  const text = exercise.rest ?? ''
+  const match = text.match(/(\d+(?:[.,]\d+)?)/)
+  if (!match) return DEFAULT_REST_SECONDS
+  const value = Number(match[1].replace(',', '.'))
+  if (!Number.isFinite(value) || value <= 0) return DEFAULT_REST_SECONDS
+  return /min/i.test(text) ? Math.round(value * 60) : Math.round(value)
+}
 
 export function WorkoutTracker({
   workout,
@@ -19,11 +36,34 @@ export function WorkoutTracker({
   readOnly?: boolean
   showResults?: boolean
 }) {
-  const { session, error, clearError, setsForRow, noteForRow, setTime, saveTimes, addSet, updateSet, deleteSet, saveExerciseNote, saveSessionNote } =
-    useWorkoutSession(workout, { readOnly, showResults })
+  const {
+    session,
+    sessionCompleted,
+    error,
+    saveStatus,
+    clearError,
+    setsForRow,
+    prevSetsForRow,
+    noteForRow,
+    setTime,
+    saveTimes,
+    upsertSet,
+    updateSet,
+    deleteSet,
+    finishWorkout,
+    saveExerciseNote,
+    saveSessionNote,
+  } = useWorkoutSession(workout, { readOnly, showResults })
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
+  const [restTimer, setRestTimer] = useState<{ seconds: number; startedAt: number } | null>(null)
   const t = useTranslations('session')
   const sessionNote = session?.notes ?? ''
+
+  const effectiveReadOnly = readOnly || sessionCompleted
+
+  const handleSetLogged = (exercise: WorkoutExerciseTree) => {
+    setRestTimer({ seconds: parseRestSeconds(exercise), startedAt: Date.now() })
+  }
 
   return (
     <div className={`mb-3 px-4 py-3 ${panelClass}`}>
@@ -33,21 +73,28 @@ export function WorkoutTracker({
           <span className={mutedTextClass}> · #{workout.id}</span>
           {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
         </span>
-        {!readOnly && (
-          <SessionTimesBadge
-            session={session}
-            open={timeEditorOpen}
-            onOpen={() => setTimeEditorOpen((prev) => !prev)}
-          />
-        )}
+        <span className="flex items-center gap-2">
+          {!readOnly && <SaveStatusChip status={saveStatus} />}
+          {!readOnly && (
+            <SessionTimesBadge
+              session={session}
+              open={timeEditorOpen}
+              onOpen={() => setTimeEditorOpen((prev) => !prev)}
+            />
+          )}
+        </span>
       </div>
 
-      {!readOnly && timeEditorOpen && (
+      {!effectiveReadOnly && timeEditorOpen && (
         <SessionTimesForm
           key={session?.id ?? 'new'}
           session={session}
-          onSet={setTime}
-          onSave={saveTimes}
+          onSet={async (field, iso) => {
+            await setTime(field, iso)
+          }}
+          onSave={async (startedAt, finishedAt) => {
+            await saveTimes(startedAt, finishedAt)
+          }}
           onClose={() => setTimeEditorOpen(false)}
         />
       )}
@@ -89,12 +136,14 @@ export function WorkoutTracker({
                         key={exercise.id}
                         exercise={exercise}
                         sets={setsForRow(exercise.id)}
+                        prevSets={prevSetsForRow(exercise.id)}
                         clientNote={noteForRow(exercise.id)}
-                        onAdd={addSet}
+                        onUpsert={upsertSet}
                         onUpdate={updateSet}
                         onDelete={deleteSet}
                         onSaveNote={saveExerciseNote}
-                        readOnly={readOnly}
+                        onSetLogged={handleSetLogged}
+                        readOnly={effectiveReadOnly}
                       />
                     ))}
                   </div>
@@ -105,12 +154,14 @@ export function WorkoutTracker({
         </div>
       ))}
 
-      {(!readOnly || sessionNote) && (
+      {(!effectiveReadOnly || sessionNote) && (
         <div className="-mx-4 border-t border-ui-border-base px-4 pt-2.5">
           <NoteField
             note={sessionNote}
-            readOnly={readOnly}
-            onSave={saveSessionNote}
+            readOnly={effectiveReadOnly}
+            onSave={async (note) => {
+              await saveSessionNote(note)
+            }}
             labels={{
               label: t('noteLabel'),
               add: t('addNote'),
@@ -121,6 +172,25 @@ export function WorkoutTracker({
             }}
           />
         </div>
+      )}
+
+      {!readOnly && (
+        <FinishWorkout
+          session={session}
+          completed={sessionCompleted}
+          onFinish={async () => {
+            setRestTimer(null)
+            await finishWorkout()
+          }}
+        />
+      )}
+
+      {!effectiveReadOnly && restTimer && (
+        <RestTimer
+          seconds={restTimer.seconds}
+          startedAt={restTimer.startedAt}
+          onDismiss={() => setRestTimer(null)}
+        />
       )}
     </div>
   )

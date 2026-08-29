@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { joinClasses, panelClass } from '@/lib/class-names'
@@ -26,6 +27,7 @@ export function SeriesRow({
   onDelete: () => Promise<void>
   readOnly?: boolean
 }) {
+  const t = useTranslations('exercise')
   const [editing, setEditing] = useState(false)
 
   if (editing) {
@@ -34,6 +36,7 @@ export function SeriesRow({
         <SeriesForm
           fields={fields}
           initial={toMetricFormValues(set, fields)}
+          onAutosave={onUpdate}
           onSubmit={async (values) => {
             await onUpdate(values)
             setEditing(false)
@@ -47,14 +50,14 @@ export function SeriesRow({
   return (
     <li className="mb-1 flex items-center justify-between gap-2 rounded-lg border border-ui-border-base bg-ui-bg-base px-2.5 py-1.5 text-sm">
       <span>
-        Seria {set.setNumber}: {formatSetLogSummary(set)}
+        {t('setLabel')} {set.setNumber}: {formatSetLogSummary(set)}
       </span>
       {!readOnly && (
         <span className="flex shrink-0 gap-0.5">
-          <Button variant="icon" onClick={() => setEditing(true)} aria-label="Edytuj">
+          <Button variant="icon" onClick={() => setEditing(true)} aria-label={t('editSet')}>
             <Pencil size={14} />
           </Button>
-          <Button variant="danger" onClick={onDelete} aria-label="Usuń">
+          <Button variant="danger" onClick={onDelete} aria-label={t('deleteSet')}>
             <Trash2 size={14} />
           </Button>
         </span>

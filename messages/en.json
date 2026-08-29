@@ -17,7 +17,11 @@
     "editNote": "Edit note",
     "notePlaceholder": "note for the whole exercise",
     "saveNote": "Save",
-    "cancelNote": "Cancel"
+    "cancelNote": "Cancel",
+    "previousSession": "Last time",
+    "setLabel": "Set",
+    "editSet": "Edit",
+    "deleteSet": "Delete"
   },
   "session": {
     "noteLabel": "Workout note:",
@@ -25,7 +29,25 @@
     "editNote": "Edit note",
     "notePlaceholder": "note for the whole workout",
     "saveNote": "Save",
-    "cancelNote": "Cancel"
+    "cancelNote": "Cancel",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "saveFailed": "Save failed — retrying may help",
+    "restLabel": "Rest",
+    "restDone": "Rest over — next set!",
+    "restSkip": "Skip rest",
+    "finishButton": "Finish workout",
+    "finishConfirmText": "Finish this workout? You will no longer be able to edit the logged sets.",
+    "finishConfirmYes": "Yes, finish",
+    "finishConfirmNo": "Keep training",
+    "completedBanner": "Workout completed",
+    "loadError": "Failed to load the session",
+    "timeSaveError": "Failed to save the time",
+    "setSaveError": "Failed to save the set",
+    "setUpdateError": "Failed to update the set",
+    "setDeleteError": "Failed to delete the set",
+    "finishError": "Failed to finish the workout",
+    "noteSaveError": "Failed to save the note"
   },
   "seriesForm": {
     "note": "Note",

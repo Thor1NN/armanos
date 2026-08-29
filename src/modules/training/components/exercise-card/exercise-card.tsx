@@ -1,11 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
+import React, { useRef, useState } from 'react'
 import { SeriesForm } from '@/modules/training/components/series-form'
 import { getTrackingFields, type MetricField } from '@/modules/training/exercises'
 import { getExerciseName, type WorkoutExerciseTree } from '@/modules/training/plans'
 import type { SetLog } from '@/payload-types'
 import {
+  formatSetLogSummary,
   toMetricFormValues,
   type MetricFormValues,
 } from '@/modules/training/logs'
@@ -18,27 +20,38 @@ import { SeriesList } from './components/series-list'
 export function ExerciseCard({
   exercise,
   sets,
+  prevSets = [],
   clientNote = '',
-  onAdd,
+  onUpsert,
   onUpdate,
   onDelete,
   onSaveNote,
+  onSetLogged,
   readOnly,
 }: {
   exercise: WorkoutExerciseTree
   sets: SetLog[]
+  /** The same exercise row's sets from the previous completed session. */
+  prevSets?: SetLog[]
   clientNote?: string
-  onAdd?: (
+  onUpsert?: (
     exercise: WorkoutExerciseTree,
     fields: MetricField[],
     values: MetricFormValues,
-  ) => Promise<void>
-  onUpdate?: (id: number, fields: MetricField[], values: MetricFormValues) => Promise<void>
-  onDelete?: (id: number) => Promise<void>
-  onSaveNote?: (exercise: WorkoutExerciseTree, note: string) => Promise<void>
+    setNumber?: number,
+  ) => Promise<number | null>
+  onUpdate?: (id: number, fields: MetricField[], values: MetricFormValues) => Promise<unknown>
+  onDelete?: (id: number) => Promise<unknown>
+  onSaveNote?: (exercise: WorkoutExerciseTree, note: string) => Promise<unknown>
+  /** Called after a set is logged — starts the rest timer. */
+  onSetLogged?: (exercise: WorkoutExerciseTree) => void
   readOnly?: boolean
 }) {
+  const t = useTranslations('exercise')
   const [open, setOpen] = useState(false)
+  // The set number reserved by the first autosave of the open form, so every
+  // subsequent autosave updates the same row instead of appending new ones.
+  const draftSetNumber = useRef<number | null>(null)
   const fields: MetricField[] =
     exercise.targetType === 'duration'
       ? ['weightLeft', 'weightRight', 'durationSec']
@@ -51,6 +64,17 @@ export function ExerciseCard({
   const name = getExerciseName(exercise)
   const note = exercise.exercise && exercise.note !== name ? exercise.note : null
 
+  const saveDraft = async (values: MetricFormValues): Promise<number | null> => {
+    const savedNumber = await onUpsert?.(
+      exercise,
+      fields,
+      values,
+      draftSetNumber.current ?? undefined,
+    )
+    if (savedNumber != null) draftSetNumber.current = savedNumber
+    return savedNumber ?? null
+  }
+
   return (
     <div className="border-t border-ui-border-base py-2.5 first:border-t-0 first:pt-0 last:pb-0">
       <ExerciseHeader
@@ -61,25 +85,68 @@ export function ExerciseCard({
 
       {exercise.meta.length > 0 && <MetaLine>{exercise.meta.join(' · ')}</MetaLine>}
       {note && <MetaLine>{note}</MetaLine>}
+      {prevSets.length > 0 && (
+        <MetaLine>
+          {t('previousSession')}: {prevSets.map((set) => formatSetLogSummary(set)).join(' | ')}
+        </MetaLine>
+      )}
 
-      <SeriesList sets={sets} fields={fields} onUpdate={onUpdate} onDelete={onDelete} readOnly={readOnly} />
+      <SeriesList
+        sets={sets}
+        fields={fields}
+        onUpdate={
+          onUpdate
+            ? async (id, updateFields, values) => {
+                await onUpdate(id, updateFields, values)
+              }
+            : undefined
+        }
+        onDelete={
+          onDelete
+            ? async (id) => {
+                await onDelete(id)
+              }
+            : undefined
+        }
+        readOnly={readOnly}
+      />
 
       {!readOnly &&
         (open ? (
           <SeriesForm
             fields={fields}
             initial={prefillValues}
+            onAutosave={async (values) => {
+              await saveDraft(values)
+            }}
             onSubmit={async (values) => {
-              await onAdd?.(exercise, fields, values)
+              const saved = await saveDraft(values)
+              draftSetNumber.current = null
+              setOpen(false)
+              if (saved != null) onSetLogged?.(exercise)
+            }}
+            onCancel={() => {
+              draftSetNumber.current = null
               setOpen(false)
             }}
-            onCancel={() => setOpen(false)}
           />
         ) : (
           <AddSetActions
-            onAdd={() => setOpen(true)}
+            onAdd={() => {
+              draftSetNumber.current = null
+              setOpen(true)
+            }}
             onDuplicate={
-              sets.length > 0 ? () => onAdd?.(exercise, fields, toMetricFormValues(sets.at(-1)!, fields)) : undefined
+              sets.length > 0
+                ? async () => {
+                    const saved = await onUpsert?.(
+                      exercise,
+                      fields,
+                      toMetricFormValues(sets.at(-1)!, fields),
+                    )
+                    if (saved != null) onSetLogged?.(exercise)
+                  }
+                : undefined
             }
           />
         ))}
@@ -87,7 +154,9 @@ export function ExerciseCard({
       <ExerciseNote
         note={clientNote}
         readOnly={readOnly}
-        onSave={(note) => onSaveNote!(exercise, note)}
+        onSave={async (note) => {
+          await onSaveNote!(exercise, note)
+        }}
       />
     </div>
   )
