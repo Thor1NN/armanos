@@ -187,6 +187,8 @@ export function WorkoutTracker({
 
       {!effectiveReadOnly && restTimer && (
         <RestTimer
+          // Remount per logged set so the countdown state resets cleanly.
+          key={restTimer.startedAt}
           seconds={restTimer.seconds}
           startedAt={restTimer.startedAt}
           onDismiss={() => setRestTimer(null)}

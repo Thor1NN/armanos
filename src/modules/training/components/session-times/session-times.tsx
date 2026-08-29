@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Clock, X } from 'lucide-react'
 import { joinClasses, mutedTextClass } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
@@ -59,6 +60,7 @@ export function SessionTimesForm({
   onSave: (startedAt: string | null, finishedAt: string | null) => Promise<void>
   onClose: () => void
 }) {
+  const t = useTranslations('session')
   const startIso = session?.startedAt ?? null
   const finishIso = session?.finishedAt ?? null
 
@@ -96,7 +98,7 @@ export function SessionTimesForm({
   return (
     <div className="mt-2 font-normal">
       <div className="flex flex-col gap-2.5">
-        <Field label="Rozpoczęto" className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
+        <Field label={t('startedLabel')} className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
           <div className="flex items-center gap-1.5">
             <Input
               type="date"
@@ -113,12 +115,12 @@ export function SessionTimesForm({
               onBlur={() => onSet('startedAt', combineDateTime(startDate, startTime))}
             />
             <Button variant="secondary" onClick={setStartNow}>
-              teraz
+              {t('now')}
             </Button>
           </div>
         </Field>
 
-        <Field label="Zakończono" className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
+        <Field label={t('finishedLabel')} className="sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5 text-sm">
           <div className="flex flex-wrap items-center gap-1.5">
             <Input
               type="time"
@@ -136,7 +138,7 @@ export function SessionTimesForm({
 
         <div className="flex flex-wrap items-center gap-1.5">
           <Button size="sm" onClick={save} disabled={saving}>
-            {saving ? '…' : 'Zapisz'}
+            {saving ? '…' : t('save')}
           </Button>
         </div>
       </div>

@@ -30,11 +30,6 @@ export function RestTimer({
   const [now, setNow] = useState(() => Date.now())
   const doneNotified = useRef(false)
 
-  useEffect(() => {
-    setExtraSeconds(0)
-    doneNotified.current = false
-  }, [startedAt])
-
   const deadline = startedAt + (seconds + extraSeconds) * 1000
   const remaining = Math.max(0, Math.ceil((deadline - now) / 1000))
 

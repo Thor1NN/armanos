@@ -13,8 +13,9 @@ export async function loadPlanTree(
   planIds: (number | string)[],
   labels: ExerciseMetaLabels,
   overrideAccess = false,
+  dateLocale = 'en-GB',
 ): Promise<PlanTree[]> {
   const documents = await loadPlanDocuments(payload, planIds, overrideAccess)
 
-  return buildPlanTree(documents, labels)
+  return buildPlanTree(documents, labels, dateLocale)
 }

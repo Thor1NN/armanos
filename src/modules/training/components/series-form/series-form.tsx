@@ -91,10 +91,13 @@ export function SeriesForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(watchedValues)])
 
-  const submit = handleSubmit(async (data) => {
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    // Cancel any pending autosave — the explicit save supersedes it.
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current)
-    await onSubmit(data)
-  })
+    void handleSubmit(async (data) => {
+      await onSubmit(data)
+    })(event)
+  }
 
   const firstField = visibleFields[0]
 

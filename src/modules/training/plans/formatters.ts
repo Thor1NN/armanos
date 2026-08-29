@@ -28,8 +28,8 @@ export const buildExerciseMeta = (
     if (duration) parts.push(`${labels.durationPrefix}: ${duration}`)
   } else {
     const sideReps = formatSideReps(exercise.repsLeft, exercise.repsRight)
-    if (sideReps) parts.push(`Steps: ${sideReps}`)
-    else if (hasMetricValue(exercise.reps)) parts.push(`Steps: ${exercise.reps}`)
+    if (sideReps) parts.push(`Reps: ${sideReps}`)
+    else if (hasMetricValue(exercise.reps)) parts.push(`Reps: ${exercise.reps}`)
   }
 
   if (hasMetricValue(exercise.rest)) parts.push(`${labels.restPrefix}: ${exercise.rest}`)

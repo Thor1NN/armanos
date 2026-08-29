@@ -6,7 +6,10 @@
     "seriesPrefix": "Sets",
     "repsPrefix": "Reps",
     "durationPrefix": "Time",
-    "restPrefix": "Rest(s)"
+    "restPrefix": "Rest(s)",
+    "statusActive": "Active",
+    "statusPaused": "Paused",
+    "statusCompleted": "Completed"
   },
   "exercise": {
     "video": "▶ video",
@@ -47,7 +50,11 @@
     "setUpdateError": "Failed to update the set",
     "setDeleteError": "Failed to delete the set",
     "finishError": "Failed to finish the workout",
-    "noteSaveError": "Failed to save the note"
+    "noteSaveError": "Failed to save the note",
+    "startedLabel": "Started",
+    "finishedLabel": "Finished",
+    "now": "now",
+    "save": "Save"
   },
   "seriesForm": {
     "note": "Note",
@@ -93,7 +100,10 @@
     "seriesPrefix": "Sets",
     "repsPrefix": "Reps",
     "durationPrefix": "Time",
-    "restPrefix": "Rest(s)"
+    "restPrefix": "Rest(s)",
+    "statusActive": "Active",
+    "statusPaused": "Paused",
+    "statusCompleted": "Completed"
   },
   "history": {
     "title": "Workout history",

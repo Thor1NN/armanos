@@ -1,18 +1,28 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import React from 'react'
+import { RegisterSw } from '@/components/common/register-sw'
 import './styles.css'
 
 export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
   colorScheme: 'dark',
+  themeColor: '#0f1115',
 }
 
 export const metadata = {
-  description: 'Aplikacja treningowa',
-  title: 'Trening',
+  description: 'Personal training & workout tracking',
+  title: 'ArmanOS',
   robots: {
     index: false,
     follow: false,
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'ArmanOS',
+    statusBarStyle: 'black-translucent',
   },
   icons: {
     icon: [
@@ -34,7 +44,7 @@ export const metadata = {
       { url: '/favicon/apple-icon-180x180.png', sizes: '180x180' },
     ],
   },
-  manifest: '/favicon/manifest.json',
+  manifest: '/manifest.webmanifest',
 }
 
 export default async function RootLayout(props: {
@@ -50,6 +60,7 @@ export default async function RootLayout(props: {
         <NextIntlClientProvider messages={messages}>
           <main>{props.children}</main>
         </NextIntlClientProvider>
+        <RegisterSw />
       </body>
     </html>
   )

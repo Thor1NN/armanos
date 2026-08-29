@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { headers as getHeaders } from 'next/headers.js'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
@@ -19,6 +19,7 @@ export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
   }
 
   const t = await getTranslations('home')
+  const locale = await getLocale()
 
   const plans = await payload.find({
     collection: 'plans',
@@ -37,8 +38,12 @@ export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
       seriesPrefix: t('seriesPrefix'),
       durationPrefix: t('durationPrefix'),
       restPrefix: t('restPrefix'),
+      statusActive: t('statusActive'),
+      statusPaused: t('statusPaused'),
+      statusCompleted: t('statusCompleted'),
     },
     true,
+    locale || 'en-GB',
   )
 
   return {

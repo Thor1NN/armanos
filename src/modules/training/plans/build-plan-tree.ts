@@ -3,7 +3,6 @@ import {
   buildWorkoutGroupMeta,
   formatWorkoutGroupLabel,
 } from './formatters'
-import { STATUS_LABEL } from './constants'
 import type {
   ExerciseMetaLabels,
   PlanDocuments,
@@ -38,9 +37,23 @@ const groupByRelationship = <Item>(
   return groupedItems
 }
 
+const statusLabelFor = (status: string, labels: ExerciseMetaLabels): string => {
+  switch (status) {
+    case 'active':
+      return labels.statusActive
+    case 'paused':
+      return labels.statusPaused
+    case 'completed':
+      return labels.statusCompleted
+    default:
+      return status
+  }
+}
+
 export const buildPlanTree = (
   documents: PlanDocuments,
   labels: ExerciseMetaLabels,
+  dateLocale: string = 'en-GB',
 ): PlanTree[] => {
   const microcyclesByPlan = groupByRelationship(
     documents.microcycles,
@@ -117,11 +130,11 @@ export const buildPlanTree = (
     return {
       ...plan,
       status,
-      statusLabel: STATUS_LABEL[status] || status,
+      statusLabel: statusLabelFor(status, labels),
       dateRange:
         plan.startDate || plan.endDate
           ? [plan.startDate, plan.endDate]
-              .map((date) => (date ? new Date(date).toLocaleDateString('pl-PL') : '...'))
+              .map((date) => (date ? new Date(date).toLocaleDateString(dateLocale) : '...'))
               .join(' - ')
           : null,
       microcycles: (microcyclesByPlan.get(plan.id) ?? []).map((microcycle) => ({

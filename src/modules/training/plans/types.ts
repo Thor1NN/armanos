@@ -67,6 +67,9 @@ export type ExerciseMetaLabels = {
   seriesPrefix: string
   durationPrefix: string
   restPrefix: string
+  statusActive: string
+  statusPaused: string
+  statusCompleted: string
 }
 
 export type BuildExerciseMetaInput = Pick<

@@ -13,6 +13,10 @@
     "seed:export": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/export-seed.ts",
     "seed": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx src/scripts/seed.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:int": "vitest run",
+    "test": "yarn build && vitest run",
+    "migrate:prod": "bash scripts/migrate-prod.sh",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation tsx node_modules/payload/bin.js --disable-transpile",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "install-skills": "sh scripts/install-skills.sh",
@@ -53,7 +57,9 @@
     "prettier": "^3.4.2",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=24.0.0"

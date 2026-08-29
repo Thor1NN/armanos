@@ -6,7 +6,10 @@
     "seriesPrefix": "Serie",
     "repsPrefix": "Powt.",
     "durationPrefix": "Czas",
-    "restPrefix": "Przerwa (s)"
+    "restPrefix": "Przerwa (s)",
+    "statusActive": "Aktywny",
+    "statusPaused": "Wstrzymany",
+    "statusCompleted": "Zakończony"
   },
   "exercise": {
     "video": "▶ wideo",
@@ -47,7 +50,11 @@
     "setUpdateError": "Błąd aktualizacji serii",
     "setDeleteError": "Błąd usunięcia serii",
     "finishError": "Błąd zakończenia treningu",
-    "noteSaveError": "Błąd zapisu notatki"
+    "noteSaveError": "Błąd zapisu notatki",
+    "startedLabel": "Rozpoczęto",
+    "finishedLabel": "Zakończono",
+    "now": "teraz",
+    "save": "Zapisz"
   },
   "seriesForm": {
     "note": "Notatka",
@@ -93,7 +100,10 @@
     "seriesPrefix": "Serie",
     "repsPrefix": "Powt.",
     "durationPrefix": "Czas",
-    "restPrefix": "Przerwa (s)"
+    "restPrefix": "Przerwa (s)",
+    "statusActive": "Aktywny",
+    "statusPaused": "Wstrzymany",
+    "statusCompleted": "Zakończony"
   },
   "history": {
     "title": "Historia treningów",

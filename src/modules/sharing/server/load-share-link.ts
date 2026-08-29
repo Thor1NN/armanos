@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
@@ -31,6 +31,7 @@ export async function loadShareLink(token: string): Promise<LoadShareLinkOutput>
   const permissions = link.permissions as ('plan' | 'results')[]
 
   const t = await getTranslations('share')
+  const locale = await getLocale()
 
   let planData: PlanTree[] | undefined
 
@@ -42,8 +43,12 @@ export async function loadShareLink(token: string): Promise<LoadShareLinkOutput>
         seriesPrefix: t('seriesPrefix'),
         durationPrefix: t('durationPrefix'),
         restPrefix: t('restPrefix'),
+        statusActive: t('statusActive'),
+        statusPaused: t('statusPaused'),
+        statusCompleted: t('statusCompleted'),
       },
       true,
+      locale || 'en-GB',
     )
   }
 
