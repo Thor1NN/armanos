@@ -69,7 +69,10 @@
     "genericError": "Coś poszło nie tak. Spróbuj ponownie."
   },
   "nav": {
-    "logout": "Wyloguj"
+    "logout": "Wyloguj",
+    "today": "Dziś",
+    "history": "Historia",
+    "progress": "Postępy"
   },
   "workout": {
     "activeContext": "Aktywny kontekst"
@@ -91,5 +94,34 @@
     "repsPrefix": "Powt.",
     "durationPrefix": "Czas",
     "restPrefix": "Przerwa (s)"
+  },
+  "history": {
+    "title": "Historia treningów",
+    "subtitle": "Ukończone sesje",
+    "empty": "Brak ukończonych treningów. Zakończ pierwszy trening, aby zobaczyć go tutaj.",
+    "sessionFallback": "Trening"
+  },
+  "progress": {
+    "title": "Postępy",
+    "subtitle": "Najcięższa seria w kolejnych sesjach",
+    "empty": "Brak danych. Postępy pojawią się po pierwszych ukończonych treningach.",
+    "exerciseLabel": "Ćwiczenie",
+    "chartAria": "Wykres postępów: {exercise}",
+    "noWeightData": "Brak zapisanych obciążeń dla tego ćwiczenia.",
+    "sessionsCount": "{count} sesji",
+    "lastTotalReps": "ostatnia sesja: {count} powtórzeń łącznie"
+  },
+  "setPassword": {
+    "title": "Ustaw hasło",
+    "subtitle": "Wybierz hasło, aby aktywować konto.",
+    "passwordLabel": "Nowe hasło",
+    "confirmLabel": "Powtórz hasło",
+    "passwordHint": "Minimum 15 znaków. Najlepiej długa fraza.",
+    "mismatch": "Hasła nie są takie same.",
+    "missingToken": "Ten link jest nieprawidłowy. Poproś trenera o nowy.",
+    "invalidToken": "Link wygasł lub został już użyty. Poproś trenera o nowy.",
+    "genericError": "Coś poszło nie tak. Spróbuj ponownie.",
+    "saving": "Zapisywanie…",
+    "button": "Zapisz i zaloguj"
   }
 }

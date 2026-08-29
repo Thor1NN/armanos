@@ -1,3 +1,5 @@
+import { ClientActions as ClientActions_0ac4c5c114e8700f54b9a40f01c7894b } from '@/modules/training/admin/client-actions/client-actions'
+import { DuplicatePlan as DuplicatePlan_1bc2595283ecd7efbefeb8ede8282021 } from '@/modules/training/admin/plan-actions/plan-actions'
 import { PlanMicrocycles as PlanMicrocycles_aa9e64122204e91344087361d305f543 } from '@/modules/training/admin/training-navigation/training-navigation'
 import { MicrocycleWorkouts as MicrocycleWorkouts_aa9e64122204e91344087361d305f543 } from '@/modules/training/admin/training-navigation/training-navigation'
 import { WorkoutLogsNotice as WorkoutLogsNotice_328f06a3a687f2f021e5e330fd11e578 } from '@/modules/training/admin/workout-logs-notice/workout-logs-notice'
@@ -7,6 +9,8 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/modules/training/admin/client-actions/client-actions#ClientActions": ClientActions_0ac4c5c114e8700f54b9a40f01c7894b,
+  "@/modules/training/admin/plan-actions/plan-actions#DuplicatePlan": DuplicatePlan_1bc2595283ecd7efbefeb8ede8282021,
   "@/modules/training/admin/training-navigation/training-navigation#PlanMicrocycles": PlanMicrocycles_aa9e64122204e91344087361d305f543,
   "@/modules/training/admin/training-navigation/training-navigation#MicrocycleWorkouts": MicrocycleWorkouts_aa9e64122204e91344087361d305f543,
   "@/modules/training/admin/workout-logs-notice/workout-logs-notice#WorkoutLogsNotice": WorkoutLogsNotice_328f06a3a687f2f021e5e330fd11e578,

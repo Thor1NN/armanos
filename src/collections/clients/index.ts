@@ -134,6 +134,19 @@ export const Clients: CollectionConfig = {
       },
     },
     {
+      name: 'clientActions',
+      type: 'ui',
+      label: '',
+      admin: {
+        components: {
+          Field: {
+            path: '@/modules/training/admin/client-actions/client-actions',
+            exportName: 'ClientActions',
+          },
+        },
+      },
+    },
+    {
       name: 'plans',
       type: 'join',
       collection: 'plans',

@@ -69,7 +69,10 @@
     "genericError": "Something went wrong. Please try again."
   },
   "nav": {
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "today": "Today",
+    "history": "History",
+    "progress": "Progress"
   },
   "workout": {
     "activeContext": "Active context"
@@ -91,5 +94,34 @@
     "repsPrefix": "Reps",
     "durationPrefix": "Time",
     "restPrefix": "Rest(s)"
+  },
+  "history": {
+    "title": "Workout history",
+    "subtitle": "Completed sessions",
+    "empty": "No completed workouts yet. Finish your first workout to see it here.",
+    "sessionFallback": "Workout"
+  },
+  "progress": {
+    "title": "Progress",
+    "subtitle": "Top set weight per session",
+    "empty": "No data yet. Progress appears after your first completed workouts.",
+    "exerciseLabel": "Exercise",
+    "chartAria": "Progress chart for {exercise}",
+    "noWeightData": "No weight data logged for this exercise yet.",
+    "sessionsCount": "{count} sessions",
+    "lastTotalReps": "last session: {count} total reps"
+  },
+  "setPassword": {
+    "title": "Set your password",
+    "subtitle": "Choose a password to activate your account.",
+    "passwordLabel": "New password",
+    "confirmLabel": "Repeat password",
+    "passwordHint": "At least 15 characters. A longer passphrase works best.",
+    "mismatch": "Passwords do not match.",
+    "missingToken": "This link is invalid. Ask your coach for a new one.",
+    "invalidToken": "This link has expired or was already used. Ask your coach for a new one.",
+    "genericError": "Something went wrong. Please try again.",
+    "saving": "Saving…",
+    "button": "Save and sign in"
   }
 }

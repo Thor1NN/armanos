@@ -116,6 +116,20 @@ export const Plans: CollectionConfig = {
       admin: { description: 'Where the plan was imported from' },
     },
     {
+      name: 'planActions',
+      type: 'ui',
+      label: '',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/modules/training/admin/plan-actions/plan-actions',
+            exportName: 'DuplicatePlan',
+          },
+        },
+      },
+    },
+    {
       name: 'microcyclesNavigation',
       type: 'ui',
       label: '',
