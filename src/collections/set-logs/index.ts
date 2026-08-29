@@ -1,5 +1,5 @@
 import { APIError, type CollectionConfig, type PayloadRequest } from 'payload'
-import { adminOrOwnByClient, canReadViaShareToken } from '../../access'
+import { adminOrOwnByClient } from '../../access'
 import { ALL_METRIC_FIELDS, getTrackingFields } from '@/modules/training/exercises'
 import { LEGACY_SET_LOG_FIELDS } from '@/modules/training/logs'
 import {
@@ -121,11 +121,8 @@ export const SetLogs: CollectionConfig = {
   ],
   access: {
     create: ({ req: { user } }) => Boolean(user),
-    read: async (ctx) => {
-      const own = adminOrOwnByClient(ctx)
-      if (own !== false) return own
-      return canReadViaShareToken(ctx)
-    },
+    // V1: share-token read access removed — logs are strictly coach or owner.
+    read: adminOrOwnByClient,
     update: adminOrOwnByClient,
     delete: adminOrOwnByClient,
   },

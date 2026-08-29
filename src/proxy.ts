@@ -8,18 +8,10 @@ const intlMiddleware = createMiddleware(routing)
 export default function middleware(req: NextRequest) {
   const response = intlMiddleware(req) ?? NextResponse.next()
 
-  const match = req.nextUrl.pathname.match(/\/share\/([^/]+)/)
-  if (match) {
-    const token = match[1]
-    response.cookies.set('share-token', token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      // Server-side expiry is authoritative; this just stops the cookie from
-      // lingering in the browser indefinitely.
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    })
+  // V1: public share links are disabled. Proactively clear any share-token
+  // cookie left over from earlier versions instead of setting one.
+  if (req.cookies.has('share-token')) {
+    response.cookies.delete('share-token')
   }
 
   return response

@@ -7,6 +7,9 @@ export const ShareLinks: CollectionConfig = {
     useAsTitle: 'label',
     defaultColumns: ['label', 'plan', 'permissions', 'expiresAt', 'active'],
     group: 'Sharing',
+    // V1: the public share feature is disabled (route 404s, no share-token
+    // access). Hidden from the admin so no new links can be handed out.
+    hidden: true,
   },
   access: {
     create: isAdmin,

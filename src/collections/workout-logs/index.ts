@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig, type PayloadRequest } from 'payload'
 import { sql } from '@payloadcms/db-postgres'
-import { adminOrOwnByClient, canReadViaShareToken } from '../../access'
+import { adminOrOwnByClient } from '../../access'
 
 type DrizzleExecutor = {
   drizzle: { execute: (query: unknown) => Promise<{ rows?: unknown[] }> }
@@ -57,11 +57,8 @@ export const WorkoutLogs: CollectionConfig = {
   },
   access: {
     create: ({ req: { user } }) => Boolean(user),
-    read: async (ctx) => {
-      const own = adminOrOwnByClient(ctx)
-      if (own !== false) return own
-      return canReadViaShareToken(ctx)
-    },
+    // V1: share-token read access removed — logs are strictly coach or owner.
+    read: adminOrOwnByClient,
     update: adminOrOwnByClient,
     delete: adminOrOwnByClient,
   },

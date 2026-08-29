@@ -1,50 +1,12 @@
 import { notFound } from 'next/navigation'
-import { getFormatter, getTranslations } from 'next-intl/server'
-import React from 'react'
 
-import { loadShareLink } from '@/modules/sharing/server'
-import { WorkoutPlans } from '@/modules/training/components/workout-plans'
-import { PageContainer } from '@/components/ui/page-container'
-import { PageHeader } from '@/components/ui/page-header'
-
-export default async function SharePage({
-  params,
-}: {
-  params: Promise<{ token: string; locale: string }>
-}) {
-  const { token } = await params
-  const data = await loadShareLink(token)
-
-  if (!data) notFound()
-
-  const t = await getTranslations('share')
-  const format = await getFormatter()
-  const expiryDate = format.dateTime(new Date(data.meta.expiresAt), {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-
-  return (
-    <PageContainer>
-      <PageHeader
-        className="mb-6"
-        layout="stacked"
-        title={data.meta.planTitle}
-        right={
-          <span className="shrink-0 text-xs text-ui-fg-muted">{t('expiresOn', { date: expiryDate })}</span>
-        }
-      />
-
-      {data.plan ? (
-        <WorkoutPlans
-          plans={data.plan}
-          readOnly={true}
-          showResults={data.meta.permissions.includes('results')}
-        />
-      ) : (
-        <div className="py-10 text-center text-sm text-ui-fg-muted">{t('noPlan')}</div>
-      )}
-    </PageContainer>
-  )
+/**
+ * V1: the public share-link feature is disabled. The route 404s
+ * unconditionally; server-side share-token access has also been removed from
+ * every log collection, so a leaked historical link exposes nothing.
+ * The `share-links` collection is retained (hidden) so re-enabling later is a
+ * revert, not a rebuild.
+ */
+export default function SharePage() {
+  notFound()
 }
