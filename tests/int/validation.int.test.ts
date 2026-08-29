@@ -35,23 +35,23 @@ describe('set-log validation & unit handling', () => {
   it('accepts weights on the 0.25 kg grid and rejects finer values', async () => {
     const ok = await createSet({ weightLeft: 62.25, repsLeft: '5' })
     expect(ok.weightLeft).toBe(62.25)
-    await expect(createSet({ weightLeft: 60.1 })).rejects.toThrow(/0\.25/)
+    await expect(createSet({ weightLeft: 60.1 })).rejects.toThrow(/invalid: Weight/i)
   })
 
   it('rejects negative weight', async () => {
-    await expect(createSet({ weightLeft: -5 })).rejects.toThrow(/non-negative/i)
+    await expect(createSet({ weightLeft: -5 })).rejects.toThrow(/invalid: Weight/i)
   })
 
   it('requires reps to be non-negative integers', async () => {
-    await expect(createSet({ repsLeft: '-3' })).rejects.toThrow(/whole number/i)
-    await expect(createSet({ repsLeft: '8.5' })).rejects.toThrow(/whole number/i)
+    await expect(createSet({ repsLeft: '-3' })).rejects.toThrow(/invalid: Reps/i)
+    await expect(createSet({ repsLeft: '8.5' })).rejects.toThrow(/invalid: Reps/i)
     const ok = await createSet({ repsLeft: '12' })
     expect(ok.repsLeft).toBe('12')
   })
 
   it('bounds RIR to 0–10', async () => {
-    await expect(createSet({ rir: '11' })).rejects.toThrow(/between 0 and 10/i)
-    await expect(createSet({ rir: '-1' })).rejects.toThrow(/between 0 and 10/i)
+    await expect(createSet({ rir: '11' })).rejects.toThrow(/invalid: RIR/i)
+    await expect(createSet({ rir: '-1' })).rejects.toThrow(/invalid: RIR/i)
     const ok = await createSet({ rir: '7.5', repsLeft: '5' })
     expect(ok.rir).toBe('7.5')
   })
@@ -62,7 +62,7 @@ describe('set-log validation & unit handling', () => {
         collection: 'set-logs',
         data: { session: sessionId, exerciseRow: rowId, setNumber: 0, weightLeft: 10 },
       }),
-    ).rejects.toThrow(/set number/i)
+    ).rejects.toThrow(/invalid: Set number/i)
   })
 
   it('rejects negative duration and distance', async () => {

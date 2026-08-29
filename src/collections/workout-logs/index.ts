@@ -86,16 +86,17 @@ export const WorkoutLogs: CollectionConfig = {
               collection: 'workouts',
               id: data.workout,
               depth: 0,
+              req,
             })
             const microcycleId =
               typeof workout.microcycle === 'object' ? workout.microcycle?.id : workout.microcycle
             const microcycle = microcycleId
-              ? await req.payload.findByID({ collection: 'microcycles', id: microcycleId, depth: 0 })
+              ? await req.payload.findByID({ collection: 'microcycles', id: microcycleId, depth: 0, req })
               : null
             const planId =
               typeof microcycle?.plan === 'object' ? microcycle.plan?.id : microcycle?.plan
             const plan = planId
-              ? await req.payload.findByID({ collection: 'plans', id: planId, depth: 0 })
+              ? await req.payload.findByID({ collection: 'plans', id: planId, depth: 0, req })
               : null
             const ownerId = typeof plan?.client === 'object' ? plan.client?.id : plan?.client
             if (ownerId !== req.user.id) {
@@ -120,6 +121,7 @@ export const WorkoutLogs: CollectionConfig = {
               collection: 'workouts',
               id: data.workout,
               depth: 0,
+              req,
             })
             data.title = `${w?.title ?? 'Workout'} — ${new Date().toLocaleDateString('en-GB')}`
           } catch {
@@ -145,6 +147,7 @@ export const WorkoutLogs: CollectionConfig = {
             id: clientId,
             depth: 0,
             overrideAccess: true,
+            req,
           })
           if (!client.lastWorkoutAt || new Date(when) > new Date(client.lastWorkoutAt)) {
             await req.payload.update({
@@ -153,6 +156,7 @@ export const WorkoutLogs: CollectionConfig = {
               data: { lastWorkoutAt: when },
               depth: 0,
               overrideAccess: true,
+              req,
             })
           }
         } catch {

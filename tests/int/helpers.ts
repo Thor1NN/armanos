@@ -60,7 +60,11 @@ export async function createPlanChain(payload: Payload, clientId: number) {
   return { plan, microcycle, workout, group, row }
 }
 
-/** Logs in over REST and returns an authed fetch bound to the session cookie. */
+/**
+ * Logs in over REST and returns an authed fetch. Uses the `Authorization: JWT`
+ * strategy — cookie auth is CSRF-guarded by Origin/Sec-Fetch-Site headers that
+ * non-browser clients don't reliably send.
+ */
 export async function loginClient(email: string, password = PASSWORD) {
   const res = await fetch(`${TEST_BASE_URL}/api/clients/login`, {
     method: 'POST',
@@ -68,9 +72,8 @@ export async function loginClient(email: string, password = PASSWORD) {
     body: JSON.stringify({ email, password }),
   })
   if (!res.ok) throw new Error(`Login failed: ${res.status}`)
-  const setCookie = res.headers.get('set-cookie') ?? ''
-  const cookie = setCookie.split(';')[0]
-  if (!cookie.includes('payload-token')) throw new Error('No auth cookie returned')
+  const { token } = (await res.json()) as { token?: string }
+  if (!token) throw new Error('No auth token returned')
 
   return async (path: string, init: RequestInit = {}) =>
     fetch(`${TEST_BASE_URL}${path}`, {
@@ -78,7 +81,7 @@ export async function loginClient(email: string, password = PASSWORD) {
       headers: {
         'Content-Type': 'application/json',
         ...(init.headers ?? {}),
-        cookie,
+        Authorization: `JWT ${token}`,
       },
     })
 }

@@ -147,6 +147,7 @@ export const SetLogs: CollectionConfig = {
               collection: 'workout-exercise-rows',
               id: exerciseRowId,
               depth: 0,
+              req,
             })
           : null
 
@@ -160,6 +161,7 @@ export const SetLogs: CollectionConfig = {
             collection: 'exercises',
             id: data.exercise,
             depth: 0,
+            req,
           })
           const allowed = getTrackingFields(ex?.trackingType)
           const allowedFields = new Set<string>([...allowed, ...LEGACY_SET_LOG_FIELDS])
