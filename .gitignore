@@ -57,3 +57,6 @@ node_modules/
 .ai/things
 .ai/audits
 skills-lock.json
+
+# local scratch scripts
+*.local.ts
