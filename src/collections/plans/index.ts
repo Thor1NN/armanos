@@ -1,5 +1,6 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 import { isAdmin, adminOrOwnByClient } from '../../access'
+import { duplicatePlanHandler } from './duplicate'
 
 export const Plans: CollectionConfig = {
   slug: 'plans',
@@ -13,6 +14,50 @@ export const Plans: CollectionConfig = {
     read: adminOrOwnByClient,
     update: isAdmin,
     delete: isAdmin,
+  },
+  endpoints: [
+    {
+      path: '/:id/duplicate',
+      method: 'post',
+      handler: duplicatePlanHandler,
+    },
+  ],
+  hooks: {
+    beforeDelete: [
+      // Deleting a plan would orphan its microcycles/workouts (FKs are
+      // ON DELETE SET NULL) and silently bypass the workout-level log
+      // protection — block it whenever any session was logged under it.
+      async ({ id, req }) => {
+        const microcycles = await req.payload.find({
+          collection: 'microcycles',
+          where: { plan: { equals: id } },
+          depth: 0,
+          limit: 1000,
+          pagination: false,
+        })
+        const microcycleIds = microcycles.docs.map((doc) => doc.id)
+        if (!microcycleIds.length) return
+        const workouts = await req.payload.find({
+          collection: 'workouts',
+          where: { microcycle: { in: microcycleIds } },
+          depth: 0,
+          limit: 10000,
+          pagination: false,
+        })
+        const workoutIds = workouts.docs.map((doc) => doc.id)
+        if (!workoutIds.length) return
+        const logs = await req.payload.count({
+          collection: 'workout-logs',
+          where: { workout: { in: workoutIds } },
+        })
+        if (logs.totalDocs > 0) {
+          throw new APIError(
+            'Cannot delete a plan that already has logged sessions. Set its status to "Completed" instead.',
+            400,
+          )
+        }
+      },
+    ],
   },
   // Keep an audit trail of every change (no drafts — publish workflow unchanged).
   versions: true,

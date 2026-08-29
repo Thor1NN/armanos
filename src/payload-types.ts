@@ -196,6 +196,14 @@ export interface User {
 export interface Client {
   id: number;
   name?: string | null;
+  /**
+   * Archived clients cannot log in. Their history is preserved.
+   */
+  status: 'active' | 'archived';
+  /**
+   * Updated automatically when the client trains.
+   */
+  lastWorkoutAt?: string | null;
   plans?: {
     docs?: (number | Plan)[];
     hasNextPage?: boolean;
@@ -411,6 +419,10 @@ export interface WorkoutExerciseRow {
  */
 export interface Exercise {
   id: number;
+  /**
+   * Archived exercises are hidden when building new workouts.
+   */
+  archived?: boolean | null;
   name: string;
   /**
    * Determines which fields are shown in the set logging form
@@ -440,6 +452,10 @@ export interface WorkoutLog {
   client?: (number | null) | Client;
   startedAt?: string | null;
   finishedAt?: string | null;
+  /**
+   * Set once when the client finishes the workout. Empty = session in progress.
+   */
+  completedAt?: string | null;
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -688,6 +704,8 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface ClientsSelect<T extends boolean = true> {
   name?: T;
+  status?: T;
+  lastWorkoutAt?: T;
   plans?: T;
   notes?: T;
   updatedAt?: T;
@@ -843,6 +861,7 @@ export interface WorkoutLogsSelect<T extends boolean = true> {
   client?: T;
   startedAt?: T;
   finishedAt?: T;
+  completedAt?: T;
   notes?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -909,6 +928,7 @@ export interface ExerciseLogsSelect<T extends boolean = true> {
  * via the `definition` "exercises_select".
  */
 export interface ExercisesSelect<T extends boolean = true> {
+  archived?: T;
   name?: T;
   trackingType?: T;
   description?: T;

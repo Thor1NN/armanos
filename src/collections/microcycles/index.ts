@@ -1,14 +1,41 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 
-import { isAdmin, isAuthenticated } from '../../access'
+import { isAdmin } from '../../access'
 
 export const Microcycles: CollectionConfig = {
   slug: 'microcycles',
   access: {
     create: isAdmin,
-    read: isAuthenticated,
+    // Plan structure is loaded server-side with ownership already resolved
+    // (see modules/training/plans/server) — direct API reads are coach-only.
+    read: isAdmin,
     update: isAdmin,
     delete: isAdmin,
+  },
+  hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        const workouts = await req.payload.find({
+          collection: 'workouts',
+          where: { microcycle: { equals: id } },
+          depth: 0,
+          limit: 10000,
+          pagination: false,
+        })
+        const workoutIds = workouts.docs.map((doc) => doc.id)
+        if (!workoutIds.length) return
+        const logs = await req.payload.count({
+          collection: 'workout-logs',
+          where: { workout: { in: workoutIds } },
+        })
+        if (logs.totalDocs > 0) {
+          throw new APIError(
+            'Cannot delete a microcycle that already has logged sessions.',
+            400,
+          )
+        }
+      },
+    ],
   },
   admin: {
     useAsTitle: 'title',

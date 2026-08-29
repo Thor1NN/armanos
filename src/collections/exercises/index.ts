@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 import { isAdmin, isAuthenticated } from '../../access'
 import { DEFAULT_TRACKING, TRACKING_OPTIONS } from '@/modules/training/exercises'
 
@@ -6,7 +6,7 @@ export const Exercises: CollectionConfig = {
   slug: 'exercises',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'muscleGroup', 'equipment'],
+    defaultColumns: ['name', 'muscleGroup', 'equipment', 'archived'],
     group: 'Catalog',
   },
   access: {
@@ -15,7 +15,38 @@ export const Exercises: CollectionConfig = {
     update: isAdmin,
     delete: isAdmin,
   },
+  hooks: {
+    beforeDelete: [
+      // An exercise referenced by plans or logs must be archived, not deleted —
+      // deleting would NULL those references and break history.
+      async ({ id, req }) => {
+        const [logs, rows] = await Promise.all([
+          req.payload.count({ collection: 'set-logs', where: { exercise: { equals: id } } }),
+          req.payload.count({
+            collection: 'workout-exercise-rows',
+            where: { exercise: { equals: id } },
+          }),
+        ])
+        if (logs.totalDocs > 0 || rows.totalDocs > 0) {
+          throw new APIError(
+            'Cannot delete an exercise that is used in plans or logged sets. Mark it as archived instead.',
+            400,
+          )
+        }
+      },
+    ],
+  },
   fields: [
+    {
+      name: 'archived',
+      type: 'checkbox',
+      label: 'Archived',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Archived exercises are hidden when building new workouts.',
+      },
+    },
     {
       name: 'name',
       type: 'text',

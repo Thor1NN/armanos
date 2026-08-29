@@ -1,5 +1,5 @@
 import { APIError, type CollectionConfig } from 'payload'
-import { isAdmin, isAuthenticated } from '../../access'
+import { isAdmin } from '../../access'
 
 const PROTOCOL_OPTIONS = [
   { label: 'Standard', value: 'standard' },
@@ -18,7 +18,9 @@ export const WorkoutGroups: CollectionConfig = {
   },
   access: {
     create: isAdmin,
-    read: isAuthenticated,
+    // Plan structure is loaded server-side with ownership already resolved
+    // (see modules/training/plans/server) — direct API reads are coach-only.
+    read: isAdmin,
     update: isAdmin,
     delete: isAdmin,
   },

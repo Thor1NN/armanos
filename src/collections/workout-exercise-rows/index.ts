@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig } from 'payload'
 import { EXERCISE_TARGET_TYPE_OPTIONS } from '@/modules/training/exercises'
-import { isAdmin, isAuthenticated } from '../../access'
+import { isAdmin } from '../../access'
 
 const PROTOCOL_OPTIONS = [
   { label: 'None (inherits from group)', value: '' },
@@ -20,7 +20,9 @@ export const WorkoutExerciseRows: CollectionConfig = {
   },
   access: {
     create: isAdmin,
-    read: isAuthenticated,
+    // Plan structure is loaded server-side with ownership already resolved
+    // (see modules/training/plans/server) — direct API reads are coach-only.
+    read: isAdmin,
     update: isAdmin,
     delete: isAdmin,
   },

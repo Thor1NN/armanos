@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { adminOrOwnByClient, canReadViaShareToken } from '../../access'
+import { assertWritableOwnSession } from '../shared/log-integrity'
 
 export const ExerciseLogs: CollectionConfig = {
   slug: 'exercise-logs',
@@ -8,6 +9,13 @@ export const ExerciseLogs: CollectionConfig = {
     defaultColumns: ['exerciseRow', 'session', 'client'],
     group: 'Training log',
   },
+  // One note per exercise per session.
+  indexes: [
+    {
+      fields: ['session', 'exerciseRow'],
+      unique: true,
+    },
+  ],
   access: {
     create: ({ req: { user } }) => Boolean(user),
     read: async (ctx) => {
@@ -20,19 +28,9 @@ export const ExerciseLogs: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [
-      async ({ data, req }) => {
+      async ({ data, originalDoc, req }) => {
         if (!data) return data
-        if (req.user?.collection === 'clients' && data.session) {
-          const session = await req.payload.findByID({
-            collection: 'workout-logs',
-            id: data.session,
-            depth: 0,
-          })
-          const owner = typeof session.client === 'object' ? session.client?.id : session.client
-          if (owner !== req.user.id) {
-            throw new Error('You cannot add a note to someone else\'s session.')
-          }
-        }
+        await assertWritableOwnSession(req, data.session ?? originalDoc?.session)
         return data
       },
     ],

@@ -1,6 +1,6 @@
 import { APIError, type CollectionConfig } from 'payload'
 
-import { isAdmin, isAuthenticated } from '../../access'
+import { isAdmin } from '../../access'
 
 const hasWorkoutLogs = async (
   req: {
@@ -27,7 +27,9 @@ export const Workouts: CollectionConfig = {
   slug: 'workouts',
   access: {
     create: isAdmin,
-    read: isAuthenticated,
+    // Plan structure is loaded server-side with ownership already resolved
+    // (see modules/training/plans/server) — direct API reads are coach-only.
+    read: isAdmin,
     update: isAdmin,
     delete: isAdmin,
   },

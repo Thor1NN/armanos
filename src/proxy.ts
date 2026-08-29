@@ -14,6 +14,10 @@ export default function middleware(req: NextRequest) {
     response.cookies.set('share-token', token, {
       httpOnly: true,
       sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      // Server-side expiry is authoritative; this just stops the cookie from
+      // lingering in the browser indefinitely.
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
     })
   }

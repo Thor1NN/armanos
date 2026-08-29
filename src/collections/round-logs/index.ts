@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { adminOrOwnByClient, isAdmin } from '../../access'
+import { assertWritableOwnSession } from '../shared/log-integrity'
 
 export const RoundLogs: CollectionConfig = {
   slug: 'round-logs',
@@ -8,6 +9,13 @@ export const RoundLogs: CollectionConfig = {
     defaultColumns: ['session', 'group', 'roundNumber', 'status', 'client'],
     group: 'Training log',
   },
+  // One row per round of a group per session.
+  indexes: [
+    {
+      fields: ['session', 'group', 'roundNumber'],
+      unique: true,
+    },
+  ],
   access: {
     create: ({ req: { user } }) => Boolean(user),
     read: adminOrOwnByClient,
@@ -15,6 +23,13 @@ export const RoundLogs: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeValidate: [
+      async ({ data, originalDoc, req }) => {
+        if (!data) return data
+        await assertWritableOwnSession(req, data.session ?? originalDoc?.session)
+        return data
+      },
+    ],
     beforeChange: [
       ({ data, req }) => {
         if (req.user?.collection === 'clients') {
