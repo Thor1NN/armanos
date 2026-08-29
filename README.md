@@ -1,6 +1,6 @@
-# Training App
+# ArmanOS
 
-A coach-facing admin and client-facing training tracker built with Payload CMS and Next.js. Coaches build workout plans in the admin panel; clients log their sets through a mobile-friendly web interface.
+A single-trainer workout platform (coach admin + mobile-first client tracker PWA) built with Payload CMS and Next.js, deployed on Vercel + Neon PostgreSQL. Coaches build workout plans in the admin panel; clients log their sets through a mobile-friendly web interface.
 
 ## What it does
 
@@ -214,7 +214,7 @@ Maintainers run migration commands manually. Agents do not generate or apply dat
 yarn dev
 ```
 
-- App: `http://localhost:3000/pl`
+- App: `http://localhost:3000` (English default; Polish at `/pl`)
 - Admin panel: `http://localhost:3000/admin`
 
 ### First-time setup
@@ -223,7 +223,7 @@ yarn dev
 2. (Optional) seed demo data: `yarn seed`
 3. Create a **Client** record for each athlete
 4. Build a **Plan**, link microcycles → workouts → exercise rows
-5. The client logs in at `/pl` using their email and password set in the admin
+5. The client logs in at `/` — or use **Generate invite / reset link** on the client document so they set their own password
 
 ## Project structure
 
@@ -308,6 +308,10 @@ src/
 | `yarn install-skills` | Install the repository's AI skills |
 | `yarn changeset` | Create a release changeset |
 | `npx skills add <source>` | Install AI skills into `.claude/skills/` and `.agents/skills/` |
+
+## Deployment
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel + Neon setup, required env vars, the safe production migration command (`yarn migrate:prod`), and the release checklist. Integration tests: `yarn test` (build + vitest; see `tests/int/`).
 
 ## Development
 
