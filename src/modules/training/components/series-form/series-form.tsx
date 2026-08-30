@@ -17,6 +17,14 @@ import {
 } from '@/modules/training/logs'
 import { MetricFieldInput } from './components/metric-field-input'
 
+const SET_TYPES = ['normal', 'warmup', 'drop', 'failure'] as const
+const SET_TYPE_COLORS: Record<(typeof SET_TYPES)[number], string> = {
+  normal: 'var(--color-ui-fg-muted)',
+  warmup: 'var(--color-stat-amber)',
+  drop: 'var(--color-stat-blue)',
+  failure: 'var(--color-stat-red)',
+}
+
 const AUTOSAVE_DEBOUNCE_MS = 900
 
 export function SeriesForm({
@@ -47,6 +55,7 @@ export function SeriesForm({
   } = useForm<MetricFormValues>({ defaultValues: initial })
 
   const isBodyweight = useWatch({ control, name: BODYWEIGHT_FORM_FIELD }) === 'true'
+  const setType = (useWatch({ control, name: 'setType' }) as string) || 'normal'
   const visibleFields = fields.filter((field) => !isBodyweight || !METRIC_FIELDS[field].bodyweightAffected)
   const hasBodyweightFields = fields.some((field) => METRIC_FIELDS[field].bodyweightAffected)
   const toggleBodyweight = useCallback(() => {
@@ -103,6 +112,27 @@ export function SeriesForm({
 
   return (
     <form className="mt-1.5 flex flex-col gap-2" onSubmit={submit} noValidate>
+      <div className="flex flex-wrap gap-1">
+        {SET_TYPES.map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => setValue('setType', option)}
+            className="rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider transition-colors"
+            style={
+              setType === option
+                ? {
+                    borderColor: SET_TYPE_COLORS[option],
+                    color: SET_TYPE_COLORS[option],
+                    background: `color-mix(in srgb, ${SET_TYPE_COLORS[option]} 10%, transparent)`,
+                  }
+                : { borderColor: 'var(--color-ui-border-base)', color: 'var(--color-ui-fg-muted)' }
+            }
+          >
+            {t(`setType_${option}`)}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-wrap gap-2">
         {visibleFields.map((field, index) => (
           <MetricFieldInput

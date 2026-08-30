@@ -84,6 +84,7 @@ export interface Config {
     'share-links': ShareLink;
     'diary-entries': DiaryEntry;
     foods: Food;
+    'body-measurements': BodyMeasurement;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -111,6 +112,7 @@ export interface Config {
     'share-links': ShareLinksSelect<false> | ShareLinksSelect<true>;
     'diary-entries': DiaryEntriesSelect<false> | DiaryEntriesSelect<true>;
     foods: FoodsSelect<false> | FoodsSelect<true>;
+    'body-measurements': BodyMeasurementsSelect<false> | BodyMeasurementsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -497,6 +499,7 @@ export interface SetLog {
   exerciseRow?: (number | null) | WorkoutExerciseRow;
   roundLog?: (number | null) | RoundLog;
   setNumber?: number | null;
+  setType?: ('normal' | 'warmup' | 'drop' | 'failure') | null;
   weight?: number | null;
   weightLeft?: number | null;
   weightRight?: number | null;
@@ -599,6 +602,24 @@ export interface Food {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "body-measurements".
+ */
+export interface BodyMeasurement {
+  id: number;
+  client?: (number | null) | Client;
+  measuredAt: string;
+  weightKg?: number | null;
+  chestCm?: number | null;
+  waistCm?: number | null;
+  hipCm?: number | null;
+  armCm?: number | null;
+  thighCm?: number | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -684,6 +705,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'foods';
         value: number | Food;
+      } | null)
+    | ({
+        relationTo: 'body-measurements';
+        value: number | BodyMeasurement;
       } | null);
   globalSlug?: string | null;
   user:
@@ -955,6 +980,7 @@ export interface SetLogsSelect<T extends boolean = true> {
   exerciseRow?: T;
   roundLog?: T;
   setNumber?: T;
+  setType?: T;
   weight?: T;
   weightLeft?: T;
   weightRight?: T;
@@ -1048,6 +1074,23 @@ export interface FoodsSelect<T extends boolean = true> {
   carbsPer100g?: T;
   fatPer100g?: T;
   archived?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "body-measurements_select".
+ */
+export interface BodyMeasurementsSelect<T extends boolean = true> {
+  client?: T;
+  measuredAt?: T;
+  weightKg?: T;
+  chestCm?: T;
+  waistCm?: T;
+  hipCm?: T;
+  armCm?: T;
+  thighCm?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }

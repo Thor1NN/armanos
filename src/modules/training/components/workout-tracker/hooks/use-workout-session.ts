@@ -337,6 +337,7 @@ export function useWorkoutSession(
   return {
     session: displayedSession,
     sessionCompleted,
+    sets: displayedSets,
     hasLoaded,
     error,
     saveStatus,

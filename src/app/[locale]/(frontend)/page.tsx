@@ -8,6 +8,7 @@ import { TodayHome } from '@/modules/training/components/today-home'
 import { DiaryScreen } from '@/modules/training/components/diary'
 import { ProgressChart } from '@/modules/training/components/progress-chart'
 import { WeekStrip } from '@/modules/training/components/week-strip'
+import { BodyCard } from '@/modules/training/components/body-card'
 import { LogoutButton } from '@/components/common/logout-button'
 import { PageContainer } from '@/components/ui/page-container'
 import { formatSetLogSummary } from '@/modules/training/logs'
@@ -39,6 +40,8 @@ export default async function HomePage() {
         <div className={`mb-3 ${statLabelClass}`}>{td('nutritionLabel')}</div>
         <DiaryScreen />
       </section>
+
+      <BodyCard />
 
       {recent.length > 0 && (
         <section className="fx-card fx-in p-4" style={{ animationDelay: '320ms' }}>

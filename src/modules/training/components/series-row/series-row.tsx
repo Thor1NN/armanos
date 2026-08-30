@@ -50,7 +50,30 @@ export function SeriesRow({
   return (
     <li className="mb-1 flex items-center justify-between gap-2 rounded-lg border border-ui-border-base bg-ui-bg-base px-2.5 py-1.5 text-sm">
       <span>
-        {t('setLabel')} {set.setNumber}: {formatSetLogSummary(set)}
+        {t('setLabel')} {set.setNumber}:{' '}
+        {set.setType && set.setType !== 'normal' && (
+          <span
+            className="mr-1 inline-flex rounded px-1 text-[10px] font-bold uppercase"
+            style={{
+              color:
+                set.setType === 'warmup'
+                  ? 'var(--color-stat-amber)'
+                  : set.setType === 'drop'
+                    ? 'var(--color-stat-blue)'
+                    : 'var(--color-stat-red)',
+              background: `color-mix(in srgb, ${
+                set.setType === 'warmup'
+                  ? 'var(--color-stat-amber)'
+                  : set.setType === 'drop'
+                    ? 'var(--color-stat-blue)'
+                    : 'var(--color-stat-red)'
+              } 12%, transparent)`,
+            }}
+          >
+            {set.setType === 'warmup' ? 'W' : set.setType === 'drop' ? 'D' : 'F'}
+          </span>
+        )}
+        {formatSetLogSummary(set)}
       </span>
       {!readOnly && (
         <span className="flex shrink-0 gap-0.5">

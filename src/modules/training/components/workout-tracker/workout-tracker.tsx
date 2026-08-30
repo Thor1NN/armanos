@@ -8,6 +8,7 @@ import { ExerciseCard } from '@/modules/training/components/exercise-card'
 import { FinishWorkout } from '@/modules/training/components/finish-workout'
 import { NoteField } from '@/modules/training/components/note-field'
 import { RestTimer } from '@/modules/training/components/rest-timer'
+import { WorkoutSummary } from '@/modules/training/components/workout-summary'
 import { SaveStatusChip } from '@/modules/training/components/save-status'
 import { SessionTimesBadge, SessionTimesForm } from '@/modules/training/components/session-times'
 import type { WorkoutExerciseTree, WorkoutTree } from '@/modules/training/plans'
@@ -39,6 +40,7 @@ export function WorkoutTracker({
   const {
     session,
     sessionCompleted,
+    sets,
     error,
     saveStatus,
     clearError,
@@ -56,6 +58,7 @@ export function WorkoutTracker({
   } = useWorkoutSession(workout, { readOnly, showResults })
   const [timeEditorOpen, setTimeEditorOpen] = useState(false)
   const [restTimer, setRestTimer] = useState<{ seconds: number; startedAt: number } | null>(null)
+  const [showSummary, setShowSummary] = useState(false)
   const t = useTranslations('session')
   const sessionNote = session?.notes ?? ''
 
@@ -179,9 +182,18 @@ export function WorkoutTracker({
           completed={sessionCompleted}
           onFinish={async () => {
             setRestTimer(null)
-            await finishWorkout()
+            const result = await finishWorkout()
+            if (result !== null) setShowSummary(true)
           }}
         />
+      )}
+
+      {showSummary && session && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 backdrop-blur-sm sm:items-center">
+          <div className="w-full max-w-md">
+            <WorkoutSummary session={session} sets={sets} onClose={() => setShowSummary(false)} />
+          </div>
+        </div>
       )}
 
       {!effectiveReadOnly && restTimer && (

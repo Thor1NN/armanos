@@ -107,11 +107,12 @@ export const toSetLogMetricData = (
     ...metricValues,
     isBodyweight,
     note: values.note?.trim() || null,
+    setType: (values.setType as SetLogMetricInput['setType']) || 'normal',
   }
 }
 
 export const toMetricFormValues = (set: SetLog, fields: MetricField[]): MetricFormValues => {
-  const initial: MetricFormValues = { note: set.note ?? '' }
+  const initial: MetricFormValues = { note: set.note ?? '', setType: set.setType ?? 'normal' }
   if (set.isBodyweight) initial[BODYWEIGHT_FORM_FIELD] = 'true'
 
   for (const field of fields) {

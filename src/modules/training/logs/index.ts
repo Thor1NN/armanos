@@ -12,3 +12,13 @@ export type {
   MetricFormValues,
   SetLogMetricInput,
 } from './types'
+export {
+  detectPrs,
+  estimateOneRepMax,
+  exerciseRecords,
+  isWorkingSet,
+  sessionVolume,
+  setMetrics,
+  type ExerciseRecords,
+  type PrKind,
+} from './metrics'

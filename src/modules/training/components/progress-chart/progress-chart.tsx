@@ -2,8 +2,15 @@
 
 import { useFormatter, useTranslations } from 'next-intl'
 import React, { useMemo, useState } from 'react'
+import { Trophy } from 'lucide-react'
+import { statLabelClass } from '@/lib/class-names'
 import { Select } from '@/components/ui/input'
-import type { ExerciseProgressSeries } from '@/modules/training/logs/server'
+import type { ExerciseProgressPoint, ExerciseProgressSeries } from '@/modules/training/logs/server'
+
+const METRICS = ['topWeight', 'bestE1rm', 'volume'] as const
+type Metric = (typeof METRICS)[number]
+const metricValue = (point: ExerciseProgressPoint, metric: Metric): number =>
+  (metric === 'topWeight' ? point.topWeight : metric === 'bestE1rm' ? point.bestE1rm : point.volume) ?? 0
 
 const CHART_WIDTH = 640
 const CHART_HEIGHT = 220
@@ -17,16 +24,17 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
   const t = useTranslations('progress')
   const format = useFormatter()
   const [selectedName, setSelectedName] = useState(series[0]?.exerciseName ?? '')
+  const [metric, setMetric] = useState<Metric>('topWeight')
 
   const selected = series.find((entry) => entry.exerciseName === selectedName) ?? series[0]
 
   const chart = useMemo(() => {
     if (!selected) return null
     const points = selected.points
-    const weights = points.map((point) => point.topWeight ?? 0)
-    const maxWeight = Math.max(...weights, 1)
-    const minWeight = Math.min(...weights.filter((weight) => weight > 0), maxWeight)
-    const span = Math.max(maxWeight - minWeight, 1)
+    const values = points.map((point) => metricValue(point, metric))
+    const maxValue = Math.max(...values, 1)
+    const minValue = Math.min(...values.filter((value) => value > 0), maxValue)
+    const span = Math.max(maxValue - minValue, 1)
 
     const innerWidth = CHART_WIDTH - PADDING.left - PADDING.right
     const innerHeight = CHART_HEIGHT - PADDING.top - PADDING.bottom
@@ -34,18 +42,24 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
 
     const coords = points.map((point, index) => ({
       ...point,
+      value: metricValue(point, metric) || null,
       x: PADDING.left + (points.length > 1 ? index * stepX : innerWidth / 2),
       y:
         PADDING.top +
         innerHeight -
-        (((point.topWeight ?? minWeight) - minWeight) / span) * innerHeight,
+        ((Math.max(metricValue(point, metric), minValue) - minValue) / span) * innerHeight,
     }))
-    return { coords, minWeight, maxWeight }
-  }, [selected])
+    return { coords, minValue, maxValue }
+  }, [selected, metric])
 
   if (!selected || !chart) return null
 
-  const hasWeights = selected.points.some((point) => (point.topWeight ?? 0) > 0)
+  const hasWeights = selected.points.some((point) => metricValue(point, metric) > 0)
+  const records = {
+    topWeight: Math.max(...selected.points.map((point) => point.topWeight ?? 0), 0),
+    bestE1rm: Math.max(...selected.points.map((point) => point.bestE1rm ?? 0), 0),
+    volume: Math.max(...selected.points.map((point) => point.volume ?? 0), 0),
+  }
 
   return (
     <div className="rounded-xl border border-ui-border-base bg-ui-bg-component px-4 py-3">
@@ -64,6 +78,42 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
         ))}
       </Select>
 
+      {/* Metric switcher */}
+      <div className="mt-2 flex gap-1">
+        {METRICS.map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => setMetric(option)}
+            className="rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider transition-colors"
+            style={
+              metric === option
+                ? {
+                    borderColor: 'var(--color-stat-green)',
+                    color: 'var(--color-stat-green)',
+                    background: 'color-mix(in srgb, var(--color-stat-green) 10%, transparent)',
+                  }
+                : { borderColor: 'var(--color-ui-border-base)', color: 'var(--color-ui-fg-muted)' }
+            }
+          >
+            {t(`metric_${option}`)}
+          </button>
+        ))}
+      </div>
+
+      {/* Records */}
+      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+        {METRICS.map((option) => (
+          <div key={option} className="rounded-xl bg-ui-bg-subtle px-2 py-2">
+            <Trophy size={12} className="mx-auto mb-1" style={{ color: 'var(--color-stat-amber)' }} />
+            <div className="font-display text-lg font-bold tabular-nums leading-none text-ui-fg-base">
+              {records[option] > 0 ? Math.round(records[option] * 10) / 10 : '—'}
+            </div>
+            <div className={`mt-0.5 ${statLabelClass}`}>{t(`record_${option}`)}</div>
+          </div>
+        ))}
+      </div>
+
       {hasWeights ? (
         <svg
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
@@ -79,10 +129,10 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
           </defs>
           {/* Y-axis bounds */}
           <text x={4} y={PADDING.top + 4} className="fill-ui-fg-muted" fontSize={11}>
-            {chart.maxWeight}
+            {chart.maxValue}
           </text>
           <text x={4} y={CHART_HEIGHT - PADDING.bottom} className="fill-ui-fg-muted" fontSize={11}>
-            {chart.minWeight}
+            {chart.minValue}
           </text>
           <line
             x1={PADDING.left}
@@ -118,7 +168,7 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
                 fontSize={11}
                 className="fill-ui-fg-base"
               >
-                {coord.topWeight ?? ''}
+                {coord.value ?? ''}
               </text>
               <text
                 x={coord.x}

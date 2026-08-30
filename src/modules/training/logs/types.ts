@@ -10,10 +10,12 @@ export type MetricFormField =
   | `${MetricField}__unit`
   | BodyweightFormField
   | 'note'
+  | 'setType'
 
 export type MetricFormValues = Partial<Record<MetricFormField, string>>
 
 export type SetLogMetricInput = Partial<Pick<SetLog, MetricField>> & {
   isBodyweight: NonNullable<SetLog['isBodyweight']>
   note: SetLog['note']
+  setType: NonNullable<SetLog['setType']>
 }

@@ -225,6 +225,18 @@ export const SetLogs: CollectionConfig = {
       validate: validateSetNumber,
     },
     {
+      name: 'setType',
+      type: 'select',
+      label: 'Set type',
+      defaultValue: 'normal',
+      options: [
+        { label: 'Normal', value: 'normal' },
+        { label: 'Warm-up', value: 'warmup' },
+        { label: 'Drop set', value: 'drop' },
+        { label: 'Failure', value: 'failure' },
+      ],
+    },
+    {
       name: 'weight',
       type: 'number',
       label: 'Weight (kg)',

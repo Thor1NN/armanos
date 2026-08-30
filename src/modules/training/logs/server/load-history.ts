@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 
 import config from '@/payload.config'
 import type { SetLog, WorkoutLog } from '@/payload-types'
+import { isWorkingSet, setMetrics } from '../metrics'
 
 export type HistoryViewer =
   | { kind: 'client'; clientId: number }
@@ -20,6 +21,8 @@ export type ExerciseProgressPoint = {
   date: string
   topWeight: number | null
   totalReps: number | null
+  bestE1rm: number | null
+  volume: number | null
 }
 
 export type ExerciseProgressSeries = {
@@ -128,19 +131,27 @@ export async function loadExerciseProgress(clientId: number): Promise<ExercisePr
     overrideAccess: true,
   })
 
-  // exerciseName → sessionId → aggregate
-  const series = new Map<string, Map<number, { topWeight: number | null; totalReps: number }>>()
+  // exerciseName → sessionId → aggregate (warm-up sets excluded)
+  const series = new Map<
+    string,
+    Map<number, { topWeight: number | null; totalReps: number; bestE1rm: number; volume: number }>
+  >()
   for (const set of sets.docs) {
     const name = set.exerciseName?.trim()
     const sessionId = relId(set.session)
     if (!name || !sessionId || !sessionDate.has(sessionId)) continue
+    if (!isWorkingSet(set)) continue
 
     const perSession = series.get(name) ?? new Map()
-    const agg = perSession.get(sessionId) ?? { topWeight: null as number | null, totalReps: 0 }
+    const agg =
+      perSession.get(sessionId) ??
+      { topWeight: null as number | null, totalReps: 0, bestE1rm: 0, volume: 0 }
 
-    const weight = Math.max(set.weightLeft ?? 0, set.weightRight ?? 0)
-    if (weight > 0) agg.topWeight = Math.max(agg.topWeight ?? 0, weight)
+    const metrics = setMetrics(set)
+    if (metrics.weight > 0) agg.topWeight = Math.max(agg.topWeight ?? 0, metrics.weight)
     agg.totalReps += (parseReps(set.repsLeft) ?? 0) + (parseReps(set.repsRight) ?? 0)
+    agg.bestE1rm = Math.max(agg.bestE1rm, metrics.e1rm)
+    agg.volume += metrics.volume
 
     perSession.set(sessionId, agg)
     series.set(name, perSession)
@@ -155,6 +166,8 @@ export async function loadExerciseProgress(clientId: number): Promise<ExercisePr
           date: sessionDate.get(sessionId)!,
           topWeight: agg.topWeight,
           totalReps: agg.totalReps || null,
+          bestE1rm: agg.bestE1rm > 0 ? agg.bestE1rm : null,
+          volume: agg.volume > 0 ? Math.round(agg.volume) : null,
         }))
         .sort((a, b) => a.date.localeCompare(b.date)),
     }))

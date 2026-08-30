@@ -63,7 +63,11 @@
     "cancel": "Anuluj",
     "bodyweightActive": "masa własna ✕",
     "bodyweightTitle": "Masa własnego ciała",
-    "atLeastOneValue": "Podaj co najmniej jedną wartość"
+    "atLeastOneValue": "Podaj co najmniej jedną wartość",
+    "setType_normal": "Normalna",
+    "setType_warmup": "Rozgrzewka",
+    "setType_drop": "Drop",
+    "setType_failure": "Upadek"
   },
   "login": {
     "title": "Zaloguj się",
@@ -120,7 +124,13 @@
     "chartAria": "Wykres postępów: {exercise}",
     "noWeightData": "Brak zapisanych obciążeń dla tego ćwiczenia.",
     "sessionsCount": "{count} sesji",
-    "lastTotalReps": "ostatnia sesja: {count} powtórzeń łącznie"
+    "lastTotalReps": "ostatnia sesja: {count} powtórzeń łącznie",
+    "metric_topWeight": "Najw. ciężar",
+    "metric_bestE1rm": "Szac. 1RM",
+    "metric_volume": "Objętość",
+    "record_topWeight": "Rekord kg",
+    "record_bestE1rm": "Rekord 1RM",
+    "record_volume": "Rekord obj."
   },
   "setPassword": {
     "title": "Ustaw hasło",
@@ -191,5 +201,28 @@
     "recentLabel": "Ostatnie treningi",
     "progressLabel": "Postępy",
     "sessionFallback": "Trening"
+  },
+  "summary": {
+    "label": "Sesja ukończona",
+    "title": "Świetna robota",
+    "minutes": "minut",
+    "volumeKg": "kg objętości",
+    "sets": "serie",
+    "noPrs": "Brak nowych rekordów — konsekwencja wygrywa.",
+    "pr_weight": "Najw. ciężar",
+    "pr_e1rm": "Szac. 1RM",
+    "pr_volume": "Najl. objętość serii",
+    "prev": "poprz.",
+    "done": "Gotowe",
+    "close": "Zamknij"
+  },
+  "body": {
+    "label": "Ciało",
+    "weightPlaceholder": "kg",
+    "waistPlaceholder": "talia cm",
+    "add": "Zapisz",
+    "more": "talia",
+    "deleteLatest": "Usuń ostatni",
+    "saveError": "Błąd zapisu pomiaru"
   }
 }

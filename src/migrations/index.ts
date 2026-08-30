@@ -13,6 +13,7 @@ import * as migration_20260829_160754_armanos_integrity from './20260829_160754_
 import * as migration_20260830_115703_diary_entries from './20260830_115703_diary_entries';
 import * as migration_20260830_121520_foods_and_meal_items from './20260830_121520_foods_and_meal_items';
 import * as migration_20260830_124858_kcal_target from './20260830_124858_kcal_target';
+import * as migration_20260830_141943_hevy_pack from './20260830_141943_hevy_pack';
 
 export const migrations = [
   {
@@ -88,6 +89,11 @@ export const migrations = [
   {
     up: migration_20260830_124858_kcal_target.up,
     down: migration_20260830_124858_kcal_target.down,
-    name: '20260830_124858_kcal_target'
+    name: '20260830_124858_kcal_target',
+  },
+  {
+    up: migration_20260830_141943_hevy_pack.up,
+    down: migration_20260830_141943_hevy_pack.down,
+    name: '20260830_141943_hevy_pack'
   },
 ];

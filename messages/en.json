@@ -63,7 +63,11 @@
     "cancel": "Cancel",
     "bodyweightActive": "bodyweight ✕",
     "bodyweightTitle": "Bodyweight",
-    "atLeastOneValue": "Enter at least one value"
+    "atLeastOneValue": "Enter at least one value",
+    "setType_normal": "Normal",
+    "setType_warmup": "Warmup",
+    "setType_drop": "Drop",
+    "setType_failure": "Failure"
   },
   "login": {
     "title": "Sign in",
@@ -120,7 +124,13 @@
     "chartAria": "Progress chart for {exercise}",
     "noWeightData": "No weight data logged for this exercise yet.",
     "sessionsCount": "{count} sessions",
-    "lastTotalReps": "last session: {count} total reps"
+    "lastTotalReps": "last session: {count} total reps",
+    "metric_topWeight": "Top weight",
+    "metric_bestE1rm": "Est. 1RM",
+    "metric_volume": "Volume",
+    "record_topWeight": "Best kg",
+    "record_bestE1rm": "Best 1RM",
+    "record_volume": "Best volume"
   },
   "setPassword": {
     "title": "Set your password",
@@ -191,5 +201,28 @@
     "recentLabel": "Recent workouts",
     "progressLabel": "Progress",
     "sessionFallback": "Workout"
+  },
+  "summary": {
+    "label": "Session complete",
+    "title": "Great work",
+    "minutes": "minutes",
+    "volumeKg": "kg volume",
+    "sets": "sets",
+    "noPrs": "No new records this time — consistency wins.",
+    "pr_weight": "Top weight",
+    "pr_e1rm": "Est. 1RM",
+    "pr_volume": "Best set volume",
+    "prev": "prev",
+    "done": "Done",
+    "close": "Close"
+  },
+  "body": {
+    "label": "Body",
+    "weightPlaceholder": "kg",
+    "waistPlaceholder": "waist cm",
+    "add": "Log",
+    "more": "waist",
+    "deleteLatest": "Delete latest",
+    "saveError": "Failed to save the measurement"
   }
 }
