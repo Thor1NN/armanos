@@ -10,7 +10,6 @@ import { ProgressChart } from '@/modules/training/components/progress-chart'
 import { WeekStrip } from '@/modules/training/components/week-strip'
 import { LogoutButton } from '@/components/common/logout-button'
 import { PageContainer } from '@/components/ui/page-container'
-import { PageHeader } from '@/components/ui/page-header'
 import { formatSetLogSummary } from '@/modules/training/logs'
 
 export default async function HomePage() {
@@ -88,15 +87,23 @@ export default async function HomePage() {
     </>
   )
 
+  const displayName = (result.user.name || result.user.email || '').split(' ')[0]
+  const today = new Date()
+
   return (
     <PageContainer>
       <div className="pb-6">
-        <PageHeader
-          className="mb-4 sm:mb-7"
-          title={t('greeting', { name: result.user.name || result.user.email || '' })}
-          subtitle={t('yourTrainingPlans')}
-          right={<LogoutButton />}
-        />
+        <header className="fx-in mb-5 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <div className={statLabelClass} style={{ color: 'var(--color-stat-blue)' }}>
+              ArmanOS · {format.dateTime(today, { weekday: 'long', day: 'numeric', month: 'long' })}
+            </div>
+            <h1 className="font-display mt-1 truncate text-4xl font-bold uppercase leading-none tracking-wide text-ui-fg-base">
+              {displayName}
+            </h1>
+          </div>
+          <LogoutButton />
+        </header>
 
         {result.plans.length > 0 ? (
           <TodayHome plans={result.plans} dailyKcalTarget={result.user.dailyKcalTarget} dashboard={dashboard} />

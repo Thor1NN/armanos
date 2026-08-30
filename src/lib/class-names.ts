@@ -31,4 +31,4 @@ export const statusBadgeClass = (status: string) =>
     status === 'completed' && 'bg-ui-tag-neutral-bg text-ui-tag-neutral-text',
   )
 
-export const statLabelClass = 'text-[10px] font-semibold uppercase tracking-[0.18em] text-ui-fg-muted'
+export const statLabelClass = 'font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-ui-fg-muted'

@@ -71,6 +71,12 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
           role="img"
           aria-label={t('chartAria', { exercise: selected.exerciseName })}
         >
+          <defs>
+            <linearGradient id="progress-area" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--color-stat-green)" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="var(--color-stat-green)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
           {/* Y-axis bounds */}
           <text x={4} y={PADDING.top + 4} className="fill-ui-fg-muted" fontSize={11}>
             {chart.maxWeight}
@@ -85,6 +91,14 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
             y2={CHART_HEIGHT - PADDING.bottom}
             className="stroke-ui-border-base"
           />
+          {chart.coords.length > 1 && (
+            <polygon
+              fill="url(#progress-area)"
+              points={`${chart.coords[0].x},${CHART_HEIGHT - PADDING.bottom} ${chart.coords
+                .map((coord) => `${coord.x},${coord.y}`)
+                .join(' ')} ${chart.coords[chart.coords.length - 1].x},${CHART_HEIGHT - PADDING.bottom}`}
+            />
+          )}
           {chart.coords.length > 1 && (
             <polyline
               fill="none"

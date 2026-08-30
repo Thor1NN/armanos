@@ -244,12 +244,12 @@ export function TodayHome({
 
   return (
     <div className="space-y-3">
-      {/* Top stat rings — the WHOOP row */}
-      <div className="fx-card fx-in px-2 py-4">
-        <div className="flex items-start justify-around">
-          <div className="flex flex-col items-center gap-2">
-            <StatRing value={kcalValue} color="green" size={96} strokeWidth={7}>
-              <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
+      {/* Top stat rings — podium composition, effort dominates */}
+      <div className="fx-card fx-in px-3 pb-5 pt-6">
+        <div className="flex items-end justify-center gap-3 sm:gap-6">
+          <div className="flex flex-col items-center gap-2.5">
+            <StatRing value={kcalValue} color="green" size={92} strokeWidth={7}>
+              <span className="font-display text-[26px] font-bold tabular-nums leading-none text-ui-fg-base">
                 <CountUp value={kcalToday} />
               </span>
               <span className={`mt-0.5 ${statLabelClass}`}>/ {kcalTarget}</span>
@@ -257,24 +257,33 @@ export function TodayHome({
             <span className={statLabelClass}>{t('ringCalories')}</span>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <StatRing value={effortValue} color="blue" size={96} strokeWidth={7}>
-              <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
-                <CountUp value={effortValue} />%
+          <div className="-mb-1 flex flex-col items-center gap-2.5">
+            <StatRing
+              value={effortValue}
+              color="blue"
+              size={148}
+              strokeWidth={11}
+              live={sessionState === 'inProgress'}
+            >
+              <span className="font-display text-5xl font-bold tabular-nums leading-none text-ui-fg-base">
+                <CountUp value={effortValue} />
+                <span className="text-2xl align-top">%</span>
               </span>
-              <span className={`mt-0.5 ${statLabelClass}`}>
+              <span className={`mt-1 ${statLabelClass}`}>
                 {sessionState === 'inProgress'
-                  ? `${current?.setsLogged ?? 0}/${prescribedSets}`
+                  ? `${current?.setsLogged ?? 0}/${prescribedSets} ${t('ringSets')}`
                   : t('ringSets')}
               </span>
             </StatRing>
-            <span className={statLabelClass}>{t('ringEffort')}</span>
+            <span className={statLabelClass} style={{ color: 'var(--color-stat-blue)' }}>
+              {t('ringEffort')}
+            </span>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <StatRing value={tasksValue} color={tasksDone === 3 ? 'green' : 'amber'} size={96} strokeWidth={7}>
-              <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
-                {tasksDone}/3
+          <div className="flex flex-col items-center gap-2.5">
+            <StatRing value={tasksValue} color={tasksDone === 3 ? 'green' : 'amber'} size={92} strokeWidth={7}>
+              <span className="font-display text-[26px] font-bold tabular-nums leading-none text-ui-fg-base">
+                {tasksDone}<span className="text-ui-fg-muted">/3</span>
               </span>
               <span className={`mt-0.5 ${statLabelClass}`}>{t('ringDone')}</span>
             </StatRing>
@@ -291,7 +300,9 @@ export function TodayHome({
         </div>
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-xl font-bold leading-tight text-ui-fg-base">{activeWorkout.title}</h2>
+            <h2 className="font-display text-3xl font-bold uppercase leading-none tracking-wide text-ui-fg-base">
+              {activeWorkout.title}
+            </h2>
             <p className="mt-0.5 text-xs text-ui-fg-muted">
               {activePlan.title} · {activeMicrocycle.title} · {t('exerciseCount', { count: exerciseCount })}
               {prescribedSets > 0 && ` · ${t('setCount', { count: prescribedSets })}`}
@@ -307,7 +318,7 @@ export function TodayHome({
           )}
         </div>
         <Button
-          className="fx-btn-glow mt-3 w-full gap-2 py-2.5 text-sm font-semibold"
+          className="fx-btn-glow font-display mt-3 w-full gap-2 py-2.5 text-base font-semibold uppercase tracking-[0.14em]"
           onClick={() => setInWorkout(true)}
           disabled={sessionState === 'loading'}
         >

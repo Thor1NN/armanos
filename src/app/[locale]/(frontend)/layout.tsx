@@ -1,8 +1,21 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
+import { Barlow, Barlow_Condensed } from 'next/font/google'
 import React from 'react'
 import { RegisterSw } from '@/components/common/register-sw'
 import './styles.css'
+
+const displayFont = Barlow_Condensed({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['500', '600', '700'],
+  variable: '--font-display',
+})
+
+const bodyFont = Barlow({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-body',
+})
 
 export const viewport = {
   width: 'device-width',
@@ -55,9 +68,10 @@ export default async function RootLayout(props: {
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className="dark">
+    <html lang={locale} className={`dark ${displayFont.variable} ${bodyFont.variable}`}>
       <body className="bg-ui-bg-base text-ui-fg-base">
         <div className="fx-ambient" aria-hidden />
+        <div className="fx-grain" aria-hidden />
         <NextIntlClientProvider messages={messages}>
           <main>{props.children}</main>
         </NextIntlClientProvider>
