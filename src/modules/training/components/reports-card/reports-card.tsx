@@ -170,16 +170,24 @@ export function ReportsCard() {
 
   const loading = report?.key !== rangeKey
 
+  // next-intl renders dates in UTC — anchor display dates to local noon so
+  // midnight boundaries never shift a day.
+  const atNoon = (date: Date): Date => {
+    const copy = new Date(date)
+    copy.setHours(12, 0, 0, 0)
+    return copy
+  }
+
   const rangeLabel =
     period === 'day'
-      ? format.dateTime(range.start, { weekday: 'short', day: 'numeric', month: 'long' })
+      ? format.dateTime(atNoon(range.start), { weekday: 'short', day: 'numeric', month: 'long' })
       : period === 'week'
-        ? `${format.dateTime(range.start, { day: 'numeric', month: 'short' })} – ${format.dateTime(
-            new Date(range.end.getTime() - 86400000),
+        ? `${format.dateTime(atNoon(range.start), { day: 'numeric', month: 'short' })} – ${format.dateTime(
+            atNoon(new Date(range.end.getTime() - 86400000)),
             { day: 'numeric', month: 'short' },
           )}`
         : period === 'month'
-          ? format.dateTime(range.start, { month: 'long', year: 'numeric' })
+          ? format.dateTime(atNoon(range.start), { month: 'long', year: 'numeric' })
           : `${range.start.getFullYear()} · ${t('ytdLabel')}`
 
   const weightDelta =
