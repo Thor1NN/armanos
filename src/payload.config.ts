@@ -21,6 +21,7 @@ import {
   Exercises,
   ShareLinks,
   DiaryEntries,
+  Foods,
 } from './collections'
 
 const filename = fileURLToPath(import.meta.url)
@@ -84,6 +85,7 @@ export default buildConfig({
     Exercises,
     ShareLinks,
     DiaryEntries,
+    Foods,
   ],
   editor: lexicalEditor(),
   secret: payloadSecret,

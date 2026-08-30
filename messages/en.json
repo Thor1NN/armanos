@@ -165,6 +165,14 @@
     "empty": "Nothing logged this day yet.",
     "loadError": "Failed to load the diary",
     "saveError": "Failed to save the entry",
-    "deleteError": "Failed to delete the entry"
+    "deleteError": "Failed to delete the entry",
+    "searchFood": "Search food (e.g. chicken, rice)…",
+    "addCustomFood": "Add custom food",
+    "customName": "Food name",
+    "customKcal": "kcal/100g",
+    "removeItem": "Remove",
+    "mealTotal": "Meal total: {kcal} kcal",
+    "dayTotal": "{kcal} kcal today",
+    "placeholder_mealNote": "Optional note…"
   }
 }

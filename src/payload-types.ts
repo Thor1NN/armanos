@@ -83,6 +83,7 @@ export interface Config {
     exercises: Exercise;
     'share-links': ShareLink;
     'diary-entries': DiaryEntry;
+    foods: Food;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -109,6 +110,7 @@ export interface Config {
     exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     'share-links': ShareLinksSelect<false> | ShareLinksSelect<true>;
     'diary-entries': DiaryEntriesSelect<false> | DiaryEntriesSelect<true>;
+    foods: FoodsSelect<false> | FoodsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -555,7 +557,39 @@ export interface DiaryEntry {
   client?: (number | null) | Client;
   entryDate: string;
   kind: 'meal' | 'activity' | 'note';
-  text: string;
+  text?: string | null;
+  /**
+   * Foods with weight in grams. Calories are computed automatically.
+   */
+  items?:
+    | {
+        food?: (number | null) | Food;
+        name?: string | null;
+        grams: number;
+        kcalPer100g?: number | null;
+        kcal?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  totalKcal?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "foods".
+ */
+export interface Food {
+  id: number;
+  name: string;
+  kcalPer100g: number;
+  proteinPer100g?: number | null;
+  carbsPer100g?: number | null;
+  fatPer100g?: number | null;
+  /**
+   * Archived foods are hidden from the client food search.
+   */
+  archived?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -642,6 +676,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'diary-entries';
         value: number | DiaryEntry;
+      } | null)
+    | ({
+        relationTo: 'foods';
+        value: number | Food;
       } | null);
   globalSlug?: string | null;
   user:
@@ -980,6 +1018,31 @@ export interface DiaryEntriesSelect<T extends boolean = true> {
   entryDate?: T;
   kind?: T;
   text?: T;
+  items?:
+    | T
+    | {
+        food?: T;
+        name?: T;
+        grams?: T;
+        kcalPer100g?: T;
+        kcal?: T;
+        id?: T;
+      };
+  totalKcal?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "foods_select".
+ */
+export interface FoodsSelect<T extends boolean = true> {
+  name?: T;
+  kcalPer100g?: T;
+  proteinPer100g?: T;
+  carbsPer100g?: T;
+  fatPer100g?: T;
+  archived?: T;
   updatedAt?: T;
   createdAt?: T;
 }

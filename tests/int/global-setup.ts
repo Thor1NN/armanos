@@ -53,6 +53,17 @@ export async function setup(): Promise<void> {
   `)
 
   // 3. Boot the production server against the test DB (requires `yarn build`).
+  // A leftover server from a crashed run would silently serve a stale build —
+  // refuse to run against one.
+  const portTaken = await fetch(`${TEST_BASE_URL}/api/clients/me`).then(
+    () => true,
+    () => false,
+  )
+  if (portTaken) {
+    throw new Error(
+      `Port ${TEST_SERVER_PORT} is already in use (stale test server?). Kill it first: lsof -ti :${TEST_SERVER_PORT} | xargs kill`,
+    )
+  }
   server = spawn('yarn', ['start'], { env, stdio: 'ignore', detached: false })
   await waitForServer()
 }

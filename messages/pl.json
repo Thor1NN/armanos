@@ -165,6 +165,14 @@
     "empty": "Brak wpisów tego dnia.",
     "loadError": "Błąd ładowania dziennika",
     "saveError": "Błąd zapisu wpisu",
-    "deleteError": "Błąd usuwania wpisu"
+    "deleteError": "Błąd usuwania wpisu",
+    "searchFood": "Szukaj produktu (np. kurczak, ryż)…",
+    "addCustomFood": "Dodaj własny produkt",
+    "customName": "Nazwa produktu",
+    "customKcal": "kcal/100g",
+    "removeItem": "Usuń",
+    "mealTotal": "Posiłek razem: {kcal} kcal",
+    "dayTotal": "{kcal} kcal dzisiaj",
+    "placeholder_mealNote": "Opcjonalna notatka…"
   }
 }
