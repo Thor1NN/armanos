@@ -57,6 +57,7 @@ export default async function RootLayout(props: {
   return (
     <html lang={locale} className="dark">
       <body className="bg-ui-bg-base text-ui-fg-base">
+        <div className="fx-ambient" aria-hidden />
         <NextIntlClientProvider messages={messages}>
           <main>{props.children}</main>
         </NextIntlClientProvider>

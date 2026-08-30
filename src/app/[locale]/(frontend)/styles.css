@@ -342,3 +342,70 @@
     @apply max-w-296 w-full mx-auto px-6;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   ArmanOS dashboard effects
+--------------------------------------------------------------------------- */
+
+/* Ambient color glow behind the whole app */
+.fx-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(640px 420px at 12% -6%, color-mix(in srgb, var(--color-stat-blue) 13%, transparent), transparent 70%),
+    radial-gradient(520px 400px at 92% 12%, color-mix(in srgb, var(--color-stat-green) 9%, transparent), transparent 70%),
+    radial-gradient(760px 540px at 50% 112%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 70%);
+}
+
+/* Depth card: soft gradient sheen, top highlight, lifted shadow */
+.fx-card {
+  position: relative;
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--color-ui-border-base) 80%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 38%),
+    var(--color-ui-bg-component);
+  box-shadow:
+    0 14px 34px -16px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Staggered entrance */
+.fx-in {
+  animation: fx-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes fx-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fx-in {
+    animation: none;
+  }
+}
+
+/* Glowing primary action */
+.fx-btn-glow {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-stat-blue) 100%);
+  border: 0;
+  box-shadow:
+    0 6px 26px -6px color-mix(in srgb, var(--color-stat-blue) 65%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform 120ms ease, box-shadow 200ms ease;
+}
+.fx-btn-glow:active {
+  transform: scale(0.98);
+}
+.fx-btn-glow:hover {
+  box-shadow:
+    0 8px 32px -6px color-mix(in srgb, var(--color-stat-blue) 80%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}

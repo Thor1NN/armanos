@@ -36,13 +36,13 @@ export default async function HomePage() {
     <>
       <WeekStrip completedDates={completedDates} />
 
-      <section className="rounded-2xl border border-ui-border-base bg-ui-bg-component p-4">
+      <section className="fx-card fx-in p-4" style={{ animationDelay: '260ms' }}>
         <div className={`mb-3 ${statLabelClass}`}>{td('nutritionLabel')}</div>
         <DiaryScreen />
       </section>
 
       {recent.length > 0 && (
-        <section className="rounded-2xl border border-ui-border-base bg-ui-bg-component p-4">
+        <section className="fx-card fx-in p-4" style={{ animationDelay: '320ms' }}>
           <div className={`mb-3 ${statLabelClass}`}>{td('recentLabel')}</div>
           <ul className="flex list-none flex-col gap-2.5 p-0">
             {recent.map(({ session, sets }) => (
@@ -80,7 +80,7 @@ export default async function HomePage() {
       )}
 
       {progress.length > 0 && (
-        <section>
+        <section className="fx-in" style={{ animationDelay: '380ms' }}>
           <div className={`mb-2 px-1 ${statLabelClass}`}>{td('progressLabel')}</div>
           <ProgressChart series={progress} />
         </section>

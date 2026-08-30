@@ -6,7 +6,7 @@ import { ArrowLeft, Check, ChevronDown, Play } from 'lucide-react'
 import { sdk } from '@/lib/sdk'
 import { statLabelClass } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
-import { StatRing } from '@/components/ui/stat-ring'
+import { CountUp, StatRing } from '@/components/ui/stat-ring'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { WorkoutTracker } from '@/modules/training/components/workout-tracker'
 import type { PlanTree, WorkoutTree } from '@/modules/training/plans'
@@ -245,12 +245,12 @@ export function TodayHome({
   return (
     <div className="space-y-3">
       {/* Top stat rings — the WHOOP row */}
-      <div className="rounded-2xl border border-ui-border-base bg-ui-bg-component px-2 py-4">
+      <div className="fx-card fx-in px-2 py-4">
         <div className="flex items-start justify-around">
           <div className="flex flex-col items-center gap-2">
             <StatRing value={kcalValue} color="green" size={96} strokeWidth={7}>
               <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
-                {kcalToday}
+                <CountUp value={kcalToday} />
               </span>
               <span className={`mt-0.5 ${statLabelClass}`}>/ {kcalTarget}</span>
             </StatRing>
@@ -260,7 +260,7 @@ export function TodayHome({
           <div className="flex flex-col items-center gap-2">
             <StatRing value={effortValue} color="blue" size={96} strokeWidth={7}>
               <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
-                {effortValue}%
+                <CountUp value={effortValue} />%
               </span>
               <span className={`mt-0.5 ${statLabelClass}`}>
                 {sessionState === 'inProgress'
@@ -284,7 +284,7 @@ export function TodayHome({
       </div>
 
       {/* Compact workout card */}
-      <div className="rounded-2xl border border-ui-border-base bg-ui-bg-component p-4">
+      <div className="fx-card fx-in p-4" style={{ animationDelay: '80ms' }}>
         <div className={`mb-2 flex items-center justify-between gap-2 ${statLabelClass}`}>
           <span>{t('heroLabel')}</span>
           <StatusBadge status={activePlan.status}>{activePlan.statusLabel}</StatusBadge>
@@ -307,7 +307,7 @@ export function TodayHome({
           )}
         </div>
         <Button
-          className="mt-3 w-full gap-2 py-2.5 text-sm font-semibold"
+          className="fx-btn-glow mt-3 w-full gap-2 py-2.5 text-sm font-semibold"
           onClick={() => setInWorkout(true)}
           disabled={sessionState === 'loading'}
         >
@@ -321,7 +321,7 @@ export function TodayHome({
       </div>
 
       {/* Plan machinery, hidden until needed */}
-      <div className="rounded-2xl border border-ui-border-base bg-ui-bg-component">
+      <div className="fx-card fx-in" style={{ animationDelay: '140ms' }}>
         <button
           type="button"
           className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-ui-fg-muted"
