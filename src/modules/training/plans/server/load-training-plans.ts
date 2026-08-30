@@ -52,6 +52,7 @@ export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
       name: user.name ?? null,
       email: user.email ?? null,
       dailyKcalTarget: user.dailyKcalTarget ?? null,
+      onboardedAt: user.onboardedAt ?? null,
     },
     plans: planTree,
   }

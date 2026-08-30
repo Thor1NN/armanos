@@ -224,5 +224,31 @@
     "more": "waist",
     "deleteLatest": "Delete latest",
     "saveError": "Failed to save the measurement"
+  },
+  "onboarding": {
+    "q_gender": "What is your gender?",
+    "q_birthday": "When is your birthday?",
+    "q_height": "What is your height?",
+    "q_weight": "What is your weight?",
+    "q_goal": "What is your top goal?",
+    "q_experience": "How much training experience do you have?",
+    "gender_male": "Male",
+    "gender_female": "Female",
+    "gender_other": "Other",
+    "goal_build_muscle": "Build muscle",
+    "goal_gain_strength": "Gain strength",
+    "goal_fat_loss": "Fat loss",
+    "level_beginner": "Beginner",
+    "level_beginner_sub": "0–1 year",
+    "level_intermediate": "Intermediate",
+    "level_intermediate_sub": "1–3 years",
+    "level_advanced": "Advanced",
+    "level_advanced_sub": "3+ years",
+    "continue": "Continue",
+    "finish": "Finish",
+    "skip": "Skip",
+    "back": "Back",
+    "privacy": "Your data is private — only your coach can see it.",
+    "error": "Something went wrong. Please try again."
   }
 }

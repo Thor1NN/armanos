@@ -63,6 +63,7 @@ export type LoadTrainingPlansOutput =
         name?: string | null
         email?: string | null
         dailyKcalTarget?: number | null
+        onboardedAt?: string | null
       }
       plans: PlanTree[]
     }

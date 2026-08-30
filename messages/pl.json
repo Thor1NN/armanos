@@ -224,5 +224,31 @@
     "more": "talia",
     "deleteLatest": "Usuń ostatni",
     "saveError": "Błąd zapisu pomiaru"
+  },
+  "onboarding": {
+    "q_gender": "Jaka jest Twoja płeć?",
+    "q_birthday": "Kiedy masz urodziny?",
+    "q_height": "Jaki masz wzrost?",
+    "q_weight": "Ile ważysz?",
+    "q_goal": "Jaki jest Twój główny cel?",
+    "q_experience": "Jakie masz doświadczenie treningowe?",
+    "gender_male": "Mężczyzna",
+    "gender_female": "Kobieta",
+    "gender_other": "Inna",
+    "goal_build_muscle": "Budowa mięśni",
+    "goal_gain_strength": "Zwiększenie siły",
+    "goal_fat_loss": "Redukcja tkanki tłuszczowej",
+    "level_beginner": "Początkujący",
+    "level_beginner_sub": "0–1 rok",
+    "level_intermediate": "Średniozaawansowany",
+    "level_intermediate_sub": "1–3 lata",
+    "level_advanced": "Zaawansowany",
+    "level_advanced_sub": "3+ lata",
+    "continue": "Dalej",
+    "finish": "Zakończ",
+    "skip": "Pomiń",
+    "back": "Wstecz",
+    "privacy": "Twoje dane są prywatne — widzi je tylko Twój trener.",
+    "error": "Coś poszło nie tak. Spróbuj ponownie."
   }
 }

@@ -20,6 +20,7 @@ export default async function HomePage() {
   const result = await loadTrainingPlans()
 
   if (!result.user) redirect('/login')
+  if (!result.user.onboardedAt) redirect('/onboarding')
 
   const clientId = Number(result.user.id)
   const [history, progress] = await Promise.all([

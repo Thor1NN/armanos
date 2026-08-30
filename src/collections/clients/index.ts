@@ -123,6 +123,81 @@ export const Clients: CollectionConfig = {
       },
     },
     {
+      name: 'profile',
+      type: 'group',
+      label: 'Profile',
+      admin: { description: 'Collected by the first-login onboarding; editable by the client.' },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'gender',
+              type: 'select',
+              label: 'Gender',
+              options: [
+                { label: 'Male', value: 'male' },
+                { label: 'Female', value: 'female' },
+                { label: 'Other', value: 'other' },
+              ],
+              admin: { width: '33%' },
+            },
+            {
+              name: 'birthDate',
+              type: 'date',
+              label: 'Birthday',
+              admin: { width: '33%', date: { pickerAppearance: 'dayOnly' } },
+            },
+            {
+              name: 'heightCm',
+              type: 'number',
+              label: 'Height (cm)',
+              min: 100,
+              max: 250,
+              admin: { width: '33%' },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'goal',
+              type: 'select',
+              label: 'Top goal',
+              options: [
+                { label: 'Build muscle', value: 'build_muscle' },
+                { label: 'Gain strength', value: 'gain_strength' },
+                { label: 'Fat loss', value: 'fat_loss' },
+              ],
+              admin: { width: '50%' },
+            },
+            {
+              name: 'experience',
+              type: 'select',
+              label: 'Experience',
+              options: [
+                { label: 'Beginner (0–1y)', value: 'beginner' },
+                { label: 'Intermediate (1–3y)', value: 'intermediate' },
+                { label: 'Advanced (3y+)', value: 'advanced' },
+              ],
+              admin: { width: '50%' },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'onboardedAt',
+      type: 'date',
+      label: 'Onboarded at',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Set when the client completes the first-login questions.',
+      },
+    },
+    {
       name: 'dailyKcalTarget',
       type: 'number',
       label: 'Daily kcal target',

@@ -14,6 +14,7 @@ import * as migration_20260830_115703_diary_entries from './20260830_115703_diar
 import * as migration_20260830_121520_foods_and_meal_items from './20260830_121520_foods_and_meal_items';
 import * as migration_20260830_124858_kcal_target from './20260830_124858_kcal_target';
 import * as migration_20260830_141943_hevy_pack from './20260830_141943_hevy_pack';
+import * as migration_20260830_142809_client_profile from './20260830_142809_client_profile';
 
 export const migrations = [
   {
@@ -94,6 +95,11 @@ export const migrations = [
   {
     up: migration_20260830_141943_hevy_pack.up,
     down: migration_20260830_141943_hevy_pack.down,
-    name: '20260830_141943_hevy_pack'
+    name: '20260830_141943_hevy_pack',
+  },
+  {
+    up: migration_20260830_142809_client_profile.up,
+    down: migration_20260830_142809_client_profile.down,
+    name: '20260830_142809_client_profile'
   },
 ];

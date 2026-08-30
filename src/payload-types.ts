@@ -207,6 +207,20 @@ export interface Client {
    */
   status: 'active' | 'archived';
   /**
+   * Collected by the first-login onboarding; editable by the client.
+   */
+  profile?: {
+    gender?: ('male' | 'female' | 'other') | null;
+    birthDate?: string | null;
+    heightCm?: number | null;
+    goal?: ('build_muscle' | 'gain_strength' | 'fat_loss') | null;
+    experience?: ('beginner' | 'intermediate' | 'advanced') | null;
+  };
+  /**
+   * Set when the client completes the first-login questions.
+   */
+  onboardedAt?: string | null;
+  /**
    * Drives the calorie ring in the client app.
    */
   dailyKcalTarget?: number | null;
@@ -791,6 +805,16 @@ export interface UsersSelect<T extends boolean = true> {
 export interface ClientsSelect<T extends boolean = true> {
   name?: T;
   status?: T;
+  profile?:
+    | T
+    | {
+        gender?: T;
+        birthDate?: T;
+        heightCm?: T;
+        goal?: T;
+        experience?: T;
+      };
+  onboardedAt?: T;
   dailyKcalTarget?: T;
   lastWorkoutAt?: T;
   plans?: T;
