@@ -9,7 +9,8 @@
 /.idea/*
 !/.idea/runConfigurations
 .vscode/
-.yarn/
+.yarn/*
+!.yarn/releases
 
 # testing
 /coverage
@@ -60,3 +61,4 @@ skills-lock.json
 
 # local scratch scripts
 *.local.ts
+.env*
