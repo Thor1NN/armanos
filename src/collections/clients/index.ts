@@ -123,6 +123,21 @@ export const Clients: CollectionConfig = {
       },
     },
     {
+      name: 'dailyKcalTarget',
+      type: 'number',
+      label: 'Daily kcal target',
+      defaultValue: 2000,
+      min: 0,
+      max: 10000,
+      admin: {
+        position: 'sidebar',
+        description: 'Drives the calorie ring in the client app.',
+      },
+      access: {
+        update: isAdminField,
+      },
+    },
+    {
       name: 'lastWorkoutAt',
       type: 'date',
       label: 'Last workout',

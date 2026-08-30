@@ -99,7 +99,7 @@ export default async function HomePage() {
         />
 
         {result.plans.length > 0 ? (
-          <TodayHome plans={result.plans} dashboard={dashboard} />
+          <TodayHome plans={result.plans} dailyKcalTarget={result.user.dailyKcalTarget} dashboard={dashboard} />
         ) : (
           <div className="space-y-3">
             <div className="py-6 text-center text-sm text-ui-fg-muted">{t('noPlans')}</div>

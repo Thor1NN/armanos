@@ -58,7 +58,12 @@ export type PlanTree = PayloadPlan & {
 
 export type LoadTrainingPlansOutput =
   | {
-      user: { id: number | string; name?: string | null; email?: string | null }
+      user: {
+        id: number | string
+        name?: string | null
+        email?: string | null
+        dailyKcalTarget?: number | null
+      }
       plans: PlanTree[]
     }
   | { user: null }

@@ -12,6 +12,7 @@ import * as migration_20260724_090318 from './20260724_090318';
 import * as migration_20260829_160754_armanos_integrity from './20260829_160754_armanos_integrity';
 import * as migration_20260830_115703_diary_entries from './20260830_115703_diary_entries';
 import * as migration_20260830_121520_foods_and_meal_items from './20260830_121520_foods_and_meal_items';
+import * as migration_20260830_124858_kcal_target from './20260830_124858_kcal_target';
 
 export const migrations = [
   {
@@ -82,6 +83,11 @@ export const migrations = [
   {
     up: migration_20260830_121520_foods_and_meal_items.up,
     down: migration_20260830_121520_foods_and_meal_items.down,
-    name: '20260830_121520_foods_and_meal_items'
+    name: '20260830_121520_foods_and_meal_items',
+  },
+  {
+    up: migration_20260830_124858_kcal_target.up,
+    down: migration_20260830_124858_kcal_target.down,
+    name: '20260830_124858_kcal_target'
   },
 ];

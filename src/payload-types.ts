@@ -205,6 +205,10 @@ export interface Client {
    */
   status: 'active' | 'archived';
   /**
+   * Drives the calorie ring in the client app.
+   */
+  dailyKcalTarget?: number | null;
+  /**
    * Updated automatically when the client trains.
    */
   lastWorkoutAt?: string | null;
@@ -762,6 +766,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface ClientsSelect<T extends boolean = true> {
   name?: T;
   status?: T;
+  dailyKcalTarget?: T;
   lastWorkoutAt?: T;
   plans?: T;
   notes?: T;

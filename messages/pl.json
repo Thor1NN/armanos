@@ -147,7 +147,11 @@
     "heroLabel": "Dzisiejszy trening",
     "ringSets": "serie zrobione",
     "ringExercises": "ćwiczeń",
-    "setCount": "{count, plural, one {# seria} few {# serie} other {# serii}}"
+    "setCount": "{count, plural, one {# seria} few {# serie} other {# serii}}",
+    "ringCalories": "Kalorie",
+    "ringEffort": "Wysiłek",
+    "ringTasks": "Zadania",
+    "ringDone": "zrobione"
   },
   "diary": {
     "title": "Dziennik",

@@ -47,7 +47,12 @@ export async function loadTrainingPlans(): Promise<LoadTrainingPlansOutput> {
   )
 
   return {
-    user: { id: user.id, name: user.name ?? null, email: user.email ?? null },
+    user: {
+      id: user.id,
+      name: user.name ?? null,
+      email: user.email ?? null,
+      dailyKcalTarget: user.dailyKcalTarget ?? null,
+    },
     plans: planTree,
   }
 }

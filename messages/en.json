@@ -147,7 +147,11 @@
     "heroLabel": "Today's workout",
     "ringSets": "sets done",
     "ringExercises": "exercises",
-    "setCount": "{count, plural, one {# set} other {# sets}}"
+    "setCount": "{count, plural, one {# set} other {# sets}}",
+    "ringCalories": "Calories",
+    "ringEffort": "Effort",
+    "ringTasks": "Tasks",
+    "ringDone": "done"
   },
   "diary": {
     "title": "Diary",

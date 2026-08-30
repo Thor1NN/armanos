@@ -14,8 +14,38 @@ import { MicrocyclePicker, WorkoutPicker } from '@/modules/training/components/w
 import { useWorkoutSelection } from '@/modules/training/components/workout-plans/hooks/use-workout-selection'
 
 const VIEW_STORAGE_KEY = 'training-app:today-view'
+const DEFAULT_KCAL_TARGET = 2000
 
 type SessionState = 'fresh' | 'inProgress' | 'completed'
+
+type TodayStats = {
+  workoutId: number
+  state: SessionState
+  setsLogged: number
+  completedToday: boolean
+  kcalToday: number
+  hasMealToday: boolean
+  hasActivityToday: boolean
+}
+
+const dayBounds = () => {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const end = new Date(start)
+  end.setDate(end.getDate() + 1)
+  return { start: start.toISOString(), end: end.toISOString() }
+}
+
+const isTodayIso = (iso: string | null | undefined): boolean => {
+  if (!iso) return false
+  const date = new Date(iso)
+  const now = new Date()
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  )
+}
 
 /** Sum of prescribed sets across the workout (first number of each row's `rounds`). */
 const countPrescribedSets = (workout: WorkoutTree): number =>
@@ -52,15 +82,18 @@ const countExercises = (workout: WorkoutTree): number =>
   )
 
 /**
- * App-style client home: one "today's workout" hero card with a Start /
- * Continue button; the plan machinery hides behind "Change workout". Starting
- * opens the focused workout screen (the existing tracker).
+ * Single-screen dashboard home. Top: three WHOOP-style rings — calories
+ * (green, vs daily target), effort (blue, sets done vs prescribed), tasks
+ * (daily checklist: train / log a meal / log activity). Below: compact
+ * workout card, plan picker, then the dashboard sections.
  */
 export function TodayHome({
   plans,
+  dailyKcalTarget,
   dashboard,
 }: {
   plans: PlanTree[]
+  dailyKcalTarget?: number | null
   /** Dashboard cards rendered below the hero when not inside a workout. */
   dashboard?: React.ReactNode
 }) {
@@ -84,11 +117,7 @@ export function TodayHome({
     }
   })
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [checked, setChecked] = useState<{
-    workoutId: number
-    state: SessionState
-    setsLogged: number
-  } | null>(null)
+  const [stats, setStats] = useState<TodayStats | null>(null)
 
   useEffect(() => {
     try {
@@ -98,21 +127,35 @@ export function TodayHome({
     }
   }, [inWorkout])
 
-  // What state is today's workout in? Drives the hero button label.
+  // One combined stats fetch: session state + today's diary.
   useEffect(() => {
     if (!activeWorkout) return
     const workoutId = activeWorkout.id
     let active = true
-    sdk
-      .find({
+    const { start, end } = dayBounds()
+
+    Promise.all([
+      sdk.find({
         collection: 'workout-logs',
-        where: { workout: { equals: activeWorkout.id } },
+        where: { workout: { equals: workoutId } },
         sort: '-updatedAt',
         limit: 1,
         depth: 0,
-      })
-      .then(async (result) => {
-        const doc = result.docs[0]
+      }),
+      sdk.find({
+        collection: 'diary-entries',
+        where: {
+          and: [
+            { entryDate: { greater_than_equal: start } },
+            { entryDate: { less_than: end } },
+          ],
+        },
+        limit: 100,
+        depth: 0,
+      }),
+    ])
+      .then(async ([logs, diary]) => {
+        const doc = logs.docs[0]
         const state: SessionState = !doc ? 'fresh' : !doc.completedAt ? 'inProgress' : 'completed'
         let setsLogged = 0
         if (doc && state === 'inProgress') {
@@ -125,10 +168,28 @@ export function TodayHome({
           setsLogged = sets.totalDocs
         }
         if (!active) return
-        setChecked({ workoutId, state, setsLogged })
+        setStats({
+          workoutId,
+          state,
+          setsLogged,
+          completedToday: state === 'completed' && isTodayIso(doc?.completedAt),
+          kcalToday: diary.docs.reduce((sum, entry) => sum + (entry.totalKcal ?? 0), 0),
+          hasMealToday: diary.docs.some((entry) => entry.kind === 'meal'),
+          hasActivityToday: diary.docs.some((entry) => entry.kind !== 'meal'),
+        })
       })
       .catch(() => {
-        if (active) setChecked({ workoutId, state: 'fresh', setsLogged: 0 })
+        if (active) {
+          setStats({
+            workoutId,
+            state: 'fresh',
+            setsLogged: 0,
+            completedToday: false,
+            kcalToday: 0,
+            hasMealToday: false,
+            hasActivityToday: false,
+          })
+        }
       })
     return () => {
       active = false
@@ -158,72 +219,99 @@ export function TodayHome({
 
   const exerciseCount = countExercises(activeWorkout)
   const prescribedSets = countPrescribedSets(activeWorkout)
-  const sessionState: SessionState | 'loading' =
-    checked && checked.workoutId === activeWorkout.id ? checked.state : 'loading'
-  const setsLogged = checked && checked.workoutId === activeWorkout.id ? checked.setsLogged : 0
-  const ringValue =
+  const current = stats && stats.workoutId === activeWorkout.id ? stats : null
+  const sessionState: SessionState | 'loading' = current ? current.state : 'loading'
+
+  // Ring 1 — calories vs daily target (green)
+  const kcalToday = current?.kcalToday ?? 0
+  const kcalTarget = dailyKcalTarget || DEFAULT_KCAL_TARGET
+  const kcalValue = Math.min(100, Math.round((kcalToday / kcalTarget) * 100))
+
+  // Ring 2 — effort: sets done vs prescribed (blue)
+  const effortValue =
     sessionState === 'completed'
       ? 100
       : sessionState === 'inProgress' && prescribedSets > 0
-        ? Math.min(100, Math.round((setsLogged / prescribedSets) * 100))
+        ? Math.min(100, Math.round(((current?.setsLogged ?? 0) / prescribedSets) * 100))
         : 0
-  const ringColor = sessionState === 'completed' ? 'green' : 'blue'
+
+  // Ring 3 — daily tasks: train, log a meal, log activity (amber → green)
+  const tasksDone =
+    (current?.completedToday ? 1 : 0) +
+    (current?.hasMealToday ? 1 : 0) +
+    (current?.hasActivityToday ? 1 : 0)
+  const tasksValue = Math.round((tasksDone / 3) * 100)
 
   return (
     <div className="space-y-3">
-      {/* Hero: today's workout */}
-      <div className="rounded-2xl border border-ui-border-base bg-ui-bg-component p-5">
-        <div className={`mb-3 flex items-center justify-between gap-2 ${statLabelClass}`}>
+      {/* Top stat rings — the WHOOP row */}
+      <div className="rounded-2xl border border-ui-border-base bg-ui-bg-component px-2 py-4">
+        <div className="flex items-start justify-around">
+          <div className="flex flex-col items-center gap-2">
+            <StatRing value={kcalValue} color="green" size={96} strokeWidth={7}>
+              <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
+                {kcalToday}
+              </span>
+              <span className={`mt-0.5 ${statLabelClass}`}>/ {kcalTarget}</span>
+            </StatRing>
+            <span className={statLabelClass}>{t('ringCalories')}</span>
+          </div>
+
+          <div className="flex flex-col items-center gap-2">
+            <StatRing value={effortValue} color="blue" size={96} strokeWidth={7}>
+              <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
+                {effortValue}%
+              </span>
+              <span className={`mt-0.5 ${statLabelClass}`}>
+                {sessionState === 'inProgress'
+                  ? `${current?.setsLogged ?? 0}/${prescribedSets}`
+                  : t('ringSets')}
+              </span>
+            </StatRing>
+            <span className={statLabelClass}>{t('ringEffort')}</span>
+          </div>
+
+          <div className="flex flex-col items-center gap-2">
+            <StatRing value={tasksValue} color={tasksDone === 3 ? 'green' : 'amber'} size={96} strokeWidth={7}>
+              <span className="text-xl font-bold tabular-nums leading-none text-ui-fg-base">
+                {tasksDone}/3
+              </span>
+              <span className={`mt-0.5 ${statLabelClass}`}>{t('ringDone')}</span>
+            </StatRing>
+            <span className={statLabelClass}>{t('ringTasks')}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Compact workout card */}
+      <div className="rounded-2xl border border-ui-border-base bg-ui-bg-component p-4">
+        <div className={`mb-2 flex items-center justify-between gap-2 ${statLabelClass}`}>
           <span>{t('heroLabel')}</span>
           <StatusBadge status={activePlan.status}>{activePlan.statusLabel}</StatusBadge>
         </div>
-
-        <div className="flex items-center gap-5">
-          <StatRing value={ringValue} color={ringColor} size={116} strokeWidth={9}>
-            {sessionState === 'completed' ? (
-              <Check size={34} strokeWidth={2.5} style={{ color: 'var(--color-stat-green)' }} />
-            ) : (
-              <>
-                <span className="text-2xl font-bold tabular-nums leading-none text-ui-fg-base">
-                  {sessionState === 'inProgress' ? `${ringValue}%` : exerciseCount}
-                </span>
-                <span className={`mt-1 ${statLabelClass}`}>
-                  {sessionState === 'inProgress' ? t('ringSets') : t('ringExercises')}
-                </span>
-              </>
-            )}
-          </StatRing>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-ui-fg-muted">
-              {activePlan.title} · {activeMicrocycle.title}
-            </div>
-            <h2 className="mt-0.5 text-2xl font-bold leading-tight text-ui-fg-base">
-              {activeWorkout.title}
-            </h2>
-            <p className="mt-1 text-sm text-ui-fg-muted">
-              {t('exerciseCount', { count: exerciseCount })}
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-xl font-bold leading-tight text-ui-fg-base">{activeWorkout.title}</h2>
+            <p className="mt-0.5 text-xs text-ui-fg-muted">
+              {activePlan.title} · {activeMicrocycle.title} · {t('exerciseCount', { count: exerciseCount })}
               {prescribedSets > 0 && ` · ${t('setCount', { count: prescribedSets })}`}
-              {activeWorkout.rpe != null && ` · RPE ${activeWorkout.rpe}`}
             </p>
           </div>
+          {sessionState === 'completed' && (
+            <Check
+              size={22}
+              strokeWidth={2.5}
+              className="shrink-0"
+              style={{ color: 'var(--color-stat-green)' }}
+            />
+          )}
         </div>
-
-        {sessionState === 'completed' ? (
-          <div
-            className="mt-4 flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm"
-            style={{ background: 'color-mix(in srgb, var(--color-stat-green) 10%, transparent)', color: 'var(--color-stat-green)' }}
-          >
-            <Check size={16} className="shrink-0" />
-            {t('completedHint')}
-          </div>
-        ) : null}
-
         <Button
-          className="mt-4 w-full gap-2 py-3 text-base font-semibold"
+          className="mt-3 w-full gap-2 py-2.5 text-sm font-semibold"
           onClick={() => setInWorkout(true)}
           disabled={sessionState === 'loading'}
         >
-          <Play size={16} />
+          <Play size={15} />
           {sessionState === 'inProgress'
             ? t('continueWorkout')
             : sessionState === 'completed'
