@@ -72,7 +72,7 @@ export function StatRing({
           r={tickRadius}
           fill="none"
           strokeWidth={2}
-          stroke="rgba(255,255,255,0.10)"
+          stroke="rgba(15,23,42,0.14)"
           strokeDasharray="1.5 5.5"
         />
 
@@ -83,7 +83,7 @@ export function StatRing({
           r={radius}
           fill="none"
           strokeWidth={strokeWidth}
-          stroke="rgba(255,255,255,0.06)"
+          stroke="rgba(15,23,42,0.08)"
         />
 
         {/* Bloom underlay — blurred copy of the arc */}

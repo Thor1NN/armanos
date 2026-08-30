@@ -22,10 +22,10 @@
 
   /* Stat accents — dashboard color coding: blue = effort/active,
      green = recovery/complete, red = alert/fail, amber = caution */
-  --color-stat-blue: #3b9eff;
-  --color-stat-green: #23e07d;
-  --color-stat-red: #ff4d5a;
-  --color-stat-amber: #ffb020;
+  --color-stat-blue: #2f6bff;
+  --color-stat-green: #0eb968;
+  --color-stat-red: #ef3a4d;
+  --color-stat-amber: #f59e0b;
 
   /* UI tokens – light (default) */
   --color-ui-fg-base: #0f1419;
@@ -38,11 +38,11 @@
   --color-ui-fg-on-inverted: #ffffff;
   --color-ui-fg-error: #f43f5e;
 
-  --color-ui-bg-base: #ffffff;
-  --color-ui-bg-base-hover: #f8fafc;
-  --color-ui-bg-subtle: #f8fafc;
-  --color-ui-bg-subtle-hover: #f1f5f9;
-  --color-ui-bg-component: #f8fafc;
+  --color-ui-bg-base: #f5f6f8;
+  --color-ui-bg-base-hover: #eef0f4;
+  --color-ui-bg-subtle: #eef0f4;
+  --color-ui-bg-subtle-hover: #e7eaef;
+  --color-ui-bg-component: #ffffff;
   --color-ui-bg-field: #ffffff;
   --color-ui-bg-field-hover: #f8fafc;
   --color-ui-bg-disabled: #f1f5f9;
@@ -347,29 +347,78 @@
    ArmanOS dashboard effects
 --------------------------------------------------------------------------- */
 
-/* Ambient color glow behind the whole app */
+/* Ambient: slow drifting color fields behind the whole app */
 .fx-ambient {
   position: fixed;
-  inset: 0;
+  inset: -20%;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(640px 420px at 12% -6%, color-mix(in srgb, var(--color-stat-blue) 13%, transparent), transparent 70%),
-    radial-gradient(520px 400px at 92% 12%, color-mix(in srgb, var(--color-stat-green) 9%, transparent), transparent 70%),
-    radial-gradient(760px 540px at 50% 112%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 70%);
+  filter: blur(70px);
+  opacity: 0.6;
+}
+.fx-ambient::before,
+.fx-ambient::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+.fx-ambient::before {
+  width: 58vmax;
+  height: 58vmax;
+  left: -8%;
+  top: -10%;
+  background: radial-gradient(
+    circle at 32% 32%,
+    color-mix(in srgb, var(--color-stat-blue) 24%, transparent),
+    transparent 66%
+  );
+  animation: fx-drift-a 28s ease-in-out infinite alternate;
+}
+.fx-ambient::after {
+  width: 50vmax;
+  height: 50vmax;
+  right: -12%;
+  top: 24%;
+  background: radial-gradient(
+    circle at 60% 40%,
+    color-mix(in srgb, var(--color-stat-green) 20%, transparent),
+    transparent 66%
+  );
+  animation: fx-drift-b 36s ease-in-out infinite alternate;
+}
+@keyframes fx-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(11vw, 9vh, 0) scale(1.14);
+  }
+}
+@keyframes fx-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  to {
+    transform: translate3d(-9vw, -7vh, 0) scale(0.94);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fx-ambient::before,
+  .fx-ambient::after {
+    animation: none;
+  }
 }
 
-/* Depth card: soft gradient sheen, top highlight, lifted shadow */
+/* Depth card: white surface, crisp lifted shadow */
 .fx-card {
   position: relative;
   border-radius: 1.25rem;
-  border: 1px solid color-mix(in srgb, var(--color-ui-border-base) 80%, transparent);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 38%),
-    var(--color-ui-bg-component);
+  border: 1px solid #e7eaef;
+  background: var(--color-ui-bg-component);
   box-shadow:
-    0 14px 34px -16px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 16px 36px -20px rgba(15, 23, 42, 0.22),
+    0 2px 10px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Staggered entrance */
@@ -424,8 +473,8 @@ body {
   inset: 0;
   z-index: 50;
   pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: 0.028;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 

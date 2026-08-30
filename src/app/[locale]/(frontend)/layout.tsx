@@ -21,8 +21,8 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  colorScheme: 'dark',
-  themeColor: '#0f1115',
+  colorScheme: 'light',
+  themeColor: '#f5f6f8',
 }
 
 export const metadata = {
@@ -35,7 +35,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     title: 'ArmanOS',
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
   },
   icons: {
     icon: [
@@ -68,7 +68,7 @@ export default async function RootLayout(props: {
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`dark ${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang={locale} className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="bg-ui-bg-base text-ui-fg-base">
         <div className="fx-ambient" aria-hidden />
         <div className="fx-grain" aria-hidden />
