@@ -22,7 +22,11 @@ export function SaveStatusChip({ status }: { status: SaveStatus }) {
 
   if (status === 'failed') {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-ui-fg-error" role="status">
+      <span
+        className="inline-flex items-center gap-1 text-xs font-semibold"
+        style={{ color: 'var(--color-stat-red)' }}
+        role="status"
+      >
         <CloudOff size={12} />
         {t('saveFailed')}
       </span>
@@ -30,7 +34,11 @@ export function SaveStatusChip({ status }: { status: SaveStatus }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-ui-fg-muted" role="status">
+    <span
+      className="inline-flex items-center gap-1 text-xs font-semibold"
+      style={{ color: 'var(--color-stat-green)' }}
+      role="status"
+    >
       <Check size={12} />
       {t('saved')}
     </span>

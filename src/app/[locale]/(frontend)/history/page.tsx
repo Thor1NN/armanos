@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getFormatter, getTranslations } from 'next-intl/server'
+import { CheckCircle2 } from 'lucide-react'
+import { statLabelClass } from '@/lib/class-names'
 import { AppNav } from '@/components/common/app-nav'
 import { LogoutButton } from '@/components/common/logout-button'
 import { PageContainer } from '@/components/ui/page-container'
@@ -55,10 +57,17 @@ export default async function HistoryPage({
                 key={session.id}
                 className="rounded-xl border border-ui-border-base bg-ui-bg-component px-4 py-3"
               >
-                <div className="flex items-baseline justify-between gap-2 text-sm font-semibold">
-                  <span className="break-words">{session.title || t('sessionFallback')}</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center gap-2 text-sm font-semibold">
+                    <CheckCircle2
+                      size={16}
+                      className="shrink-0"
+                      style={{ color: 'var(--color-stat-green)' }}
+                    />
+                    <span className="break-words">{session.title || t('sessionFallback')}</span>
+                  </span>
                   {session.completedAt && (
-                    <span className="shrink-0 text-xs font-normal text-ui-fg-muted">
+                    <span className={`shrink-0 ${statLabelClass}`}>
                       {format.dateTime(new Date(session.completedAt), { dateStyle: 'medium' })}
                     </span>
                   )}

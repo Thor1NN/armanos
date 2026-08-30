@@ -32,8 +32,9 @@ export function AppNav() {
               href={href}
               className={joinClasses(
                 'flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium',
-                active ? 'text-ui-fg-interactive' : 'text-ui-fg-muted',
+                active ? '' : 'text-ui-fg-muted',
               )}
+              style={active ? { color: 'var(--color-stat-blue)' } : undefined}
             >
               <Icon size={18} />
               {t(key)}

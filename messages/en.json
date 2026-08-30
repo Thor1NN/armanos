@@ -143,7 +143,11 @@
     "continueWorkout": "Continue workout",
     "reviewWorkout": "Review workout",
     "startWorkout": "Start workout",
-    "changeWorkout": "Change workout"
+    "changeWorkout": "Change workout",
+    "heroLabel": "Today's workout",
+    "ringSets": "sets done",
+    "ringExercises": "exercises",
+    "setCount": "{count, plural, one {# set} other {# sets}}"
   },
   "diary": {
     "title": "Diary",
@@ -173,6 +177,7 @@
     "removeItem": "Remove",
     "mealTotal": "Meal total: {kcal} kcal",
     "dayTotal": "{kcal} kcal today",
-    "placeholder_mealNote": "Optional note…"
+    "placeholder_mealNote": "Optional note…",
+    "dayTotalLabel": "kcal today"
   }
 }

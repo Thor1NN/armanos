@@ -143,7 +143,11 @@
     "continueWorkout": "Kontynuuj trening",
     "reviewWorkout": "Zobacz trening",
     "startWorkout": "Rozpocznij trening",
-    "changeWorkout": "Zmień trening"
+    "changeWorkout": "Zmień trening",
+    "heroLabel": "Dzisiejszy trening",
+    "ringSets": "serie zrobione",
+    "ringExercises": "ćwiczeń",
+    "setCount": "{count, plural, one {# seria} few {# serie} other {# serii}}"
   },
   "diary": {
     "title": "Dziennik",
@@ -173,6 +177,7 @@
     "removeItem": "Usuń",
     "mealTotal": "Posiłek razem: {kcal} kcal",
     "dayTotal": "{kcal} kcal dzisiaj",
-    "placeholder_mealNote": "Opcjonalna notatka…"
+    "placeholder_mealNote": "Opcjonalna notatka…",
+    "dayTotalLabel": "kcal dzisiaj"
   }
 }

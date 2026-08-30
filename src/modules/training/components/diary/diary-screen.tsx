@@ -7,7 +7,7 @@ import { sdk } from '@/lib/sdk'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { joinClasses } from '@/lib/class-names'
+import { joinClasses, statLabelClass } from '@/lib/class-names'
 import type { DiaryEntry, Food } from '@/payload-types'
 
 const KINDS = ['meal', 'activity', 'note'] as const
@@ -254,9 +254,12 @@ export function DiaryScreen() {
           </Button>
         </div>
         {!loading && dayTotal > 0 && (
-          <div className="flex items-center justify-center gap-1 border-t border-ui-border-base pt-1.5 pb-0.5 text-xs text-ui-fg-muted">
-            <Flame size={12} className="text-ui-fg-interactive" />
-            {t('dayTotal', { kcal: dayTotal })}
+          <div className="flex items-baseline justify-center gap-2 border-t border-ui-border-base pt-2 pb-1">
+            <Flame size={14} style={{ color: 'var(--color-stat-green)' }} />
+            <span className="text-2xl font-bold tabular-nums leading-none text-ui-fg-base">
+              {dayTotal}
+            </span>
+            <span className={statLabelClass}>{t('dayTotalLabel')}</span>
           </div>
         )}
       </div>
@@ -435,7 +438,13 @@ export function DiaryScreen() {
                   <div className="mb-0.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-ui-fg-interactive">
                     {t(`kind_${(entry.kind as Kind) ?? 'note'}`)}
                     {entry.totalKcal != null && entry.totalKcal > 0 && (
-                      <span className="inline-flex items-center gap-0.5 rounded-full bg-ui-fg-interactive/15 px-1.5 py-0.5 normal-case tracking-normal">
+                      <span
+                        className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 normal-case tracking-normal"
+                        style={{
+                          color: 'var(--color-stat-green)',
+                          background: 'color-mix(in srgb, var(--color-stat-green) 12%, transparent)',
+                        }}
+                      >
                         <Flame size={10} />
                         {entry.totalKcal} kcal
                       </span>

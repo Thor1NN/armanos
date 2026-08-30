@@ -20,6 +20,13 @@
   --color-concrete: #f8fafc;
   --color-white: #ffffff;
 
+  /* Stat accents — dashboard color coding: blue = effort/active,
+     green = recovery/complete, red = alert/fail, amber = caution */
+  --color-stat-blue: #3b9eff;
+  --color-stat-green: #23e07d;
+  --color-stat-red: #ff4d5a;
+  --color-stat-amber: #ffb020;
+
   /* UI tokens – light (default) */
   --color-ui-fg-base: #0f1419;
   --color-ui-fg-subtle: #475569;
@@ -193,18 +200,18 @@
     --color-ui-fg-on-inverted: #0f1419;
     --color-ui-fg-error: #ff5a5a;
 
-    --color-ui-bg-base: #0f1115;
-    --color-ui-bg-base-hover: #181b22;
-    --color-ui-bg-subtle: #14171d;
-    --color-ui-bg-subtle-hover: #1c2430;
-    --color-ui-bg-component: #181b22;
-    --color-ui-bg-field: #14171d;
+    --color-ui-bg-base: #0a0b0e;
+    --color-ui-bg-base-hover: #14161c;
+    --color-ui-bg-subtle: #101218;
+    --color-ui-bg-subtle-hover: #191c24;
+    --color-ui-bg-component: #14161c;
+    --color-ui-bg-field: #101218;
     --color-ui-bg-field-hover: #1c2430;
     --color-ui-bg-disabled: #1c2430;
     --color-ui-bg-interactive: #3d5eff;
     --color-ui-bg-overlay: rgba(0, 0, 0, 0.6);
 
-    --color-ui-border-base: #262a33;
+    --color-ui-border-base: #21252e;
     --color-ui-border-strong: #363b47;
     --color-ui-border-interactive: #6c84ff;
     --color-ui-border-error: #ff5a5a;

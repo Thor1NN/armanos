@@ -88,14 +88,15 @@ export function ProgressChart({ series }: { series: ExerciseProgressSeries[] }) 
           {chart.coords.length > 1 && (
             <polyline
               fill="none"
-              strokeWidth={2}
-              className="stroke-ui-fg-interactive"
+              strokeWidth={2.5}
+              stroke="var(--color-stat-green)"
+              style={{ filter: 'drop-shadow(0 0 6px color-mix(in srgb, var(--color-stat-green) 60%, transparent))' }}
               points={chart.coords.map((coord) => `${coord.x},${coord.y}`).join(' ')}
             />
           )}
           {chart.coords.map((coord) => (
             <g key={coord.sessionId}>
-              <circle cx={coord.x} cy={coord.y} r={3.5} className="fill-ui-fg-interactive" />
+              <circle cx={coord.x} cy={coord.y} r={3.5} fill="var(--color-stat-green)" />
               <text
                 x={coord.x}
                 y={coord.y - 8}
