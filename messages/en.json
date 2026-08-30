@@ -250,5 +250,24 @@
     "back": "Back",
     "privacy": "Your data is private — only your coach can see it.",
     "error": "Something went wrong. Please try again."
+  },
+  "reports": {
+    "label": "Reports",
+    "period_day": "Day",
+    "period_week": "Week",
+    "period_month": "Month",
+    "period_ytd": "YTD",
+    "prev": "Previous",
+    "next": "Next",
+    "today": "Today",
+    "ytdLabel": "Year to date",
+    "workouts": "Workouts",
+    "volumeKg": "kg volume",
+    "sets": "Sets",
+    "kcal": "kcal",
+    "kcalPerDay": "kcal / day",
+    "sessionFallback": "Workout",
+    "empty": "Nothing logged in this period.",
+    "error": "Failed to load the report."
   }
 }

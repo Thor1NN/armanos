@@ -125,6 +125,11 @@ export function StatRing({
 export function useCountUp(target: number, duration = 900): number {
   const [value, setValue] = useState(0)
   useEffect(() => {
+    // Hidden tabs suspend rAF — show the real value immediately there.
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      const snap = setTimeout(() => setValue(target), 0)
+      return () => clearTimeout(snap)
+    }
     let raf = 0
     const startTime = performance.now()
     const step = (now: number) => {
@@ -133,7 +138,12 @@ export function useCountUp(target: number, duration = 900): number {
       if (progress < 1) raf = requestAnimationFrame(step)
     }
     raf = requestAnimationFrame(step)
-    return () => cancelAnimationFrame(raf)
+    // Safety snap: whatever happens to the animation, land on the target.
+    const snap = setTimeout(() => setValue(target), duration + 150)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(snap)
+    }
   }, [target, duration])
   return value
 }

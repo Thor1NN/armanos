@@ -250,5 +250,24 @@
     "back": "Wstecz",
     "privacy": "Twoje dane są prywatne — widzi je tylko Twój trener.",
     "error": "Coś poszło nie tak. Spróbuj ponownie."
+  },
+  "reports": {
+    "label": "Raporty",
+    "period_day": "Dzień",
+    "period_week": "Tydzień",
+    "period_month": "Miesiąc",
+    "period_ytd": "Rok",
+    "prev": "Poprzedni",
+    "next": "Następny",
+    "today": "Dziś",
+    "ytdLabel": "Od początku roku",
+    "workouts": "Treningi",
+    "volumeKg": "kg objętości",
+    "sets": "Serie",
+    "kcal": "kcal",
+    "kcalPerDay": "kcal / dzień",
+    "sessionFallback": "Trening",
+    "empty": "Brak zapisów w tym okresie.",
+    "error": "Błąd ładowania raportu."
   }
 }
