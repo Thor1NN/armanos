@@ -4,11 +4,12 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import React from 'react'
-import { Dumbbell, History, TrendingUp } from 'lucide-react'
+import { Dumbbell, History, NotebookPen, TrendingUp } from 'lucide-react'
 import { joinClasses } from '@/lib/class-names'
 
 const NAV_ITEMS = [
   { href: '/', key: 'today', icon: Dumbbell, exact: true },
+  { href: '/diary', key: 'diary', icon: NotebookPen, exact: false },
   { href: '/history', key: 'history', icon: History, exact: false },
   { href: '/progress', key: 'progress', icon: TrendingUp, exact: false },
 ] as const

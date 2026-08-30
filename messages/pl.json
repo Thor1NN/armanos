@@ -3,10 +3,10 @@
     "greeting": "Cześć, {name}",
     "yourTrainingPlans": "Twoje plany treningowe",
     "noPlans": "Nie masz jeszcze przypisanego planu. Skontaktuj się z trenerem.",
-    "seriesPrefix": "Serie",
+    "seriesPrefix": "serie",
     "repsPrefix": "Powt.",
     "durationPrefix": "Czas",
-    "restPrefix": "Przerwa (s)",
+    "restPrefix": "przerwa",
     "statusActive": "Aktywny",
     "statusPaused": "Wstrzymany",
     "statusCompleted": "Zakończony"
@@ -79,7 +79,8 @@
     "logout": "Wyloguj",
     "today": "Dziś",
     "history": "Historia",
-    "progress": "Postępy"
+    "progress": "Postępy",
+    "diary": "Dziennik"
   },
   "workout": {
     "activeContext": "Aktywny kontekst"
@@ -97,10 +98,10 @@
     "reps": "Powt.",
     "rir": "RIR",
     "duration": "Czas",
-    "seriesPrefix": "Serie",
+    "seriesPrefix": "serie",
     "repsPrefix": "Powt.",
     "durationPrefix": "Czas",
-    "restPrefix": "Przerwa (s)",
+    "restPrefix": "przerwa",
     "statusActive": "Aktywny",
     "statusPaused": "Wstrzymany",
     "statusCompleted": "Zakończony"
@@ -133,5 +134,37 @@
     "genericError": "Coś poszło nie tak. Spróbuj ponownie.",
     "saving": "Zapisywanie…",
     "button": "Zapisz i zaloguj"
+  },
+  "today": {
+    "noWorkout": "Brak przypisanego treningu. Skontaktuj się z trenerem.",
+    "backToToday": "Dziś",
+    "exerciseCount": "{count, plural, one {# ćwiczenie} few {# ćwiczenia} other {# ćwiczeń}}",
+    "completedHint": "Trening ukończony — świetna robota! Wybierz inny dzień poniżej albo przejrzyj sesję.",
+    "continueWorkout": "Kontynuuj trening",
+    "reviewWorkout": "Zobacz trening",
+    "startWorkout": "Rozpocznij trening",
+    "changeWorkout": "Zmień trening"
+  },
+  "diary": {
+    "title": "Dziennik",
+    "subtitle": "Co dziś zjadłeś i co robiłeś",
+    "today": "Dziś",
+    "prevDay": "Poprzedni dzień",
+    "nextDay": "Następny dzień",
+    "kind_meal": "Posiłek",
+    "kind_activity": "Aktywność",
+    "kind_note": "Notatka",
+    "placeholder_meal": "np. Kurczak, ryż i sałatka na obiad",
+    "placeholder_activity": "np. 30 min spaceru, 8 tys. kroków",
+    "placeholder_note": "Samopoczucie, sen, energia…",
+    "add": "Dodaj wpis",
+    "saveEdit": "Zapisz zmiany",
+    "cancelEdit": "Anuluj",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "empty": "Brak wpisów tego dnia.",
+    "loadError": "Błąd ładowania dziennika",
+    "saveError": "Błąd zapisu wpisu",
+    "deleteError": "Błąd usuwania wpisu"
   }
 }

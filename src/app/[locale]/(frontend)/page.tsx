@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { loadTrainingPlans } from '@/modules/training/plans/server'
-import { WorkoutPlans } from '@/modules/training/components/workout-plans'
+import { TodayHome } from '@/modules/training/components/today-home'
 import { AppNav } from '@/components/common/app-nav'
 import { LogoutButton } from '@/components/common/logout-button'
 import { PageContainer } from '@/components/ui/page-container'
@@ -24,7 +24,7 @@ export default async function HomePage() {
         />
 
         {result.plans.length > 0 ? (
-          <WorkoutPlans plans={result.plans} />
+          <TodayHome plans={result.plans} />
         ) : (
           <div className="py-10 text-center text-sm text-ui-fg-muted">{t('noPlans')}</div>
         )}

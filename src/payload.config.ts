@@ -20,6 +20,7 @@ import {
   ExerciseLogs,
   Exercises,
   ShareLinks,
+  DiaryEntries,
 } from './collections'
 
 const filename = fileURLToPath(import.meta.url)
@@ -82,6 +83,7 @@ export default buildConfig({
     ExerciseLogs,
     Exercises,
     ShareLinks,
+    DiaryEntries,
   ],
   editor: lexicalEditor(),
   secret: payloadSecret,

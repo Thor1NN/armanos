@@ -82,6 +82,7 @@ export interface Config {
     'exercise-logs': ExerciseLog;
     exercises: Exercise;
     'share-links': ShareLink;
+    'diary-entries': DiaryEntry;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -107,6 +108,7 @@ export interface Config {
     'exercise-logs': ExerciseLogsSelect<false> | ExerciseLogsSelect<true>;
     exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     'share-links': ShareLinksSelect<false> | ShareLinksSelect<true>;
+    'diary-entries': DiaryEntriesSelect<false> | DiaryEntriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -546,6 +548,19 @@ export interface ShareLink {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "diary-entries".
+ */
+export interface DiaryEntry {
+  id: number;
+  client?: (number | null) | Client;
+  entryDate: string;
+  kind: 'meal' | 'activity' | 'note';
+  text: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -623,6 +638,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'share-links';
         value: number | ShareLink;
+      } | null)
+    | ({
+        relationTo: 'diary-entries';
+        value: number | DiaryEntry;
       } | null);
   globalSlug?: string | null;
   user:
@@ -949,6 +968,18 @@ export interface ShareLinksSelect<T extends boolean = true> {
   permissions?: T;
   expiresAt?: T;
   active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "diary-entries_select".
+ */
+export interface DiaryEntriesSelect<T extends boolean = true> {
+  client?: T;
+  entryDate?: T;
+  kind?: T;
+  text?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -17,25 +17,27 @@ export const buildExerciseMeta = (
   exercise: BuildExerciseMetaInput,
   labels: ExerciseMetaLabels,
 ): string[] => {
+  // Compact, app-like prescription line: "3 × 8 · 60 kg · RIR 2 · rest 90s"
   const parts: string[] = []
 
-  if (hasMetricValue(exercise.rounds)) {
-    parts.push(`${labels.seriesPrefix}: ${exercise.rounds}`)
+  const target =
+    exercise.targetType === 'duration'
+      ? formatMinSec(exercise.durationMin, exercise.durationSec)
+      : (formatSideReps(exercise.repsLeft, exercise.repsRight) ??
+        (hasMetricValue(exercise.reps) ? exercise.reps : null))
+
+  if (hasMetricValue(exercise.rounds) && target) {
+    parts.push(`${exercise.rounds} × ${target}`)
+  } else if (hasMetricValue(exercise.rounds)) {
+    parts.push(`${exercise.rounds} ${labels.seriesPrefix.toLowerCase()}`)
+  } else if (target) {
+    parts.push(String(target))
   }
 
-  if (exercise.targetType === 'duration') {
-    const duration = formatMinSec(exercise.durationMin, exercise.durationSec)
-    if (duration) parts.push(`${labels.durationPrefix}: ${duration}`)
-  } else {
-    const sideReps = formatSideReps(exercise.repsLeft, exercise.repsRight)
-    if (sideReps) parts.push(`Reps: ${sideReps}`)
-    else if (hasMetricValue(exercise.reps)) parts.push(`Reps: ${exercise.reps}`)
-  }
-
-  if (hasMetricValue(exercise.rest)) parts.push(`${labels.restPrefix}: ${exercise.rest}`)
-  if (hasMetricValue(exercise.tut)) parts.push(`TUT: ${exercise.tut}`)
-  if (hasMetricValue(exercise.rir)) parts.push(`RIR: ${exercise.rir}`)
-  if (hasMetricValue(exercise.kg)) parts.push(`KG: ${exercise.kg}`)
+  if (hasMetricValue(exercise.kg)) parts.push(`${exercise.kg} kg`)
+  if (hasMetricValue(exercise.rir)) parts.push(`RIR ${exercise.rir}`)
+  if (hasMetricValue(exercise.tut)) parts.push(`TUT ${exercise.tut}`)
+  if (hasMetricValue(exercise.rest)) parts.push(`${labels.restPrefix.toLowerCase()} ${exercise.rest}s`)
 
   return parts
 }

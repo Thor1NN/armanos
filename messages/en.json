@@ -3,10 +3,10 @@
     "greeting": "Hey, {name}",
     "yourTrainingPlans": "Your training plans",
     "noPlans": "You don't have a plan assigned yet. Contact your coach.",
-    "seriesPrefix": "Sets",
+    "seriesPrefix": "sets",
     "repsPrefix": "Reps",
     "durationPrefix": "Time",
-    "restPrefix": "Rest(s)",
+    "restPrefix": "rest",
     "statusActive": "Active",
     "statusPaused": "Paused",
     "statusCompleted": "Completed"
@@ -79,7 +79,8 @@
     "logout": "Sign out",
     "today": "Today",
     "history": "History",
-    "progress": "Progress"
+    "progress": "Progress",
+    "diary": "Diary"
   },
   "workout": {
     "activeContext": "Active context"
@@ -97,10 +98,10 @@
     "reps": "Reps",
     "rir": "RIR",
     "duration": "Time",
-    "seriesPrefix": "Sets",
+    "seriesPrefix": "sets",
     "repsPrefix": "Reps",
     "durationPrefix": "Time",
-    "restPrefix": "Rest(s)",
+    "restPrefix": "rest",
     "statusActive": "Active",
     "statusPaused": "Paused",
     "statusCompleted": "Completed"
@@ -133,5 +134,37 @@
     "genericError": "Something went wrong. Please try again.",
     "saving": "Saving…",
     "button": "Save and sign in"
+  },
+  "today": {
+    "noWorkout": "No workout assigned yet. Contact your coach.",
+    "backToToday": "Today",
+    "exerciseCount": "{count, plural, one {# exercise} other {# exercises}}",
+    "completedHint": "Workout completed — great job! Pick another day below or review your session.",
+    "continueWorkout": "Continue workout",
+    "reviewWorkout": "Review workout",
+    "startWorkout": "Start workout",
+    "changeWorkout": "Change workout"
+  },
+  "diary": {
+    "title": "Diary",
+    "subtitle": "What you ate and did today",
+    "today": "Today",
+    "prevDay": "Previous day",
+    "nextDay": "Next day",
+    "kind_meal": "Meal",
+    "kind_activity": "Activity",
+    "kind_note": "Note",
+    "placeholder_meal": "e.g. Chicken, rice and salad for lunch",
+    "placeholder_activity": "e.g. 30 min walk, 8k steps",
+    "placeholder_note": "How you feel, sleep, energy…",
+    "add": "Add entry",
+    "saveEdit": "Save changes",
+    "cancelEdit": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "empty": "Nothing logged this day yet.",
+    "loadError": "Failed to load the diary",
+    "saveError": "Failed to save the entry",
+    "deleteError": "Failed to delete the entry"
   }
 }

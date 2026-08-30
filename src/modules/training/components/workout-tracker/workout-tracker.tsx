@@ -70,7 +70,6 @@ export function WorkoutTracker({
       <div className="-mx-4 flex items-center justify-between gap-2.5 border-b border-ui-border-base px-4 pb-2.5 text-sm font-semibold text-ui-fg-base">
         <span>
           <span className="break-words">{workout.title}</span>
-          <span className={mutedTextClass}> · #{workout.id}</span>
           {workout.rpe != null && <span className={mutedTextClass}> · RPE {workout.rpe}</span>}
         </span>
         <span className="flex items-center gap-2">
