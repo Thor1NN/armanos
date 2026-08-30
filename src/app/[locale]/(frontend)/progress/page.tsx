@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { AppNav } from '@/components/common/app-nav'
 import { LogoutButton } from '@/components/common/logout-button'
 import { PageContainer } from '@/components/ui/page-container'
 import { PageHeader } from '@/components/ui/page-header'
@@ -25,7 +24,7 @@ export default async function ProgressPage({
 
   return (
     <PageContainer>
-      <div className="pb-16">
+      <div className="pb-6">
         <PageHeader
           className="mb-4 sm:mb-7"
           title={t('title')}
@@ -39,7 +38,6 @@ export default async function ProgressPage({
           <ProgressChart series={series} />
         )}
       </div>
-      {viewer.kind === 'client' && <AppNav />}
     </PageContainer>
   )
 }

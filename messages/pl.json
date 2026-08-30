@@ -179,5 +179,13 @@
     "dayTotal": "{kcal} kcal dzisiaj",
     "placeholder_mealNote": "Opcjonalna notatka…",
     "dayTotalLabel": "kcal dzisiaj"
+  },
+  "dashboard": {
+    "weekLabel": "Ten tydzień",
+    "weekCount": "{count, plural, one {# trening} few {# treningi} other {# treningów}}",
+    "nutritionLabel": "Odżywianie",
+    "recentLabel": "Ostatnie treningi",
+    "progressLabel": "Postępy",
+    "sessionFallback": "Trening"
   }
 }

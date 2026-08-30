@@ -56,7 +56,14 @@ const countExercises = (workout: WorkoutTree): number =>
  * Continue button; the plan machinery hides behind "Change workout". Starting
  * opens the focused workout screen (the existing tracker).
  */
-export function TodayHome({ plans }: { plans: PlanTree[] }) {
+export function TodayHome({
+  plans,
+  dashboard,
+}: {
+  plans: PlanTree[]
+  /** Dashboard cards rendered below the hero when not inside a workout. */
+  dashboard?: React.ReactNode
+}) {
   const t = useTranslations('today')
   const {
     resolvedSelection,
@@ -129,7 +136,12 @@ export function TodayHome({ plans }: { plans: PlanTree[] }) {
   }, [activeWorkout, inWorkout])
 
   if (!activeWorkout || !activePlan || !activeMicrocycle) {
-    return <div className="py-10 text-center text-sm text-ui-fg-muted">{t('noWorkout')}</div>
+    return (
+      <div className="space-y-3">
+        <div className="py-10 text-center text-sm text-ui-fg-muted">{t('noWorkout')}</div>
+        {dashboard}
+      </div>
+    )
   }
 
   if (inWorkout) {
@@ -265,6 +277,8 @@ export function TodayHome({ plans }: { plans: PlanTree[] }) {
           </div>
         )}
       </div>
+
+      {dashboard}
     </div>
   )
 }
