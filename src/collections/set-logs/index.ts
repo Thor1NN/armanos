@@ -3,6 +3,7 @@ import { adminOrOwnByClient } from '../../access'
 import { ALL_METRIC_FIELDS, getTrackingFields } from '@/modules/training/exercises'
 import { LEGACY_SET_LOG_FIELDS } from '@/modules/training/logs'
 import {
+  assertDeletableOwnSession,
   assertWritableOwnSession,
   validateNonNegative,
   validateNonNegativeInt,
@@ -68,10 +69,36 @@ const upsertHandler = async (req: PayloadRequest) => {
       user: req.user,
     })
 
+  // The ownership/completion check runs in beforeValidate, but a finish can
+  // land between that check and the write. Re-verify after writing and roll
+  // the row back if the session closed meanwhile — no set may postdate
+  // completion.
+  const rejectIfCompletedMeanwhile = async (doc: { id: number; createdAt: string; updatedAt: string }, created: boolean) => {
+    const session = await req.payload.findByID({
+      collection: 'workout-logs',
+      id: body.session as number,
+      depth: 0,
+      req,
+    })
+    if (!session.completedAt) return null
+    if (new Date(doc.updatedAt).getTime() > new Date(session.completedAt).getTime()) {
+      if (created) {
+        await req.payload.delete({ collection: 'set-logs', id: doc.id, depth: 0, req, overrideAccess: true })
+      }
+      return Response.json(
+        { message: 'This workout was completed while saving. The set was not recorded.' },
+        { status: 409 },
+      )
+    }
+    return null
+  }
+
   try {
     const existing = await findExisting()
     if (existing) {
       const doc = await updateExisting(existing.id)
+      const rejected = await rejectIfCompletedMeanwhile(doc, false)
+      if (rejected) return rejected
       return Response.json({ doc, created: false }, { status: 200 })
     }
     try {
@@ -83,6 +110,8 @@ const upsertHandler = async (req: PayloadRequest) => {
         overrideAccess: false,
         user: req.user,
       })
+      const rejected = await rejectIfCompletedMeanwhile(doc, true)
+      if (rejected) return rejected
       return Response.json({ doc, created: true }, { status: 201 })
     } catch (createError) {
       // Unique-index violation → a concurrent request created the row first.
@@ -134,6 +163,13 @@ export const SetLogs: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        const doc = await req.payload.findByID({ collection: 'set-logs', id, depth: 0, req })
+        const sessionId = typeof doc.session === 'object' ? doc.session?.id : doc.session
+        await assertDeletableOwnSession(req, sessionId)
+      },
+    ],
     beforeValidate: [
       async ({ data, originalDoc, req }) => {
         if (!data) return data

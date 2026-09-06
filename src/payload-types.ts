@@ -221,7 +221,7 @@ export interface Client {
    */
   onboardedAt?: string | null;
   /**
-   * Drives the calorie ring in the client app.
+   * Drives the calorie ring in the client app. Leave empty to show intake without a target.
    */
   dailyKcalTarget?: number | null;
   /**

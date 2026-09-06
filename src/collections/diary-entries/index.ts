@@ -40,17 +40,22 @@ export const DiaryEntries: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
-      async ({ data, req }) => {
+      async ({ data, req, operation, originalDoc }) => {
         if (req.user?.collection === 'clients') {
           data.client = req.user.id
         }
 
-        const items = (data.items ?? []) as IncomingItem[]
+        // Partial updates that don't mention `items` keep the stored items and
+        // totals untouched — a note-only PATCH must never wipe a logged meal.
+        const itemsProvided = operation === 'create' || data.items !== undefined
+        const items = (itemsProvided ? (data.items ?? []) : (originalDoc?.items ?? [])) as IncomingItem[]
 
-        const hasText = typeof data.text === 'string' && data.text.trim().length > 0
+        const text = data.text !== undefined ? data.text : originalDoc?.text
+        const hasText = typeof text === 'string' && text.trim().length > 0
         if (!hasText && items.length === 0) {
           throw new APIError('Add some text or at least one food item.', 400)
         }
+        if (!itemsProvided) return data
 
         // Server-side nutrition math — never trust client-sent kcal.
         let totalKcal = 0

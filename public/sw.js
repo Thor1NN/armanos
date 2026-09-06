@@ -1,11 +1,12 @@
 /* Minimal service worker for ArmanOS.
- * - Network-first for navigations, with a cached offline fallback ('/').
+ * - Network-first for navigations, falling back to a static, non-personalized
+ *   offline page. Authenticated HTML is never stored on the device.
  * - Cache-first for same-origin static assets (/_next/static, /favicon).
  * - Never caches /api/* or /admin.
  */
 
-const CACHE_NAME = 'armanos-v1'
-const OFFLINE_URL = '/'
+const CACHE_NAME = 'armanos-v2'
+const OFFLINE_URL = '/offline.html'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

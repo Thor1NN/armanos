@@ -70,6 +70,16 @@ export const WorkoutLogs: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeDelete: [
+      // Completed sessions are history: clients can never delete them.
+      async ({ id, req }) => {
+        if (req.user?.collection !== 'clients') return
+        const doc = await req.payload.findByID({ collection: 'workout-logs', id, depth: 0, req })
+        if (doc.completedAt) {
+          throw new APIError('Completed workouts are part of your history and cannot be deleted.', 400)
+        }
+      },
+    ],
     beforeChange: [
       async ({ data, req, operation, originalDoc }) => {
         if (req.user?.collection === 'clients') {

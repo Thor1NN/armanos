@@ -2,6 +2,29 @@ import { execSync, spawn, type ChildProcess } from 'child_process'
 
 export const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL ?? 'postgresql://training:training@localhost:55432/training_test'
+
+/**
+ * Fail-closed guard: the integration suite TRUNCATEs tables, so it must only
+ * ever run against a local database whose name marks it as a test target.
+ * Throws for anything else (remote hosts, production names, empty URLs).
+ */
+export function assertTestDatabaseUrl(url: string): void {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    throw new Error('TEST_DATABASE_URL is not a valid URL.')
+  }
+  const host = parsed.hostname
+  const dbName = parsed.pathname.replace(/^\//, '')
+  const localHost = host === 'localhost' || host === '127.0.0.1' || host === '::1'
+  if (!localHost) {
+    throw new Error(`Refusing to run integration tests against non-local host "${host}".`)
+  }
+  if (!/test/i.test(dbName)) {
+    throw new Error(`Refusing to run integration tests against database "${dbName}" (name must contain "test").`)
+  }
+}
 export const TEST_SERVER_PORT = Number(process.env.TEST_SERVER_PORT ?? 3210)
 export const TEST_BASE_URL = `http://localhost:${TEST_SERVER_PORT}`
 
@@ -31,6 +54,8 @@ const waitForServer = async (): Promise<void> => {
 }
 
 export async function setup(): Promise<void> {
+  assertTestDatabaseUrl(TEST_DATABASE_URL)
+
   // 1. Migrate the dedicated test database (never the dev/prod one).
   execSync('yarn payload migrate', { env, stdio: 'inherit' })
 

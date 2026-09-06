@@ -201,12 +201,11 @@ export const Clients: CollectionConfig = {
       name: 'dailyKcalTarget',
       type: 'number',
       label: 'Daily kcal target',
-      defaultValue: 2000,
       min: 0,
       max: 10000,
       admin: {
         position: 'sidebar',
-        description: 'Drives the calorie ring in the client app.',
+        description: 'Drives the calorie ring in the client app. Leave empty to show intake without a target.',
       },
       access: {
         update: isAdminField,

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { adminOrOwnByClient, isAdmin } from '../../access'
-import { assertWritableOwnSession } from '../shared/log-integrity'
+import { assertDeletableOwnSession, assertWritableOwnSession } from '../shared/log-integrity'
 
 export const RoundLogs: CollectionConfig = {
   slug: 'round-logs',
@@ -23,6 +23,13 @@ export const RoundLogs: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        const doc = await req.payload.findByID({ collection: 'round-logs', id, depth: 0, req })
+        const sessionId = typeof doc.session === 'object' ? doc.session?.id : doc.session
+        await assertDeletableOwnSession(req, sessionId)
+      },
+    ],
     beforeValidate: [
       async ({ data, originalDoc, req }) => {
         if (!data) return data

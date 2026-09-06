@@ -34,6 +34,18 @@ export async function assertWritableOwnSession(
   }
 }
 
+/**
+ * Deletion counterpart of `assertWritableOwnSession`: a client may remove
+ * their own log rows only while the session is still open. Completed
+ * sessions are history and stay immutable for clients.
+ */
+export async function assertDeletableOwnSession(
+  req: PayloadRequest,
+  sessionId: number | string | null | undefined,
+): Promise<void> {
+  await assertWritableOwnSession(req, sessionId)
+}
+
 const isNil = (value: unknown): value is null | undefined => value === null || value === undefined
 
 /** Non-negative number (weights, distances, durations). */
