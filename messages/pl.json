@@ -70,7 +70,8 @@
     "startedLabel": "Rozpoczęto",
     "finishedLabel": "Zakończono",
     "now": "teraz",
-    "save": "Zapisz"
+    "save": "Zapisz",
+    "lockedHint": "Ukończone treningi są zablokowane, aby historia była wiarygodna. Poproś trenera o korektę."
   },
   "seriesForm": {
     "note": "Notatka",
@@ -143,9 +144,9 @@
     "lastTotalReps": "ostatnia sesja: {count} powtórzeń łącznie",
     "metric_topWeight": "Najw. ciężar",
     "metric_bestE1rm": "Szac. 1RM",
-    "metric_volume": "Objętość",
+    "metric_volume": "Objętość (zapisana)",
     "record_topWeight": "Rekord kg",
-    "record_bestE1rm": "Rekord 1RM",
+    "record_bestE1rm": "Rekord szac. 1RM",
     "record_volume": "Rekord obj."
   },
   "setPassword": {
@@ -231,7 +232,7 @@
     "label": "Sesja ukończona",
     "title": "Świetna robota",
     "minutes": "minut",
-    "volumeKg": "kg objętości",
+    "volumeKg": "kg objętości (zapisane)",
     "sets": "serie",
     "noPrs": "Brak nowych rekordów — konsekwencja wygrywa.",
     "pr_weight": "Najw. ciężar",

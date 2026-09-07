@@ -73,7 +73,38 @@ const shift = (period: Period, cursor: Date, direction: 1 | -1): Date => {
   return new Date(cursor.getFullYear() + direction, 0, 1)
 }
 
-const LIMITS = { sessions: 400, sets: 5000, diary: 1000, measurements: 400 } as const
+const PAGE = 200
+const MAX_PAGES = 50
+
+type ReportCollection = 'workout-logs' | 'set-logs' | 'diary-entries' | 'body-measurements'
+
+/** Fetches every page of a query (up to MAX_PAGES × PAGE docs); reports whether it stopped early. */
+async function findAll<TDoc>(
+  collection: ReportCollection,
+  args: { where: Record<string, unknown>; sort?: string },
+): Promise<{ docs: TDoc[]; truncated: boolean }> {
+  const docs: TDoc[] = []
+  let page = 1
+  let truncated = false
+  for (;;) {
+    const result = (await sdk.find({
+      collection: collection as 'workout-logs',
+      where: args.where as never,
+      sort: args.sort,
+      limit: PAGE,
+      page,
+      depth: 0,
+    })) as unknown as { docs: TDoc[]; hasNextPage: boolean }
+    docs.push(...result.docs)
+    if (!result.hasNextPage) break
+    if (page >= MAX_PAGES) {
+      truncated = true
+      break
+    }
+    page += 1
+  }
+  return { docs, truncated }
+}
 
 /** Day / week / month / year-to-date training + nutrition report. */
 export function ReportsCard() {
@@ -95,8 +126,7 @@ export function ReportsCard() {
     const endIso = range.end.toISOString()
 
     const load = async () => {
-      const sessions = await sdk.find({
-        collection: 'workout-logs',
+      const sessions = await findAll<WorkoutLog>('workout-logs', {
         where: {
           and: [
             { completedAt: { greater_than_equal: startIso } },
@@ -104,33 +134,22 @@ export function ReportsCard() {
           ],
         },
         sort: 'completedAt',
-        limit: LIMITS.sessions,
-        depth: 0,
       })
       const sessionIds = sessions.docs.map((doc) => doc.id)
 
       const [sets, diary, measurements] = await Promise.all([
         sessionIds.length
-          ? sdk.find({
-              collection: 'set-logs',
-              where: { session: { in: sessionIds } },
-              limit: LIMITS.sets,
-              depth: 0,
-            })
-          : Promise.resolve({ docs: [] as SetLog[] }),
-        sdk.find({
-          collection: 'diary-entries',
+          ? findAll<SetLog>('set-logs', { where: { session: { in: sessionIds } } })
+          : Promise.resolve({ docs: [] as SetLog[], truncated: false }),
+        findAll<DiaryEntry>('diary-entries', {
           where: {
             and: [
               { entryDate: { greater_than_equal: startIso } },
               { entryDate: { less_than: endIso } },
             ],
           },
-          limit: LIMITS.diary,
-          depth: 0,
-        }) as Promise<{ docs: DiaryEntry[] }>,
-        sdk.find({
-          collection: 'body-measurements',
+        }),
+        findAll<BodyMeasurement>('body-measurements', {
           where: {
             and: [
               { measuredAt: { greater_than_equal: startIso } },
@@ -139,9 +158,7 @@ export function ReportsCard() {
             ],
           },
           sort: 'measuredAt',
-          limit: LIMITS.measurements,
-          depth: 0,
-        }) as Promise<{ docs: BodyMeasurement[] }>,
+        }),
       ])
       if (!active) return
 
@@ -171,11 +188,7 @@ export function ReportsCard() {
         weightStart: measurements.docs[0]?.weightKg ?? null,
         weightEnd: measurements.docs[measurements.docs.length - 1]?.weightKg ?? null,
         sessions: sessions.docs,
-        truncated:
-          sessions.docs.length >= LIMITS.sessions ||
-          sets.docs.length >= LIMITS.sets ||
-          diary.docs.length >= LIMITS.diary ||
-          measurements.docs.length >= LIMITS.measurements,
+        truncated: sessions.truncated || sets.truncated || diary.truncated || measurements.truncated,
       })
       setError(false)
     }

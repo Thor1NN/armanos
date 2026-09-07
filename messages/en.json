@@ -70,7 +70,8 @@
     "startedLabel": "Started",
     "finishedLabel": "Finished",
     "now": "now",
-    "save": "Save"
+    "save": "Save",
+    "lockedHint": "Completed workouts are locked so your history stays accurate. Ask your coach if something needs correcting."
   },
   "seriesForm": {
     "note": "Note",
@@ -143,9 +144,9 @@
     "lastTotalReps": "last session: {count} total reps",
     "metric_topWeight": "Top weight",
     "metric_bestE1rm": "Est. 1RM",
-    "metric_volume": "Volume",
+    "metric_volume": "Volume (recorded)",
     "record_topWeight": "Best kg",
-    "record_bestE1rm": "Best 1RM",
+    "record_bestE1rm": "Best est. 1RM",
     "record_volume": "Best volume"
   },
   "setPassword": {
@@ -231,7 +232,7 @@
     "label": "Session complete",
     "title": "Great work",
     "minutes": "minutes",
-    "volumeKg": "kg volume",
+    "volumeKg": "kg volume (recorded)",
     "sets": "sets",
     "noPrs": "No new records this time — consistency wins.",
     "pr_weight": "Top weight",

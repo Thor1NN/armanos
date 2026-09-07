@@ -27,17 +27,20 @@ export function FinishWorkout({
   if (completed) {
     const when = session?.completedAt ? new Date(session.completedAt) : null
     return (
-      <div className="mt-3 flex items-center gap-2 rounded-lg border border-ui-border-base bg-ui-bg-base px-3 py-2.5 text-sm">
-        <CheckCircle2 size={16} className="shrink-0 text-ui-fg-interactive" />
-        <span>
-          {t('completedBanner')}
-          {when && (
-            <span className="text-ui-fg-muted">
-              {' '}
-              · {format.dateTime(when, { dateStyle: 'medium', timeStyle: 'short' })}
-            </span>
-          )}
-        </span>
+      <div className="mt-3 rounded-xl border border-ui-border-base bg-ui-bg-base px-3 py-2.5 text-sm">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 size={16} className="shrink-0" style={{ color: 'var(--color-stat-green)' }} />
+          <span>
+            {t('completedBanner')}
+            {when && (
+              <span className="text-ui-fg-muted">
+                {' '}
+                · {format.dateTime(when, { dateStyle: 'medium', timeStyle: 'short' })}
+              </span>
+            )}
+          </span>
+        </div>
+        <p className="mt-1 pl-6 text-xs text-ui-fg-muted">{t('lockedHint')}</p>
       </div>
     )
   }
