@@ -6,7 +6,6 @@ import { Clock, Dumbbell, Layers, Trophy, X } from 'lucide-react'
 import { sdk } from '@/lib/sdk'
 import { statLabelClass } from '@/lib/class-names'
 import { Button } from '@/components/ui/button'
-import { CountUp } from '@/components/ui/stat-ring'
 import {
   detectPrs,
   isWorkingSet,
@@ -84,7 +83,7 @@ export function WorkoutSummary({
   }, [session.id])
 
   return (
-    <div className="fx-card fx-in relative overflow-hidden p-5">
+    <div className="fx-card relative overflow-hidden p-5">
       {/* Celebration glow */}
       <div
         aria-hidden
@@ -106,7 +105,7 @@ export function WorkoutSummary({
       <div className={statLabelClass} style={{ color: 'var(--color-stat-green)' }}>
         {t('label')}
       </div>
-      <h2 className="font-display mt-1 text-4xl font-bold uppercase leading-none tracking-wide text-ui-fg-base">
+      <h2 className="mt-1 text-2xl font-bold tracking-tight text-ui-fg-base">
         {t('title')}
       </h2>
 
@@ -114,21 +113,21 @@ export function WorkoutSummary({
         <div>
           <Clock size={15} className="mx-auto mb-1 text-ui-fg-muted" />
           <div className="font-display text-3xl font-bold tabular-nums leading-none">
-            {durationMin != null ? <CountUp value={durationMin} /> : '—'}
+            {durationMin != null ? durationMin : '–'}
           </div>
           <div className={`mt-1 ${statLabelClass}`}>{t('minutes')}</div>
         </div>
         <div>
           <Dumbbell size={15} className="mx-auto mb-1 text-ui-fg-muted" />
           <div className="font-display text-3xl font-bold tabular-nums leading-none">
-            <CountUp value={volume} />
+            {volume}
           </div>
           <div className={`mt-1 ${statLabelClass}`}>{t('volumeKg')}</div>
         </div>
         <div>
           <Layers size={15} className="mx-auto mb-1 text-ui-fg-muted" />
           <div className="font-display text-3xl font-bold tabular-nums leading-none">
-            <CountUp value={workingSets.length} />
+            {workingSets.length}
           </div>
           <div className={`mt-1 ${statLabelClass}`}>{t('sets')}</div>
         </div>
@@ -167,7 +166,7 @@ export function WorkoutSummary({
         )}
       </div>
 
-      <Button className="fx-btn-glow font-display mt-5 w-full gap-2 py-2.5 text-base font-semibold uppercase tracking-[0.14em]" onClick={onClose}>
+      <Button className="mt-5 min-h-11 w-full gap-2 text-base font-semibold" onClick={onClose}>
         {t('done')}
       </Button>
     </div>

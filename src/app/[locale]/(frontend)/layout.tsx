@@ -71,7 +71,6 @@ export default async function RootLayout(props: {
     <html lang={locale} className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="bg-ui-bg-base text-ui-fg-base">
         <div className="fx-ambient" aria-hidden />
-        <div className="fx-grain" aria-hidden />
         <NextIntlClientProvider messages={messages}>
           <main>{props.children}</main>
         </NextIntlClientProvider>

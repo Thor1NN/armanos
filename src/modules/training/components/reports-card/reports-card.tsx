@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, Flame, Scale } from 'lucide-react'
 import { sdk } from '@/lib/sdk'
 import { joinClasses, statLabelClass } from '@/lib/class-names'
-import { sessionVolume } from '@/modules/training/logs'
-import { isWorkingSet } from '@/modules/training/logs'
+import { isWorkingSet, sessionVolume } from '@/modules/training/logs'
+import { useDailyData } from '@/modules/training/components/daily'
 import type { BodyMeasurement, DiaryEntry, SetLog, WorkoutLog } from '@/payload-types'
 
 const PERIODS = ['day', 'week', 'month', 'ytd'] as const
@@ -20,10 +20,15 @@ type Report = {
   volume: number
   sets: number
   kcal: number
-  kcalPerDay: number
+  /** Average over days that have at least one meal logged. */
+  kcalPerLoggedDay: number | null
+  loggedDays: number
+  daysElapsed: number
   weightStart: number | null
   weightEnd: number | null
   sessions: WorkoutLog[]
+  /** True when any query hit its page limit — totals may be incomplete. */
+  truncated: boolean
 }
 
 const startOfDay = (date: Date): Date =>
@@ -60,14 +65,15 @@ const rangeFor = (period: Period, cursor: Date): Range => {
   return { start, end }
 }
 
+/** Moves the cursor by one period; month/year moves anchor to day 1 so end-of-month dates never overflow. */
 const shift = (period: Period, cursor: Date, direction: 1 | -1): Date => {
-  const next = new Date(cursor)
-  if (period === 'day') next.setDate(next.getDate() + direction)
-  else if (period === 'week') next.setDate(next.getDate() + 7 * direction)
-  else if (period === 'month') next.setMonth(next.getMonth() + direction)
-  else next.setFullYear(next.getFullYear() + direction)
-  return next
+  if (period === 'day') return new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + direction)
+  if (period === 'week') return new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 7 * direction)
+  if (period === 'month') return new Date(cursor.getFullYear(), cursor.getMonth() + direction, 1)
+  return new Date(cursor.getFullYear() + direction, 0, 1)
 }
+
+const LIMITS = { sessions: 400, sets: 5000, diary: 1000, measurements: 400 } as const
 
 /** Day / week / month / year-to-date training + nutrition report. */
 export function ReportsCard() {
@@ -77,9 +83,10 @@ export function ReportsCard() {
   const [cursor, setCursor] = useState(() => new Date())
   const [report, setReport] = useState<Report | null>(null)
   const [error, setError] = useState(false)
+  const { version } = useDailyData()
 
   const range = rangeFor(period, cursor)
-  const rangeKey = `${period}:${range.start.toISOString()}`
+  const rangeKey = `${period}:${range.start.toISOString()}:${version}`
   const isCurrent = rangeFor(period, new Date()).start.getTime() === range.start.getTime()
 
   useEffect(() => {
@@ -97,7 +104,7 @@ export function ReportsCard() {
           ],
         },
         sort: 'completedAt',
-        limit: 400,
+        limit: LIMITS.sessions,
         depth: 0,
       })
       const sessionIds = sessions.docs.map((doc) => doc.id)
@@ -107,7 +114,7 @@ export function ReportsCard() {
           ? sdk.find({
               collection: 'set-logs',
               where: { session: { in: sessionIds } },
-              limit: 5000,
+              limit: LIMITS.sets,
               depth: 0,
             })
           : Promise.resolve({ docs: [] as SetLog[] }),
@@ -119,7 +126,7 @@ export function ReportsCard() {
               { entryDate: { less_than: endIso } },
             ],
           },
-          limit: 1000,
+          limit: LIMITS.diary,
           depth: 0,
         }) as Promise<{ docs: DiaryEntry[] }>,
         sdk.find({
@@ -132,13 +139,20 @@ export function ReportsCard() {
             ],
           },
           sort: 'measuredAt',
-          limit: 400,
+          limit: LIMITS.measurements,
           depth: 0,
         }) as Promise<{ docs: BodyMeasurement[] }>,
       ])
       if (!active) return
 
-      const kcal = diary.docs.reduce((sum, entry) => sum + (entry.totalKcal ?? 0), 0)
+      const meals = diary.docs.filter((entry) => entry.kind === 'meal')
+      const kcal = meals.reduce((sum, entry) => sum + (entry.totalKcal ?? 0), 0)
+      const loggedDays = new Set(
+        meals.map((entry) => {
+          const d = new Date(entry.entryDate)
+          return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+        }),
+      ).size
       const daysElapsed = Math.max(
         1,
         Math.ceil(
@@ -151,10 +165,17 @@ export function ReportsCard() {
         volume: sessionVolume(sets.docs),
         sets: sets.docs.filter(isWorkingSet).length,
         kcal,
-        kcalPerDay: Math.round(kcal / daysElapsed),
+        kcalPerLoggedDay: loggedDays > 0 ? Math.round(kcal / loggedDays) : null,
+        loggedDays,
+        daysElapsed,
         weightStart: measurements.docs[0]?.weightKg ?? null,
         weightEnd: measurements.docs[measurements.docs.length - 1]?.weightKg ?? null,
         sessions: sessions.docs,
+        truncated:
+          sessions.docs.length >= LIMITS.sessions ||
+          sets.docs.length >= LIMITS.sets ||
+          diary.docs.length >= LIMITS.diary ||
+          measurements.docs.length >= LIMITS.measurements,
       })
       setError(false)
     }
@@ -196,8 +217,8 @@ export function ReportsCard() {
       : null
 
   return (
-    <section className="fx-card fx-in p-4" style={{ animationDelay: '340ms' }}>
-      <div className={`mb-3 ${statLabelClass}`}>{t('label')}</div>
+    <section className="fx-card p-4">
+      <h2 className="mb-3 text-xs font-semibold text-ui-fg-muted">{t('label')}</h2>
 
       {/* Period tabs */}
       <div className="mb-3 flex gap-1">
@@ -209,9 +230,7 @@ export function ReportsCard() {
               setPeriod(option)
               setCursor(new Date())
             }}
-            className={joinClasses(
-              'flex-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors',
-            )}
+            className={joinClasses('min-h-9 flex-1 rounded-lg border px-2 text-xs font-semibold transition-colors')}
             style={
               period === option
                 ? {
@@ -265,8 +284,8 @@ export function ReportsCard() {
               { value: report.volume, label: t('volumeKg') },
               { value: report.sets, label: t('sets') },
               {
-                value: period === 'day' ? report.kcal : report.kcalPerDay,
-                label: period === 'day' ? t('kcal') : t('kcalPerDay'),
+                value: period === 'day' ? (report.loggedDays ? report.kcal : '–') : (report.kcalPerLoggedDay ?? '–'),
+                label: period === 'day' ? t('kcal') : t('kcalPerLoggedDay'),
               },
             ].map((stat, index) => (
               <div key={index} className="rounded-xl bg-ui-bg-subtle px-2 py-2.5 text-center">
@@ -277,6 +296,17 @@ export function ReportsCard() {
               </div>
             ))}
           </div>
+
+          {period !== 'day' && (
+            <div className="mt-2 text-center text-xs text-ui-fg-muted">
+              {t('coverage', { logged: report.loggedDays, days: report.daysElapsed })}
+            </div>
+          )}
+          {report.truncated && (
+            <div className="mt-2 rounded-xl bg-ui-tag-orange-bg px-3 py-2 text-center text-xs text-ui-tag-orange-text">
+              {t('truncated')}
+            </div>
+          )}
 
           {/* Weight change */}
           {report.weightEnd != null && (
@@ -324,7 +354,7 @@ export function ReportsCard() {
             </ul>
           )}
 
-          {report.workouts === 0 && report.kcal === 0 && (
+          {report.workouts === 0 && report.loggedDays === 0 && (
             <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ui-fg-muted">
               <Flame size={12} />
               {t('empty')}

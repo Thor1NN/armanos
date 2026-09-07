@@ -1,1 +1,1 @@
-export { CountUp, StatRing, useCountUp, type StatRingColor } from './stat-ring'
+export { StatRing, usePrefersReducedMotion, type StatRingColor } from './stat-ring'

@@ -4,18 +4,15 @@ import { CheckCircle2 } from 'lucide-react'
 import { statLabelClass } from '@/lib/class-names'
 import { loadTrainingPlans } from '@/modules/training/plans/server'
 import { loadExerciseProgress, loadWorkoutHistory } from '@/modules/training/logs/server'
-import { TodayHome } from '@/modules/training/components/today-home'
-import { DiaryScreen } from '@/modules/training/components/diary'
+import { HomeShell } from '@/modules/training/components/home-shell'
 import { ProgressChart } from '@/modules/training/components/progress-chart'
 import { WeekStrip } from '@/modules/training/components/week-strip'
 import { BodyCard } from '@/modules/training/components/body-card'
 import { ReportsCard } from '@/modules/training/components/reports-card'
-import { LogoutButton } from '@/components/common/logout-button'
 import { PageContainer } from '@/components/ui/page-container'
 import { formatSetLogSummary } from '@/modules/training/logs'
 
 export default async function HomePage() {
-  const t = await getTranslations('home')
   const td = await getTranslations('dashboard')
   const format = await getFormatter()
   const result = await loadTrainingPlans()
@@ -38,17 +35,12 @@ export default async function HomePage() {
     <>
       <WeekStrip completedDates={completedDates} />
 
-      <section className="fx-card fx-in p-4" style={{ animationDelay: '260ms' }}>
-        <div className={`mb-3 ${statLabelClass}`}>{td('nutritionLabel')}</div>
-        <DiaryScreen />
-      </section>
-
       <ReportsCard />
 
       <BodyCard />
 
       {recent.length > 0 && (
-        <section className="fx-card fx-in p-4" style={{ animationDelay: '320ms' }}>
+        <section className="fx-card p-4">
           <div className={`mb-3 ${statLabelClass}`}>{td('recentLabel')}</div>
           <ul className="flex list-none flex-col gap-2.5 p-0">
             {recent.map(({ session, sets }) => (
@@ -86,7 +78,7 @@ export default async function HomePage() {
       )}
 
       {progress.length > 0 && (
-        <section className="fx-in" style={{ animationDelay: '380ms' }}>
+        <section>
           <div className={`mb-2 px-1 ${statLabelClass}`}>{td('progressLabel')}</div>
           <ProgressChart series={progress} />
         </section>
@@ -95,31 +87,18 @@ export default async function HomePage() {
   )
 
   const displayName = (result.user.name || result.user.email || '').split(' ')[0]
-  const today = new Date()
 
   return (
     <PageContainer>
       <div className="pb-6">
-        <header className="fx-in mb-5 flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <div className={statLabelClass} style={{ color: 'var(--color-stat-blue)' }}>
-              ArmanOS · {format.dateTime(today, { weekday: 'long', day: 'numeric', month: 'long' })}
-            </div>
-            <h1 className="font-display mt-1 truncate text-4xl font-bold uppercase leading-none tracking-wide text-ui-fg-base">
-              {displayName}
-            </h1>
-          </div>
-          <LogoutButton />
-        </header>
 
-        {result.plans.length > 0 ? (
-          <TodayHome plans={result.plans} dailyKcalTarget={result.user.dailyKcalTarget} dashboard={dashboard} />
-        ) : (
-          <div className="space-y-3">
-            <div className="py-6 text-center text-sm text-ui-fg-muted">{t('noPlans')}</div>
-            {dashboard}
-          </div>
-        )}
+        <HomeShell
+          clientId={result.user.id}
+          displayName={displayName}
+          plans={result.plans}
+          dailyKcalTarget={result.user.dailyKcalTarget ?? null}
+          dashboard={dashboard}
+        />
       </div>
     </PageContainer>
   )

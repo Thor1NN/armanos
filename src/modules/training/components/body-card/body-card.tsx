@@ -8,7 +8,7 @@ import { statLabelClass } from '@/lib/class-names'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { CountUp } from '@/components/ui/stat-ring'
+import { useDailyData } from '@/modules/training/components/daily'
 import type { BodyMeasurement } from '@/payload-types'
 
 const SPARK_WIDTH = 280
@@ -25,6 +25,7 @@ export function BodyCard() {
   const [waist, setWaist] = useState('')
   const [moreOpen, setMoreOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const { version, refresh } = useDailyData()
 
   useEffect(() => {
     let active = true
@@ -46,7 +47,7 @@ export function BodyCard() {
     return () => {
       active = false
     }
-  }, [])
+  }, [version])
 
   const weights = entries.filter((entry) => entry.weightKg != null)
   const latest = weights[weights.length - 1]
@@ -87,6 +88,7 @@ export function BodyCard() {
         },
       })
       setEntries((prev) => [...prev, doc])
+      refresh()
       setWeight('')
       setWaist('')
       setMoreOpen(false)
@@ -102,13 +104,14 @@ export function BodyCard() {
     try {
       await sdk.delete({ collection: 'body-measurements', id: latest.id })
       setEntries((prev) => prev.filter((entry) => entry.id !== latest.id))
+      refresh()
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : t('saveError'))
     }
   }
 
   return (
-    <section className="fx-card fx-in p-4" style={{ animationDelay: '300ms' }}>
+    <section className="fx-card p-4">
       <div className={`mb-3 flex items-center justify-between ${statLabelClass}`}>
         <span>{t('label')}</span>
         {latest?.measuredAt && (
@@ -123,7 +126,7 @@ export function BodyCard() {
           <div className="flex items-baseline gap-1">
             <Scale size={16} className="text-ui-fg-muted" />
             <span className="font-display text-4xl font-bold tabular-nums leading-none text-ui-fg-base">
-              {latest?.weightKg != null ? <CountUp value={Math.round(latest.weightKg)} /> : '—'}
+              {latest?.weightKg != null ? latest.weightKg : '–'}
             </span>
             <span className={statLabelClass}>kg</span>
           </div>

@@ -62,7 +62,7 @@ export async function loadWorkoutHistory(clientId: number): Promise<HistorySessi
     },
     sort: '-completedAt',
     depth: 0,
-    limit: 100,
+    pagination: false,
     overrideAccess: true,
   })
   if (!sessions.docs.length) return []
@@ -72,7 +72,6 @@ export async function loadWorkoutHistory(clientId: number): Promise<HistorySessi
     where: { session: { in: sessions.docs.map((doc) => doc.id) } },
     sort: 'setNumber',
     depth: 0,
-    limit: 5000,
     pagination: false,
     overrideAccess: true,
   })
@@ -113,7 +112,7 @@ export async function loadExerciseProgress(clientId: number): Promise<ExercisePr
     },
     sort: 'completedAt',
     depth: 0,
-    limit: 200,
+    pagination: false,
     overrideAccess: true,
   })
   if (!sessions.docs.length) return []
@@ -126,23 +125,28 @@ export async function loadExerciseProgress(clientId: number): Promise<ExercisePr
     collection: 'set-logs',
     where: { session: { in: sessions.docs.map((doc) => doc.id) } },
     depth: 0,
-    limit: 10000,
     pagination: false,
     overrideAccess: true,
   })
 
-  // exerciseName → sessionId → aggregate (warm-up sets excluded)
+  // Group key: catalog exercise id when the row was linked, otherwise the
+  // name snapshot — two different catalog exercises sharing a name stay apart.
+  // groupKey → sessionId → aggregate (warm-up sets excluded)
   const series = new Map<
     string,
     Map<number, { topWeight: number | null; totalReps: number; bestE1rm: number; volume: number }>
   >()
+  const displayName = new Map<string, string>()
   for (const set of sets.docs) {
     const name = set.exerciseName?.trim()
     const sessionId = relId(set.session)
     if (!name || !sessionId || !sessionDate.has(sessionId)) continue
     if (!isWorkingSet(set)) continue
+    const exerciseId = relId(set.exercise as number | { id: number } | null | undefined)
+    const groupKey = exerciseId ? `id:${exerciseId}` : `name:${name.toLowerCase()}`
+    if (!displayName.has(groupKey)) displayName.set(groupKey, name)
 
-    const perSession = series.get(name) ?? new Map()
+    const perSession = series.get(groupKey) ?? new Map()
     const agg =
       perSession.get(sessionId) ??
       { topWeight: null as number | null, totalReps: 0, bestE1rm: 0, volume: 0 }
@@ -154,12 +158,12 @@ export async function loadExerciseProgress(clientId: number): Promise<ExercisePr
     agg.volume += metrics.volume
 
     perSession.set(sessionId, agg)
-    series.set(name, perSession)
+    series.set(groupKey, perSession)
   }
 
   return [...series.entries()]
-    .map(([exerciseName, perSession]) => ({
-      exerciseName,
+    .map(([groupKey, perSession]) => ({
+      exerciseName: displayName.get(groupKey) ?? groupKey,
       points: [...perSession.entries()]
         .map(([sessionId, agg]) => ({
           sessionId,

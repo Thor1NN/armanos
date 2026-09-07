@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import type { MicrocycleTree, PlanTree, WorkoutTree } from '@/modules/training/plans'
 
-const STORAGE_KEY = 'training-app:active-workout-selection'
+const STORAGE_KEY_BASE = 'training-app:active-workout-selection'
 const SSR_SNAPSHOT = '__SSR_SELECTION__'
 
 type WorkoutSelection = {
@@ -41,7 +41,7 @@ const isValidSelection = (plans: PlanTree[], selection: WorkoutSelection) => {
 
 export function useWorkoutSelection(
   plans: PlanTree[],
-  options: { readOnly?: boolean },
+  options: { readOnly?: boolean; storageScope?: string },
 ): {
   resolvedSelection: WorkoutSelection
   activePlan: PlanTree | null
@@ -51,7 +51,9 @@ export function useWorkoutSelection(
   selectMicrocycle: (plan: PlanTree, microcycleId: number | string) => void
   selectWorkout: (workoutId: number | string) => void
 } {
-  const { readOnly } = options
+  const { readOnly, storageScope } = options
+  // Scoped per authenticated client so a shared device never leaks selection.
+  const STORAGE_KEY = storageScope ? `${STORAGE_KEY_BASE}:${storageScope}` : STORAGE_KEY_BASE
   const initialSelection = useMemo(() => firstAvailableSelection(plans), [plans])
   const [selection, setSelection] = useState<WorkoutSelection | null>(null)
   const storedSelectionRaw = useSyncExternalStore(

@@ -26,7 +26,7 @@ export function WeekStrip({ completedDates }: { completedDates: string[] }) {
   const trainedCount = days.filter((date) => trained.has(dayKey(date))).length
 
   return (
-    <div className="fx-card fx-in p-4" style={{ animationDelay: '200ms' }}>
+    <div className="fx-card p-4">
       <div className={`mb-3 flex items-center justify-between ${statLabelClass}`}>
         <span>{t('weekLabel')}</span>
         <span style={{ color: 'var(--color-stat-green)' }}>
